@@ -14,27 +14,58 @@ const essenceCounter = document.querySelector('#essence-counter');
 const crystalCounter = document.querySelector('#crystal-counter');
 const renownCounter = document.querySelector('#renown-counter');
 const events = document.querySelectorAll('.event');
+const actionReadout = document.querySelector('#action-readout');
+const turnIndicator = document.querySelector('#turn-indicator');
+const stanceIndicator = document.querySelector('#stance-indicator');
+const enemyStatus = document.querySelector('#enemy-status');
+const enemyNameElement = document.querySelector('.enemy-card__info h3');
+const enemyLevelElement = document.querySelector('#enemy-level');
+const playerLevelElement = document.querySelector('#player-level');
+
+const statElements = {
+  strength: document.querySelector('#player-strength'),
+  agility: document.querySelector('#player-agility'),
+  defense: document.querySelector('#player-defense'),
+  gold: document.querySelector('#player-gold')
+};
+
+const progressBars = new Map();
+const progressLabels = new Map();
+
+document.querySelectorAll('[data-bar]').forEach((element) => {
+  if (!element.dataset.bar) return;
+  progressBars.set(element.dataset.bar, element);
+});
+
+document.querySelectorAll('[data-bar-text]').forEach((element) => {
+  if (!element.dataset.barText) return;
+  progressLabels.set(element.dataset.barText, element);
+});
+
+function formatNumber(value) {
+  return value.toLocaleString('ru-RU');
+}
 
 const combatPhrases = {
   attack: [
-    'Вы выпускаете клинок Морессы, оставляя кровавый след на броне врага. <strong>+42</strong> урона.',
-    'Кровавое копьё пронзает Скелета-воина. <strong>+38</strong> урона.',
-    'Вы активируете умение «Багровый шторм». Враг отступает, теряя <strong>57</strong> НР.'
+    'Вы выпускаете клинок Морессы, оставляя кровавый след на броне врага. <strong>+{value}</strong> урона.',
+    'Кровавое копьё пронзает Скелета-воина. <strong>+{value}</strong> урона.',
+    'Вы активируете умение «Багровый шторм». Враг отступает, теряя <strong>{value}</strong> НР.'
   ],
   defend: [
     'Вы поднимаете щит Полумесяца, отражая удар и снижая получаемый урон.',
-    'Алое поле поглощает большую часть атаки. Вы блокируете <strong>30</strong> урона.',
+    'Алое поле поглощает большую часть атаки. Вы блокируете <strong>{value}</strong> урона.',
     'Вы укрываетесь за магической стеной крови, усиливая защиту.'
   ],
   skill: [
     'Вы читаете заклинание «Кровавые цепи», обездвиживая врага на ход.',
-    'Темная энергия прорывается через вас. Критический шанс увеличен на <strong>25%</strong>.',
+    'Темная энергия прорывается через вас. Критический шанс увеличен на <strong>{value}%</strong>.',
     'Вы вызываете фамильяра Нокса, который ослабляет Скелета-воина.'
   ],
   heal: [
-    'Кровавый эликсир восстанавливает <strong>60</strong> НР и увеличивает регенерацию.',
+    'Кровавый эликсир восстанавливает <strong>{value}</strong> НР и увеличивает регенерацию.',
     'Вы произносите мантру Лунных Жрецов, исцеляя раны и избавляясь от проклятий.',
-    'Символ Алого Света вспыхивает на вашей коже. Восстановлено <strong>45</strong> НР.'
+    'Символ Алого Света вспыхивает на вашей коже. Восстановлено <strong>{value}</strong> НР.'
   ]
 };
 
@@ -44,6 +75,272 @@ const enemyResponses = [
   'Из тени выплывает эхо древнего ритуала. Вы чувствуете прилив сил.',
   'Совет Крови наблюдает за боем, оценивая вашу решимость.'
 ];
+
+const playerState = {
+  level: 12,
+  hp: 450,
+  maxHp: 600,
+  mp: 280,
+  maxMp: 350,
+  xp: 2400,
+  maxXp: 3000,
+  strength: 45,
+  agility: 52,
+  defense: 38,
+  gold: 1250,
+  shield: 0
+};
+
+const enemyTemplates = [
+  {
+    id: 'skeleton',
+    name: 'Скелет-воин',
+    level: 8,
+    maxHp: 500,
+    minDamage: 18,
+    maxDamage: 36,
+    xpReward: 160,
+    goldReward: [85, 140],
+    intro: 'Скелет скрежещет клинками, выжидая момент для атаки.'
+  },
+  {
+    id: 'inquisitor',
+    name: 'Инквизитор Ночи',
+    level: 10,
+    maxHp: 620,
+    minDamage: 24,
+    maxDamage: 44,
+    xpReward: 210,
+    goldReward: [120, 200],
+    intro: 'Инквизитор окутан чёрным плащом и нашёптывает клятвы крови.'
+  },
+  {
+    id: 'harpy',
+    name: 'Гарпия Рассвета',
+    level: 11,
+    maxHp: 540,
+    minDamage: 20,
+    maxDamage: 38,
+    xpReward: 195,
+    goldReward: [100, 170],
+    intro: 'Гарпия кружит над ареной, рассыпая перья с огненной кромкой.'
+  },
+  {
+    id: 'warlord',
+    name: 'Полководец Багровой Стражи',
+    level: 13,
+    maxHp: 720,
+    minDamage: 28,
+    maxDamage: 52,
+    xpReward: 280,
+    goldReward: [180, 260],
+    intro: 'Полководец поднимает клинок, призывая вас к решающей дуэли.'
+  }
+];
+
+let enemyIndex = 0;
+let enemyState = { ...enemyTemplates[0], hp: enemyTemplates[0].maxHp };
+let isPlayerTurn = true;
+
+const toneVariants = ['combat-state__value--default', 'combat-state__value--danger', 'combat-state__value--victory', 'combat-state__value--focus'];
+
+function flashElement(element, className) {
+  if (!element) return;
+  element.classList.remove(className);
+  void element.offsetWidth;
+  element.classList.add(className);
+}
+
+function setProgress(id, current, max, formatter) {
+  const bar = progressBars.get(id);
+  const label = progressLabels.get(id);
+  if (!bar) return;
+  const safeMax = Number.isFinite(max) && max > 0 ? max : 1;
+  const ratio = Math.max(0, Math.min(1, current / safeMax));
+  bar.style.setProperty('--value', ratio);
+  bar.dataset.current = String(Math.max(0, Math.round(current)));
+  bar.dataset.max = String(Math.round(safeMax));
+  if (label) {
+    const formatted = formatter ? formatter(Math.max(0, Math.round(current)), Math.round(safeMax)) : `${Math.max(0, Math.round(current))} / ${Math.round(safeMax)}`;
+    label.textContent = formatted;
+  }
+}
+
+function setTone(element, tone) {
+  if (!element) return;
+  toneVariants.forEach((variant) => element.classList.remove(variant));
+  element.classList.add(`combat-state__value--${tone}`);
+  flashElement(element, 'combat-state__value--pulse');
+}
+
+function setTurnIndicatorText(text, tone = 'default') {
+  if (!turnIndicator) return;
+  turnIndicator.textContent = text;
+  setTone(turnIndicator, tone);
+}
+
+function setStanceText(text, tone = 'focus') {
+  if (!stanceIndicator) return;
+  stanceIndicator.textContent = text;
+  setTone(stanceIndicator, tone);
+}
+
+function setEnemyStatusText(text, tone = 'intro') {
+  if (!enemyStatus) return;
+  enemyStatus.textContent = text;
+  enemyStatus.classList.remove('enemy-card__status--danger', 'enemy-card__status--victory', 'enemy-card__status--intro');
+  enemyStatus.classList.add(`enemy-card__status--${tone}`);
+  flashElement(enemyStatus, 'enemy-card__status--pulse');
+}
+
+function setActionReadoutText(text) {
+  if (!actionReadout) return;
+  actionReadout.textContent = text;
+  flashElement(actionReadout, 'action-readout--flash');
+}
+
+function setPlayerTurn(state) {
+  isPlayerTurn = state;
+  actionButtons.forEach((button) => {
+    button.disabled = !state;
+    button.classList.toggle('action-button--locked', !state);
+  });
+}
+
+function updateStats() {
+  if (playerLevelElement) playerLevelElement.textContent = String(playerState.level);
+  if (statElements.strength) statElements.strength.textContent = formatNumber(playerState.strength);
+  if (statElements.agility) statElements.agility.textContent = formatNumber(playerState.agility);
+  if (statElements.defense) statElements.defense.textContent = formatNumber(playerState.defense);
+  if (statElements.gold) statElements.gold.textContent = formatNumber(playerState.gold);
+}
+
+function updatePlayerBars() {
+  setProgress('player-hp', playerState.hp, playerState.maxHp, (current, max) => `${formatNumber(current)} / ${formatNumber(max)}`);
+  setProgress('player-mp', playerState.mp, playerState.maxMp, (current, max) => `${formatNumber(current)} / ${formatNumber(max)}`);
+  setProgress('player-xp', playerState.xp, playerState.maxXp, (current, max) => `${formatNumber(current)} / ${formatNumber(max)}`);
+}
+
+function updateEnemyBar() {
+  setProgress('enemy-hp', enemyState.hp, enemyState.maxHp, (current, max) => `${formatNumber(current)} / ${formatNumber(max)}`);
+}
+
+function randomInRange(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function fillPhrase(template, value) {
+  if (!template) return '';
+  if (!template.includes('{value}')) return template;
+  const replacement = typeof value === 'number' ? formatNumber(value) : value;
+  return template.replace('{value}', replacement);
+}
+
+function gainXp(amount) {
+  playerState.xp += amount;
+  const logs = [];
+  while (playerState.xp >= playerState.maxXp) {
+    playerState.xp -= playerState.maxXp;
+    playerState.level += 1;
+    playerState.maxHp += 40;
+    playerState.maxMp += 20;
+    playerState.strength += 4;
+    playerState.agility += 3;
+    playerState.defense += 2;
+    playerState.hp = playerState.maxHp;
+    playerState.mp = playerState.maxMp;
+    playerState.maxXp = Math.round(playerState.maxXp * 1.2);
+    logs.push(`Вы повышаете уровень до <strong>${playerState.level}</strong>! Все параметры усилены.`);
+  }
+  updateStats();
+  updatePlayerBars();
+  logs.forEach((entry) => appendLog(entry, 'heal'));
+}
+
+function rewardPlayer({ xpReward, goldReward }) {
+  gainXp(xpReward);
+  const goldGain = randomInRange(goldReward[0], goldReward[1]);
+  playerState.gold += goldGain;
+  updateStats();
+  appendLog(`Вы собираете <strong>${formatNumber(goldGain)}</strong> золота с поверженного врага.`, 'heal');
+}
+
+function applyShield(amount) {
+  playerState.shield = amount;
+  if (amount <= 0) return;
+  appendLog(`Щит Полумесяца поглощает до <strong>${formatNumber(amount)}</strong> урона.`, 'heal');
+}
+
+function damageEnemy(amount, critical = false) {
+  enemyState.hp = Math.max(0, enemyState.hp - amount);
+  updateEnemyBar();
+  if (enemyState.hp <= 0) {
+    appendLog(`Вы добиваете ${enemyState.name}!`, critical ? 'critical' : undefined);
+    setEnemyStatusText(`${enemyState.name} повержен.`, 'victory');
+    setTurnIndicatorText('Победа', 'victory');
+    rewardPlayer(enemyState);
+    setPlayerTurn(false);
+    setActionReadoutText('Вы готовитесь к следующей волне противников.');
+    setTimeout(() => {
+      enemyIndex = (enemyIndex + 1) % enemyTemplates.length;
+      spawnEnemy(enemyTemplates[enemyIndex]);
+    }, 2200);
+    return true;
+  }
+  return false;
+}
+
+function damagePlayer(amount) {
+  if (playerState.shield > 0) {
+    const absorbed = Math.min(playerState.shield, amount);
+    amount -= absorbed;
+    playerState.shield = Math.max(0, playerState.shield - absorbed);
+    if (absorbed > 0) {
+      appendLog(`Ваш кровавый щит поглощает <strong>${formatNumber(absorbed)}</strong> урона.`, 'heal');
+    }
+  }
+  if (amount <= 0) return false;
+  playerState.hp = Math.max(0, playerState.hp - amount);
+  updatePlayerBars();
+  appendLog(`${enemyState.name} наносит вам <strong>${formatNumber(amount)}</strong> урона.`);
+  if (playerState.hp <= 0) {
+    handlePlayerDefeat();
+    return true;
+  }
+  return false;
+}
+
+function handlePlayerDefeat() {
+  setTurnIndicatorText('Поражение', 'danger');
+  setEnemyStatusText(`${enemyState.name} празднует победу.`, 'danger');
+  setActionReadoutText('Вы истекаете кровью, но резервная эссенция готовится к восстановлению.');
+  setPlayerTurn(false);
+  appendLog('Вы падаете на колено — бой временно проигран.', 'critical');
+  setTimeout(() => {
+    playerState.hp = Math.round(playerState.maxHp * 0.6);
+    playerState.mp = Math.round(playerState.maxMp * 0.5);
+    playerState.shield = 0;
+    updatePlayerBars();
+    setTurnIndicatorText('Ваш ход', 'default');
+    setEnemyStatusText(`${enemyState.name} не успевает нанести завершающий удар.`, 'intro');
+    setActionReadoutText('Вы возрождаетесь с резервом эссенции и готовы к ответному удару.');
+    setPlayerTurn(true);
+  }, 3500);
+}
+
+function spawnEnemy(template) {
+  enemyState = { ...template, hp: template.maxHp };
+  if (enemyNameElement) enemyNameElement.textContent = template.name;
+  if (enemyLevelElement) enemyLevelElement.textContent = String(template.level);
+  updateEnemyBar();
+  setEnemyStatusText(template.intro, 'intro');
+  appendLog(`На арену выходит ${template.name}.`, 'heal');
+  setTurnIndicatorText('Ваш ход', 'default');
+  setStanceText('Наступление', 'focus');
+  playerState.shield = 0;
+  setPlayerTurn(true);
+}
+
 
 const mapRegions = [
   {
@@ -125,15 +422,124 @@ function appendLog(entry, type) {
   combatLog.scrollTop = combatLog.scrollHeight;
 }
 
+function enemyTurn() {
+  if (enemyState.hp <= 0) return;
+  setEnemyStatusText(`${enemyState.name} готовит атаку.`, 'danger');
+  setActionReadoutText(`${enemyState.name} собирает силу.`);
+  setTurnIndicatorText('Ход врага', 'danger');
+
+  setTimeout(() => {
+    const damage = randomInRange(enemyState.minDamage, enemyState.maxDamage);
+    const response = enemyResponses[Math.floor(Math.random() * enemyResponses.length)];
+    if (response) appendLog(response);
+    const playerDefeated = damagePlayer(damage);
+    if (!playerDefeated) {
+      setEnemyStatusText(`${enemyState.name} выжидает следующую возможность.`, 'intro');
+      setActionReadoutText(`${enemyState.name} наносит ${formatNumber(damage)} урона.`);
+      setTurnIndicatorText('Ваш ход', 'default');
+      setStanceText('Наступление', 'focus');
+      setPlayerTurn(true);
+    }
+  }, 900);
+}
+
+function performPlayerAction(action) {
+  if (!isPlayerTurn) return;
+  setPlayerTurn(false);
+
+  if (action === 'attack') {
+    const base = randomInRange(42, 68) + Math.round(playerState.strength * 0.4);
+    const isCritical = Math.random() < 0.18 + playerState.agility / 400;
+    const damage = isCritical ? Math.round(base * 1.6) : base;
+    const phrase = combatPhrases.attack[Math.floor(Math.random() * combatPhrases.attack.length)];
+    appendLog(fillPhrase(phrase, damage), isCritical ? 'critical' : undefined);
+    setActionReadoutText(`Вы наносите ${formatNumber(damage)} урона по ${enemyState.name}.`);
+    setStanceText('Наступление', 'focus');
+    const enemyDefeated = damageEnemy(damage, isCritical);
+    if (!enemyDefeated) {
+      setTurnIndicatorText('Ход врага', 'danger');
+      setTimeout(enemyTurn, 650);
+    }
+    return;
+  }
+
+  if (action === 'defend') {
+    const guard = Math.round(playerState.defense * 1.4) + randomInRange(18, 35);
+    const phrase = combatPhrases.defend[Math.floor(Math.random() * combatPhrases.defend.length)];
+    appendLog(fillPhrase(phrase, guard), 'heal');
+    applyShield(guard);
+    setActionReadoutText(`Щит поглотит до ${formatNumber(guard)} урона в следующей атаке.`);
+    setStanceText('Глухая оборона', 'focus');
+    setTurnIndicatorText('Ход врага', 'danger');
+    setTimeout(enemyTurn, 650);
+    return;
+  }
+
+  if (action === 'skill') {
+    const manaCost = 60;
+    if (playerState.mp < manaCost) {
+      appendLog('Недостаточно маны для использования умения.', 'critical');
+      setActionReadoutText('Недостаточно маны для ритуала крови.');
+      setTurnIndicatorText('Ваш ход', 'default');
+      setPlayerTurn(true);
+      return;
+    }
+    playerState.mp -= manaCost;
+    const burst = Math.round(playerState.agility * 0.75) + randomInRange(75, 110);
+    const skillBuff = 25 + Math.round(playerState.level / 2);
+    const phrase = combatPhrases.skill[Math.floor(Math.random() * combatPhrases.skill.length)];
+    appendLog(fillPhrase(phrase, `${skillBuff}`), 'critical');
+    appendLog(`Ритуал крови обрушивает волну на <strong>${formatNumber(burst)}</strong> урона.`, 'critical');
+    updatePlayerBars();
+    enemyState.minDamage = Math.max(10, enemyState.minDamage - 2);
+    setActionReadoutText(`Кровавый ритуал наносит ${formatNumber(burst)} урона и ослабляет ${enemyState.name}.`);
+    setStanceText('Ритуал крови', 'focus');
+    const enemyDefeated = damageEnemy(burst, true);
+    if (!enemyDefeated) {
+      setTurnIndicatorText('Ход врага', 'danger');
+      setTimeout(enemyTurn, 650);
+    }
+    return;
+  }
+
+  if (action === 'heal') {
+    if (playerState.hp >= playerState.maxHp) {
+      appendLog('Вы и так на пике силы — исцеление не требуется.', 'heal');
+      setActionReadoutText('Здоровье уже на максимуме.');
+      setTurnIndicatorText('Ваш ход', 'default');
+      setPlayerTurn(true);
+      return;
+    }
+    const manaCost = 35;
+    if (playerState.mp < manaCost) {
+      appendLog('Недостаточно маны, чтобы соткать лечебный ритуал.', 'critical');
+      setActionReadoutText('Недостаточно маны для исцеления.');
+      setTurnIndicatorText('Ваш ход', 'default');
+      setPlayerTurn(true);
+      return;
+    }
+    playerState.mp -= manaCost;
+    const missingHp = playerState.maxHp - playerState.hp;
+    const healPotential = Math.round(playerState.maxHp * 0.35) + randomInRange(24, 44);
+    const healAmount = Math.min(healPotential, missingHp);
+    playerState.hp += healAmount;
+    updatePlayerBars();
+    const phrase = combatPhrases.heal[Math.floor(Math.random() * combatPhrases.heal.length)];
+    appendLog(fillPhrase(phrase, healAmount), 'heal');
+    setActionReadoutText(`Лечение восстанавливает ${formatNumber(healAmount)} здоровья.`);
+    setStanceText('Восстановление', 'focus');
+    setTurnIndicatorText('Ход врага', 'danger');
+    setTimeout(enemyTurn, 650);
+    return;
+  }
+
+  setPlayerTurn(true);
+}
+
 function handleAction(event) {
   const { action } = event.currentTarget.dataset;
-  const phrases = combatPhrases[action];
-  const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-  const type = action === 'heal' ? 'heal' : action === 'attack' && Math.random() > 0.8 ? 'critical' : undefined;
-
-  appendLog(phrase, type);
-  const response = enemyResponses[Math.floor(Math.random() * enemyResponses.length)];
-  appendLog(response);
+  if (!action) return;
+  performPlayerAction(action);
 }
 
 actionButtons.forEach((button) => button.addEventListener('click', handleAction));
@@ -359,10 +765,6 @@ if (mapNodes.length) {
   activateRegion(mapNodes[0]);
 }
 
-function formatNumber(value) {
-  return value.toLocaleString('ru-RU');
-}
-
 function animateResources() {
   const essenceGain = Math.floor(Math.random() * 35) + 15;
   const crystalGain = Math.floor(Math.random() * 5) + 1;
@@ -509,3 +911,8 @@ events.forEach((eventItem) => {
   tick();
   setInterval(tick, 1000);
 });
+
+updateStats();
+updatePlayerBars();
+spawnEnemy(enemyTemplates[0]);
+setActionReadoutText('Выберите действие, чтобы начать раунд.');

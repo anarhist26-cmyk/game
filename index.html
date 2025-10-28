@@ -44,36 +44,36 @@
       <section class="panel player">
         <header class="panel__header">
           <h2>Кровавый Лорд</h2>
-          <span class="tag">Вампир · Уровень 12</span>
+          <span class="tag">Вампир · Уровень <span id="player-level">12</span></span>
         </header>
         <div class="bars">
           <div class="bar">
             <label>НР</label>
             <div class="bar__track">
-              <div class="bar__value bar__value--hp" style="--value: 0.75"></div>
-              <span class="bar__text">450 / 600</span>
+              <div class="bar__value bar__value--hp" data-bar="player-hp" data-current="450" data-max="600" style="--value: 0.75"></div>
+              <span class="bar__text" data-bar-text="player-hp">450 / 600</span>
             </div>
           </div>
           <div class="bar">
             <label>МР</label>
             <div class="bar__track">
-              <div class="bar__value bar__value--mp" style="--value: 0.8"></div>
-              <span class="bar__text">280 / 350</span>
+              <div class="bar__value bar__value--mp" data-bar="player-mp" data-current="280" data-max="350" style="--value: 0.8"></div>
+              <span class="bar__text" data-bar-text="player-mp">280 / 350</span>
             </div>
           </div>
           <div class="bar">
             <label>Опыт</label>
             <div class="bar__track">
-              <div class="bar__value bar__value--xp" style="--value: 0.8"></div>
-              <span class="bar__text">2400 / 3000</span>
+              <div class="bar__value bar__value--xp" data-bar="player-xp" data-current="2400" data-max="3000" style="--value: 0.8"></div>
+              <span class="bar__text" data-bar-text="player-xp">2400 / 3000</span>
             </div>
           </div>
         </div>
         <dl class="stats">
-          <div class="stats__item"><dt>Сила</dt><dd>45</dd></div>
-          <div class="stats__item"><dt>Ловкость</dt><dd>52</dd></div>
-          <div class="stats__item"><dt>Защита</dt><dd>38</dd></div>
-          <div class="stats__item"><dt>Золото</dt><dd>1250</dd></div>
+          <div class="stats__item"><dt>Сила</dt><dd id="player-strength">45</dd></div>
+          <div class="stats__item"><dt>Ловкость</dt><dd id="player-agility">52</dd></div>
+          <div class="stats__item"><dt>Защита</dt><dd id="player-defense">38</dd></div>
+          <div class="stats__item"><dt>Золото</dt><dd id="player-gold">1 250</dd></div>
         </dl>
       </section>
 
@@ -186,6 +186,16 @@
           <li>Скелет-воин повержен. Вы получаете <strong>150</strong> опыта.</li>
           <li class="log--heal">Вы восстанавливаете <strong>30</strong> НР.</li>
         </ul>
+        <div class="combat-state">
+          <div class="combat-state__row">
+            <span class="combat-state__label">Фаза</span>
+            <span class="combat-state__value combat-state__value--default" id="turn-indicator">Ваш ход</span>
+          </div>
+          <div class="combat-state__row">
+            <span class="combat-state__label">Стойка</span>
+            <span class="combat-state__value combat-state__value--default" id="stance-indicator">Наступление</span>
+          </div>
+        </div>
       </section>
 
       <section class="panel actions">
@@ -198,6 +208,7 @@
           <button class="action-button" data-action="skill">Умение</button>
           <button class="action-button" data-action="heal">Лечение</button>
         </div>
+        <div class="action-readout" id="action-readout" aria-live="polite">Выберите действие, чтобы начать раунд.</div>
       </section>
 
       <section class="panel enemy">
@@ -207,15 +218,16 @@
         <div class="enemy-card">
           <div class="enemy-card__info">
             <h3>Скелет-воин</h3>
-            <span class="tag">Уровень 8</span>
+            <span class="tag">Уровень <span id="enemy-level">8</span></span>
           </div>
           <div class="bar">
             <label>НР</label>
             <div class="bar__track">
-              <div class="bar__value bar__value--hp" style="--value: 0.64"></div>
-              <span class="bar__text">320 / 500</span>
+              <div class="bar__value bar__value--hp" data-bar="enemy-hp" data-current="320" data-max="500" style="--value: 0.64"></div>
+              <span class="bar__text" data-bar-text="enemy-hp">320 / 500</span>
             </div>
           </div>
+          <div class="enemy-card__status" id="enemy-status">Скелет оценивает ваши манёвры.</div>
         </div>
       </section>
 
