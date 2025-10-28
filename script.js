@@ -5,7 +5,9 @@ const chatInput = document.querySelector('#chat-input');
 const actionButtons = document.querySelectorAll('.action-button');
 const questFilters = document.querySelectorAll('.quest-filter');
 const quests = document.querySelectorAll('.quest-list .quest');
-const mapItems = document.querySelectorAll('.map-list__item');
+const mapCanvas = document.querySelector('#world-map-canvas');
+const mapContext = mapCanvas?.getContext('2d');
+const mapNodes = document.querySelectorAll('.map-node');
 const mapIntel = document.querySelector('#map-intel');
 const serverTime = document.querySelector('#server-time');
 const essenceCounter = document.querySelector('#essence-counter');
@@ -42,6 +44,67 @@ const enemyResponses = [
   'Из тени выплывает эхо древнего ритуала. Вы чувствуете прилив сил.',
   'Совет Крови наблюдает за боем, оценивая вашу решимость.'
 ];
+
+const mapRegions = [
+  {
+    id: 'castle',
+    type: 'fort',
+    path: [
+      [0.55, 0.28],
+      [0.63, 0.35],
+      [0.6, 0.44],
+      [0.48, 0.46],
+      [0.46, 0.34]
+    ]
+  },
+  {
+    id: 'forest',
+    type: 'ritual',
+    path: [
+      [0.27, 0.52],
+      [0.33, 0.62],
+      [0.41, 0.58],
+      [0.38, 0.48]
+    ]
+  },
+  {
+    id: 'catacombs',
+    type: 'ruin',
+    path: [
+      [0.7, 0.58],
+      [0.78, 0.66],
+      [0.74, 0.72],
+      [0.64, 0.66]
+    ]
+  },
+  {
+    id: 'market',
+    type: 'trade',
+    path: [
+      [0.4, 0.18],
+      [0.48, 0.22],
+      [0.46, 0.3],
+      [0.36, 0.26]
+    ]
+  },
+  {
+    id: 'lair',
+    type: 'fort',
+    path: [
+      [0.78, 0.22],
+      [0.86, 0.28],
+      [0.82, 0.36],
+      [0.72, 0.3]
+    ]
+  }
+];
+
+const regionStyles = {
+  fort: { fill: '#b2243e', glow: '#f45a7a' },
+  ritual: { fill: '#472a8f', glow: '#8b63ff' },
+  ruin: { fill: '#144c61', glow: '#4ed4e0' },
+  trade: { fill: '#7a3d14', glow: '#ffb657' }
+};
 
 const resources = {
   essence: 9870,
@@ -121,6 +184,181 @@ if (loreText) {
   setInterval(rotateLore, 15000);
 }
 
+let activeRegion = mapNodes[0]?.dataset.region || 'castle';
+let hoveredRegion = null;
+let mapPulse = 0;
+
+function updateCanvasDimensions() {
+  if (!mapCanvas || !mapContext) return;
+  const ratio = window.devicePixelRatio || 1;
+  const width = mapCanvas.clientWidth || mapCanvas.width;
+  const height = mapCanvas.clientHeight || mapCanvas.height;
+  if (!width || !height) return;
+  mapCanvas.width = width * ratio;
+  mapCanvas.height = height * ratio;
+  mapContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+}
+
+function getRegionStyle(region) {
+  return regionStyles[region.type] || regionStyles.fort;
+}
+
+function drawRegionShape(region, highlightId) {
+  if (!mapCanvas || !mapContext) return;
+  const ctx = mapContext;
+  const { width, height } = mapCanvas;
+  const points = region.path.map(([x, y]) => [x * width, y * height]);
+  const style = getRegionStyle(region);
+  const isHighlight = region.id === highlightId;
+
+  ctx.beginPath();
+  ctx.moveTo(points[0][0], points[0][1]);
+  for (let i = 1; i < points.length; i += 1) {
+    const [px, py] = points[i];
+    ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+
+  ctx.save();
+  ctx.fillStyle = isHighlight ? style.glow : style.fill;
+  ctx.globalAlpha = isHighlight ? 0.9 : 0.65;
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.strokeStyle = isHighlight ? style.glow : 'rgba(255, 255, 255, 0.15)';
+  ctx.lineWidth = isHighlight ? 4 : 2;
+  ctx.stroke();
+  ctx.restore();
+
+  if (isHighlight) {
+    ctx.save();
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = style.glow;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = style.glow;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawMap(explicitHighlight) {
+  if (!mapCanvas || !mapContext) return;
+  const ctx = mapContext;
+  const width = mapCanvas.clientWidth || mapCanvas.width;
+  const height = mapCanvas.clientHeight || mapCanvas.height;
+  const highlightId = explicitHighlight || hoveredRegion || activeRegion;
+
+  ctx.clearRect(0, 0, width, height);
+
+  const baseGradient = ctx.createLinearGradient(0, 0, 0, height);
+  baseGradient.addColorStop(0, '#06070f');
+  baseGradient.addColorStop(1, '#1c0a16');
+  ctx.fillStyle = baseGradient;
+  ctx.fillRect(0, 0, width, height);
+
+  const haze = ctx.createRadialGradient(width * 0.5, height * 0.35, width * 0.1, width * 0.5, height * 0.35, width * 0.75);
+  haze.addColorStop(0, 'rgba(92, 18, 46, 0.6)');
+  haze.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = haze;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.beginPath();
+  ctx.moveTo(width * 0.12, height * 0.72);
+  ctx.quadraticCurveTo(width * 0.05, height * 0.42, width * 0.28, height * 0.25);
+  ctx.quadraticCurveTo(width * 0.46, height * 0.06, width * 0.72, height * 0.18);
+  ctx.quadraticCurveTo(width * 0.93, height * 0.34, width * 0.86, height * 0.62);
+  ctx.quadraticCurveTo(width * 0.7, height * 0.93, width * 0.38, height * 0.86);
+  ctx.quadraticCurveTo(width * 0.18, height * 0.81, width * 0.12, height * 0.72);
+  ctx.closePath();
+
+  const landGradient = ctx.createLinearGradient(width * 0.4, height * 0.15, width * 0.6, height * 0.85);
+  landGradient.addColorStop(0, '#22122c');
+  landGradient.addColorStop(0.5, '#2e1b3a');
+  landGradient.addColorStop(1, '#15162a');
+  ctx.fillStyle = landGradient;
+  ctx.fill();
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(243, 67, 112, 0.25)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(width * 0.2, height * 0.32);
+  ctx.bezierCurveTo(width * 0.32, height * 0.38, width * 0.28, height * 0.55, width * 0.38, height * 0.68);
+  ctx.bezierCurveTo(width * 0.48, height * 0.8, width * 0.62, height * 0.76, width * 0.75, height * 0.82);
+  ctx.strokeStyle = 'rgba(116, 177, 255, 0.35)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([8, 12]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(width * 0.58, height * 0.18);
+  ctx.bezierCurveTo(width * 0.66, height * 0.3, width * 0.58, height * 0.5, width * 0.68, height * 0.56);
+  ctx.strokeStyle = `rgba(233, 76, 111, ${0.2 + Math.sin(mapPulse) * 0.12})`;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.restore();
+
+  mapRegions.forEach((region) => drawRegionShape(region, highlightId));
+
+  mapRegions.forEach((region) => {
+    const point = region.path[0];
+    const x = point[0] * width;
+    const y = point[1] * height;
+    const style = getRegionStyle(region);
+
+    ctx.save();
+    ctx.fillStyle = style.glow;
+    ctx.globalAlpha = 0.4 + Math.sin(mapPulse * 1.2 + region.path[0][0]) * 0.15;
+    ctx.beginPath();
+    ctx.arc(x, y, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = '#0c101f';
+    ctx.beginPath();
+    ctx.arc(x, y, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = style.glow;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, highlightId === region.id ? 9 : 7, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  });
+}
+
+function animateMap() {
+  mapPulse += 0.02;
+  drawMap();
+  requestAnimationFrame(animateMap);
+}
+
+if (mapCanvas && mapContext) {
+  updateCanvasDimensions();
+  drawMap();
+  requestAnimationFrame(animateMap);
+  window.addEventListener('resize', () => {
+    updateCanvasDimensions();
+    drawMap();
+  });
+}
+
+if (mapNodes.length) {
+  activateRegion(mapNodes[0]);
+}
+
 function formatNumber(value) {
   return value.toLocaleString('ru-RU');
 }
@@ -190,22 +428,59 @@ if (defaultFilter) {
 
 function setIntel(text) {
   if (!mapIntel) return;
+  if (!text || mapIntel.textContent === text) return;
   mapIntel.textContent = text;
+  mapIntel.classList.remove('map-intel--pulse');
+  void mapIntel.offsetWidth;
+  mapIntel.classList.add('map-intel--pulse');
 }
 
-mapItems.forEach((item) => {
-  const intel = item.dataset.intel;
-  if (!intel) return;
-  item.addEventListener('mouseenter', () => setIntel(intel));
-  item.addEventListener('focus', () => setIntel(intel));
-});
+function activateRegion(node) {
+  if (!node) return;
+  mapNodes.forEach((button) => button.classList.remove('is-active'));
+  node.classList.add('is-active');
+  activeRegion = node.dataset.region || activeRegion;
+  hoveredRegion = null;
+  if (node.dataset.intel) {
+    setIntel(node.dataset.intel);
+  }
+  drawMap();
+}
 
-if (mapItems.length && mapIntel) {
-  const primaryIntel = mapItems[0].dataset.intel;
-  if (primaryIntel) {
-    setIntel(primaryIntel);
+function restoreActiveIntel() {
+  const current = document.querySelector('.map-node.is-active');
+  if (current && current.dataset.intel) {
+    setIntel(current.dataset.intel);
   }
 }
+
+mapNodes.forEach((node) => {
+  node.addEventListener('click', () => activateRegion(node));
+  node.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      activateRegion(node);
+    }
+  });
+  node.addEventListener('mouseenter', () => {
+    hoveredRegion = node.dataset.region || null;
+    if (node.dataset.intel) setIntel(node.dataset.intel);
+    drawMap();
+  });
+  node.addEventListener('mouseleave', () => {
+    hoveredRegion = null;
+    restoreActiveIntel();
+  });
+  node.addEventListener('focus', () => {
+    hoveredRegion = node.dataset.region || null;
+    if (node.dataset.intel) setIntel(node.dataset.intel);
+    drawMap();
+  });
+  node.addEventListener('blur', () => {
+    hoveredRegion = null;
+    restoreActiveIntel();
+  });
+});
 
 function formatDuration(seconds) {
   const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');

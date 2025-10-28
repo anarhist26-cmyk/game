@@ -131,44 +131,48 @@
           <h2>Карта мира</h2>
           <p class="panel__subtitle">Империя Кровавого Полумесяца</p>
         </header>
-        <ol class="map-list">
-          <li class="map-list__item map-list__item--current" tabindex="0" data-intel="Совет Крови держит ворота в полной боевой готовности. Укрепите отряды, чтобы открыть новые крылья замка.">
-            <div>
-              <h3>Кровавый Замок</h3>
-              <p>Древняя цитадель вампиров, где правит Совет Крови.</p>
-            </div>
-            <span class="tag tag--current">Текущая · Уровень 1</span>
-          </li>
-          <li class="map-list__item" data-intel="Темные друиды устраивают ритуалы под алыми фонарями. Магический щит усиливает прирост эссенции." tabindex="0">
-            <div>
-              <h3>Лес Мрака</h3>
-              <p>Тёмный лес, полный опасных существ и древних тайн.</p>
-            </div>
-            <span class="tag">Уровень 5</span>
-          </li>
-          <li class="map-list__item" data-intел="Эхо старых войн всё ещё слышно. Принесите 5 эссенций, чтобы войти без боя." tabindex="0">
-            <div>
-              <h3>Катакомбы Забвения</h3>
-              <p>Катакомбы с нежитью и проклятыми сокровищами.</p>
-            </div>
-            <span class="tag">Уровень 8</span>
-          </li>
-          <li class="map-list__item" data-intел="Торговцы ценят редкие души героев. Можно обменять рейтинг арены на легендарные руны." tabindex="0">
-            <div>
-              <h3>Рынок Теней</h3>
-              <p>Тайная торговая площадь, где можно купить запрещённые артефакты.</p>
-            </div>
-            <span class="tag">Уровень 12</span>
-          </li>
-          <li class="map-list__item map-list__item--locked" data-intел="Дракон спит поверх озера жидкой крови. Не входите без защиты от огня." tabindex="0">
-            <div>
-              <h3>Логово Дракона</h3>
-              <p>Опасное подземелье, доступное только сильнейшим.</p>
-            </div>
-            <span class="tag tag--locked">Закрыто · Уровень 20</span>
-          </li>
-        </ol>
-        <div class="map-intel" id="map-intel" role="status">Совет Крови держит ворота Кровавого Замка под защитой ночных стражей.</div>
+        <div class="map-viewport">
+          <canvas id="world-map-canvas" width="560" height="360" role="img" aria-label="Художественная карта Империи Кровавого Полумесяца"></canvas>
+          <ul class="map-nodes">
+            <li style="--x:54%; --y:36%;">
+              <button class="map-node is-active" type="button" data-region="castle" data-intel="Совет Крови держит ворота в полной боевой готовности. Укрепите отряды, чтобы открыть новые крылья замка.">
+                <span class="map-node__label">Кровавый Замок</span>
+                <span class="map-node__meta">Текущая · Уровень 1</span>
+              </button>
+            </li>
+            <li style="--x:32%; --y:54%;">
+              <button class="map-node" type="button" data-region="forest" data-intел="Тёмные друиды устраивают ритуалы под алыми фонарями. Магический щит усиливает прирост эссенции.">
+                <span class="map-node__label">Лес Мрака</span>
+                <span class="map-node__meta">Уровень 5</span>
+              </button>
+            </li>
+            <li style="--x:70%; --y:62%;">
+              <button class="map-node" type="button" data-region="catacombs" data-intел="Эхо старых войн всё ещё слышно. Принесите 5 эссенций, чтобы войти без боя.">
+                <span class="map-node__label">Катакомбы Забвения</span>
+                <span class="map-node__meta">Уровень 8</span>
+              </button>
+            </li>
+            <li style="--x:44%; --y:18%;">
+              <button class="map-node" type="button" data-region="market" data-intel="Торговцы ценят редкие души героев. Можно обменять рейтинг арены на легендарные руны.">
+                <span class="map-node__label">Рынок Теней</span>
+                <span class="map-node__meta">Уровень 12</span>
+              </button>
+            </li>
+            <li style="--x:82%; --y:28%;">
+              <button class="map-node map-node--locked" type="button" data-region="lair" data-intел="Дракон спит поверх озера жидкой крови. Не входите без защиты от огня.">
+                <span class="map-node__label">Логово Дракона</span>
+                <span class="map-node__meta">Закрыто · Уровень 20</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="map-legend">
+          <div class="map-legend__item"><span class="map-legend__marker"></span> Форт</div>
+          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--ritual"></span> Ритуальная зона</div>
+          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--ruin"></span> Руины и подземелья</div>
+          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--trade"></span> Торговые узлы</div>
+        </div>
+        <div class="map-intel" id="map-intел" role="status">Совет Крови держит ворота Кровавого Замка под защитой ночных стражей.</div>
       </section>
 
       <section class="panel combat">
