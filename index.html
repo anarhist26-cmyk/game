@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blood Legends</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1 class="title">Blood Legends</h1>
+      <p class="subtitle">Хроники Кровавого Полумесяца</p>
+    </header>
+
+    <main class="layout">
+      <section class="panel player">
+        <header class="panel__header">
+          <h2>Кровавый Лорд</h2>
+          <span class="tag">Вампир · Уровень 12</span>
+        </header>
+        <div class="bars">
+          <div class="bar">
+            <label>НР</label>
+            <div class="bar__track">
+              <div class="bar__value bar__value--hp" style="--value: 0.75"></div>
+              <span class="bar__text">450 / 600</span>
+            </div>
+          </div>
+          <div class="bar">
+            <label>МР</label>
+            <div class="bar__track">
+              <div class="bar__value bar__value--mp" style="--value: 0.8"></div>
+              <span class="bar__text">280 / 350</span>
+            </div>
+          </div>
+          <div class="bar">
+            <label>Опыт</label>
+            <div class="bar__track">
+              <div class="bar__value bar__value--xp" style="--value: 0.8"></div>
+              <span class="bar__text">2400 / 3000</span>
+            </div>
+          </div>
+        </div>
+        <dl class="stats">
+          <div class="stats__item"><dt>Сила</dt><dd>45</dd></div>
+          <div class="stats__item"><dt>Ловкость</dt><dd>52</dd></div>
+          <div class="stats__item"><dt>Защита</dt><dd>38</dd></div>
+          <div class="stats__item"><dt>Золото</dt><dd>1250</dd></div>
+        </dl>
+      </section>
+
+      <section class="panel quests">
+        <header class="panel__header">
+          <h2>Квесты</h2>
+        </header>
+        <ul class="quest-list">
+          <li class="quest quest--active">
+            <div>
+              <strong>Кровавая охота</strong>
+              <p>Выследите вожака стаи в Лесу Мрака.</p>
+            </div>
+            <span class="badge badge--active">Активен</span>
+          </li>
+          <li class="quest quest--available">
+            <div>
+              <strong>Реликвия тьмы</strong>
+              <p>Найдите потерянный артефакт в Катакомбах Забвения.</p>
+            </div>
+            <span class="badge">Доступен</span>
+          </li>
+          <li class="quest quest--complete">
+            <div>
+              <strong>Первая кровь</strong>
+              <p>Завершён: союз с Кровавым Советом заключён.</p>
+            </div>
+            <span class="badge badge--complete">Завершён</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="panel world-map">
+        <header class="panel__header">
+          <h2>Карта мира</h2>
+          <p class="panel__subtitle">Империя Кровавого Полумесяца</p>
+        </header>
+        <ol class="map-list">
+          <li class="map-list__item map-list__item--current">
+            <div>
+              <h3>Кровавый Замок</h3>
+              <p>Древняя цитадель вампиров, где правит Совет Крови.</p>
+            </div>
+            <span class="tag tag--current">Текущая · Уровень 1</span>
+          </li>
+          <li class="map-list__item">
+            <div>
+              <h3>Лес Мрака</h3>
+              <p>Тёмный лес, полный опасных существ и древних тайн.</p>
+            </div>
+            <span class="tag">Уровень 5</span>
+          </li>
+          <li class="map-list__item">
+            <div>
+              <h3>Катакомбы Забвения</h3>
+              <p>Катакомбы с нежитью и проклятыми сокровищами.</p>
+            </div>
+            <span class="tag">Уровень 8</span>
+          </li>
+          <li class="map-list__item">
+            <div>
+              <h3>Рынок Теней</h3>
+              <p>Тайная торговая площадь, где можно купить запрещённые артефакты.</p>
+            </div>
+            <span class="tag">Уровень 12</span>
+          </li>
+          <li class="map-list__item map-list__item--locked">
+            <div>
+              <h3>Логово Дракона</h3>
+              <p>Опасное подземелье, доступное только сильнейшим.</p>
+            </div>
+            <span class="tag tag--locked">Закрыто · Уровень 20</span>
+          </li>
+        </ol>
+      </section>
+
+      <section class="panel combat">
+        <header class="panel__header">
+          <h2>Журнал боя</h2>
+        </header>
+        <ul class="log" id="combat-log">
+          <li>Вы атакуете Скелета-воина! Вы наносите <strong>45</strong> урона.</li>
+          <li>Скелет-воин атакует вас! Вы получаете <strong>23</strong> урона.</li>
+          <li class="log--critical">КРИТИЧЕСКИЙ УДАР! Вы наносите <strong>92</strong> урона!</li>
+          <li>Скелет-воин повержен. Вы получаете <strong>150</strong> опыта.</li>
+          <li class="log--heal">Вы восстанавливаете <strong>30</strong> НР.</li>
+        </ul>
+      </section>
+
+      <section class="panel actions">
+        <header class="panel__header">
+          <h2>Действия</h2>
+        </header>
+        <div class="action-grid">
+          <button class="action-button action-button--attack" data-action="attack">Атаковать</button>
+          <button class="action-button" data-action="defend">Защита</button>
+          <button class="action-button" data-action="skill">Умение</button>
+          <button class="action-button" data-action="heal">Лечение</button>
+        </div>
+      </section>
+
+      <section class="panel enemy">
+        <header class="panel__header">
+          <h2>Противник</h2>
+        </header>
+        <div class="enemy-card">
+          <div class="enemy-card__info">
+            <h3>Скелет-воин</h3>
+            <span class="tag">Уровень 8</span>
+          </div>
+          <div class="bar">
+            <label>НР</label>
+            <div class="bar__track">
+              <div class="bar__value bar__value--hp" style="--value: 0.64"></div>
+              <span class="bar__text">320 / 500</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel chat">
+        <header class="panel__header">
+          <h2>Общий чат</h2>
+        </header>
+        <ul class="chat-log" id="chat-log">
+          <li><span class="chat-log__time">21:25</span> <span class="chat-log__name chat-log__name--mage">ТёмныйМаг:</span> Кто-нибудь хочет пойти на данж?</li>
+          <li><span class="chat-log__time">21:25</span> <span class="chat-log__name chat-log__name--warrior">КровавыйВоин:</span> Я готов! Какой уровень?</li>
+          <li><span class="chat-log__time">21:25</span> <span class="chat-log__system">Игрок "НочнойОхотник" вошёл в игру</span></li>
+          <li><span class="chat-log__time">21:25</span> <span class="chat-log__name chat-log__name--hunter">НочнойОхотник:</span> Всем привет! Есть кто для PvP?</li>
+        </ul>
+        <form class="chat-form" id="chat-form">
+          <input type="text" id="chat-input" placeholder="Введите сообщение..." required>
+          <button type="submit">Отправить</button>
+        </form>
+      </section>
+
+      <section class="panel lore">
+        <header class="panel__header">
+          <h2>Легенды Крови</h2>
+          <p class="panel__subtitle">Мифология Blood Legends</p>
+        </header>
+        <article class="lore__text">
+          <p>
+            После Ритуала Алых Врат мир Эйдолона разделился на зоны света и тени.
+            Вампирские князья, сдерживая поток кровавой магии, заключили договор с
+            смертными родами. Теперь, когда Кровавый Полумесяц поднимается над
+            горизонтом, на арену выходят новые герои, чтобы определить судьбу Империи.
+          </p>
+          <p>
+            В основе Blood Legends лежит борьба между орденом Лунных Жрецов и Советам
+            Крови. Игроки выбирают свой путь: служить тьме, хранить баланс или выжигать
+            корень зла. Каждое решение отражается на карте мира и открывает новые ветви
+            событий. Охота за реликвиями Алого Света принесёт силу, но пробудит древних
+            стражей, чьи имена забыты даже в Катакомбах Забвения.
+          </p>
+          <p>
+            Соберите союзников, отстройте собственный замок и раскройте тайны Кровавого
+            Полумесяца, пока не настал час Последней Ночи.
+          </p>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
