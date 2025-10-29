@@ -16,6 +16,8 @@ const mapCoords = document.querySelector('#map-coords');
 const mapTrailElement = document.querySelector('#map-trail');
 const mapControlButtons = document.querySelectorAll('.map-control');
 const lootList = document.querySelector('#loot-list');
+const dockTabs = document.querySelectorAll('.dock-tab');
+const dockPanels = document.querySelectorAll('.dock-panel');
 const serverTime = document.querySelector('#server-time');
 const essenceCounter = document.querySelector('#essence-counter');
 const crystalCounter = document.querySelector('#crystal-counter');
@@ -48,6 +50,25 @@ document.querySelectorAll('[data-bar-text]').forEach((element) => {
   if (!element.dataset.barText) return;
   progressLabels.set(element.dataset.barText, element);
 });
+
+if (dockTabs.length && dockPanels.length) {
+  dockTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.panel;
+      if (!target) return;
+      dockTabs.forEach((other) => {
+        const isActive = other === tab;
+        other.classList.toggle('is-active', isActive);
+        other.setAttribute('aria-selected', String(isActive));
+      });
+      dockPanels.forEach((panel) => {
+        const isActive = panel.dataset.panel === target;
+        panel.classList.toggle('is-active', isActive);
+        panel.setAttribute('aria-hidden', String(!isActive));
+      });
+    });
+  });
+}
 
 function formatNumber(value) {
   return value.toLocaleString('ru-RU');
@@ -1231,8 +1252,8 @@ function createMapNodes() {
   mapNodeLayer.innerHTML = '';
   labyrinthNodes.forEach((node) => {
     const item = document.createElement('li');
-    item.style.setProperty('--x', (node.position[0] * 100).toFixed(2));
-    item.style.setProperty('--y', (node.position[1] * 100).toFixed(2));
+    item.style.left = `${(node.position[0] * 100).toFixed(2)}%`;
+    item.style.top = `${(node.position[1] * 100).toFixed(2)}%`;
     const button = document.createElement('button');
     button.type = 'button';
     button.className = `map-node map-node--${node.type}`;
