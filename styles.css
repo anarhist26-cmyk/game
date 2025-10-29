@@ -884,6 +884,85 @@ body::before {
   animation: mapIntelPulse 0.6s ease;
 }
 
+.combat-suite__body {
+  display: grid;
+  gap: 20px;
+}
+
+.combat-suite__col {
+  display: grid;
+  gap: 20px;
+}
+
+.combat-suite__block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 24px rgba(10, 12, 24, 0.28);
+}
+
+.combat-suite__block-title {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.combat-suite__block-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.combat-suite__block-subtitle {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.combat-suite__block--log .log {
+  flex: 1;
+  min-height: 220px;
+}
+
+.combat-suite__block--loot .loot-list {
+  flex: 1;
+}
+
+.combat-suite__block--actions .action-readout {
+  margin-top: 0;
+}
+
+.combat-suite__block--state .combat-state {
+  margin-top: 0;
+}
+
+@media (min-width: 960px) {
+  .combat-suite__body {
+    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  }
+
+  .combat-suite__col--right {
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+}
+
+@media (max-width: 959px) {
+  .combat-suite__block--log .log {
+    max-height: 320px;
+  }
+}
+
 .log {
   font-size: 0.9rem;
   line-height: 1.5;
