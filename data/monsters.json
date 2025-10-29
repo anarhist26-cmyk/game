@@ -1,0 +1,134 @@
+[
+  {
+    "id": "shadow_wolf",
+    "name": "Теневой волк",
+    "rank": "охотник",
+    "level": 6,
+    "habitat": "Сумрачный лес",
+    "alignment": "дикарь",
+    "stats": {
+      "hp": 180,
+      "attack": 24,
+      "defense": 12,
+      "speed": 30
+    },
+    "abilities": [
+      "Раздирающий укус",
+      "Затуманивание"
+    ],
+    "loot": [
+      { "itemId": "wolf_pelt", "chance": 0.35 },
+      { "itemId": "moon_shard", "chance": 0.1 }
+    ]
+  },
+  {
+    "id": "gloom_stalker",
+    "name": "Мракоступ",
+    "rank": "элита",
+    "level": 12,
+    "habitat": "Катакомбы Бездны",
+    "alignment": "порождение тьмы",
+    "stats": {
+      "hp": 420,
+      "attack": 52,
+      "defense": 28,
+      "speed": 18
+    },
+    "abilities": [
+      "Отвод взгляда",
+      "Поглощение света"
+    ],
+    "loot": [
+      { "itemId": "ashen_scroll", "chance": 0.05 },
+      { "itemId": "cursed_relic", "chance": 0.22 }
+    ]
+  },
+  {
+    "id": "ember_colossus",
+    "name": "Угольный колосс",
+    "rank": "босс",
+    "level": 18,
+    "habitat": "Печи Огненной кузницы",
+    "alignment": "элементаль",
+    "stats": {
+      "hp": 780,
+      "attack": 68,
+      "defense": 44,
+      "speed": 10
+    },
+    "abilities": [
+      "Всполох пламени",
+      "Обвал лавы"
+    ],
+    "loot": [
+      { "itemId": "ember_core", "chance": 0.14 },
+      { "itemId": "iron_fang", "chance": 0.18 }
+    ]
+  },
+  {
+    "id": "blood_sentinel",
+    "name": "Кровавый страж",
+    "rank": "страж",
+    "level": 15,
+    "habitat": "Бастион Сангвинариев",
+    "alignment": "легион",
+    "stats": {
+      "hp": 560,
+      "attack": 46,
+      "defense": 40,
+      "speed": 16
+    },
+    "abilities": [
+      "Кара клинком",
+      "Кровавый щит"
+    ],
+    "loot": [
+      { "itemId": "blood_vial", "chance": 0.12 },
+      { "itemId": "cursed_relic", "chance": 0.18 }
+    ]
+  },
+  {
+    "id": "rootbound_hag",
+    "name": "Корневая ведьма",
+    "rank": "жрица",
+    "level": 9,
+    "habitat": "Болотные зеркала",
+    "alignment": "колдунья",
+    "stats": {
+      "hp": 240,
+      "attack": 28,
+      "defense": 18,
+      "speed": 22
+    },
+    "abilities": [
+      "Гниющая хватка",
+      "Ядовитая тина"
+    ],
+    "loot": [
+      { "itemId": "withered_root", "chance": 0.4 },
+      { "itemId": "moon_shard", "chance": 0.06 }
+    ]
+  },
+  {
+    "id": "grave_titan",
+    "name": "Могильный титан",
+    "rank": "мировой босс",
+    "level": 24,
+    "habitat": "Пределы Ноктуса",
+    "alignment": "древний",
+    "stats": {
+      "hp": 1200,
+      "attack": 82,
+      "defense": 70,
+      "speed": 8
+    },
+    "abilities": [
+      "Удар погребения",
+      "Песнь скорби"
+    ],
+    "loot": [
+      { "itemId": "ashen_scroll", "chance": 0.12 },
+      { "itemId": "blood_vial", "chance": 0.2 }
+    ]
+  }
+]
