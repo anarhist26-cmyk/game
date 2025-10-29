@@ -18,6 +18,151 @@ const lootList = document.getElementById('loot-list');
 const actionButtons = document.querySelectorAll('.action-button');
 const commandButtons = document.querySelectorAll('.command-button');
 
+const inventoryModal = document.getElementById('inventory-modal');
+const inventoryCloseButton = document.getElementById('inventory-close');
+const inventoryGrid = document.getElementById('inventory-grid');
+const inventoryWeightElement = document.getElementById('inventory-weight');
+const inventoryGoldElement = document.getElementById('inventory-gold');
+const inventoryEssenceElement = document.getElementById('inventory-essence');
+const inventoryCrystalsElement = document.getElementById('inventory-crystals');
+const inventoryItemName = document.getElementById('inventory-item-name');
+const inventoryItemType = document.getElementById('inventory-item-type');
+const inventoryItemDescription = document.getElementById('inventory-item-description');
+const inventoryItemStats = document.getElementById('inventory-item-stats');
+const inventoryActions = document.querySelectorAll('[data-inventory-action]');
+
+const inventoryState = {
+  capacity: 120,
+  items: [
+    {
+      id: 'blade-dawn',
+      name: 'Клинок Рассвета',
+      short: 'Рассвет',
+      type: 'Двуручный меч',
+      rarity: 'legendary',
+      icon: '⚔️',
+      quantity: 1,
+      weight: 14,
+      stats: {
+        Урон: '+52',
+        'Крит. шанс': '+7%',
+        'Сила света': '+18'
+      },
+      description: 'Меч, выкованный из крови падшего архангела. Пронзает даже теневых тварей.'
+    },
+    {
+      id: 'shield-obsidian',
+      name: 'Обсидиановый бастион',
+      short: 'Бастион',
+      type: 'Щит',
+      rarity: 'epic',
+      icon: '🛡️',
+      quantity: 1,
+      weight: 12,
+      stats: {
+        Защита: '+36',
+        'Поглощение': '+18%',
+        Стойкость: '+10'
+      },
+      description: 'Щит, отражающий удары демонов. Пропитан чарой вечной ночи.'
+    },
+    {
+      id: 'ring-storm',
+      name: 'Кольцо Бури',
+      short: 'Буря',
+      type: 'Украшение',
+      rarity: 'rare',
+      icon: '💍',
+      quantity: 1,
+      weight: 1,
+      stats: {
+        Ловкость: '+8',
+        'Скорость заклинаний': '+12%',
+        'Сопротивление молнии': '+15%'
+      },
+      description: 'Шепчет грохотом гроз при каждом движении, усиливая молниеносные удары.'
+    },
+    {
+      id: 'potion-ember',
+      name: 'Эликсир Раскалённых Жил',
+      short: 'Эликсир',
+      type: 'Расходуемое',
+      rarity: 'rare',
+      icon: '🧪',
+      quantity: 3,
+      weight: 1,
+      stats: {
+        'Восстановление HP': '240',
+        'Восстановление MP': '80'
+      },
+      description: 'Пылающий эликсир из сердца вулкана. Мгновенно восполняет жизненные силы.'
+    },
+    {
+      id: 'scroll-abyss',
+      name: 'Свиток Бездонной Стражи',
+      short: 'Свиток',
+      type: 'Расходуемое',
+      rarity: 'epic',
+      icon: '📜',
+      quantity: 2,
+      weight: 0.5,
+      stats: {
+        Щит: '+600',
+        'Длительность': '30 сек'
+      },
+      description: 'При чтении выстраивает вокруг героя кольцо бездны, блокирующее удары.'
+    },
+    {
+      id: 'relic-heart',
+      name: 'Реликвия Сердце Артерии',
+      short: 'Реликвия',
+      type: 'Реликт',
+      rarity: 'legendary',
+      icon: '🩸',
+      quantity: 1,
+      weight: 6,
+      stats: {
+        'Кровавый урон': '+24%',
+        Вампиризм: '+6%',
+        'Сопротивление тьме': '+12%'
+      },
+      description: 'Живой артефакт, бьющийся в унисон с владельцем и жаждущий крови врагов.'
+    },
+    {
+      id: 'supply-rations',
+      name: 'Полевой рацион «Алый рассвет»',
+      short: 'Рацион',
+      type: 'Припасы',
+      rarity: 'common',
+      icon: '🥡',
+      quantity: 5,
+      weight: 0.6,
+      stats: {
+        Энергия: '+30',
+        'Сопротивление холоду': '+6%'
+      },
+      description: 'Высушенное мясо и кристаллизованная эссенция. Поддерживает силы в дальних походах.'
+    },
+    {
+      id: 'gem-soul',
+      name: 'Самоцвет Душ',
+      short: 'Самоцвет',
+      type: 'Катализатор',
+      rarity: 'epic',
+      icon: '🔮',
+      quantity: 1,
+      weight: 2,
+      stats: {
+        'Запас эссенции': '+250',
+        'Восстановление MP': '+10'
+      },
+      description: 'Хранит в себе отголоски павших героев. Усиливает контроль над магией крови.'
+    }
+  ]
+};
+
+let activeInventorySlot = null;
+
 const turnIndicator = document.getElementById('turn-indicator');
 const stanceIndicator = document.getElementById('stance-indicator');
 
@@ -76,6 +221,107 @@ function appendLog(target, text) {
   }
 
   target.scrollTo({ top: target.scrollHeight, behavior: 'smooth' });
+}
+
+function calculateInventoryWeight() {
+  return inventoryState.items.reduce((total, item) => total + item.weight * item.quantity, 0);
+}
+
+function syncInventoryResources() {
+  if (!inventoryGoldElement || !inventoryEssenceElement || !inventoryCrystalsElement) return;
+  const goldText = document.getElementById('player-gold')?.textContent ?? '0';
+  const essenceText = essenceCounter?.textContent ?? '0';
+  const crystalText = crystalCounter?.textContent ?? '0';
+  inventoryGoldElement.textContent = goldText;
+  inventoryEssenceElement.textContent = essenceText;
+  inventoryCrystalsElement.textContent = crystalText;
+}
+
+function updateInventoryWeight() {
+  if (!inventoryWeightElement) return;
+  const weight = calculateInventoryWeight();
+  const formatted = Number.isInteger(weight) ? weight : weight.toFixed(1).replace('.', ',');
+  inventoryWeightElement.textContent = `${formatted} / ${inventoryState.capacity}`;
+}
+
+function clearInventorySelection() {
+  if (activeInventorySlot) {
+    activeInventorySlot.classList.remove('is-active');
+    activeInventorySlot = null;
+  }
+}
+
+function renderInventoryDetails(item) {
+  if (!inventoryItemName || !inventoryItemDescription || !inventoryItemStats || !inventoryItemType) return;
+  if (!item) {
+    inventoryItemName.textContent = 'Выберите предмет';
+    inventoryItemType.textContent = '';
+    inventoryItemDescription.textContent = 'Кликните на ячейку, чтобы увидеть подробности.';
+    inventoryItemStats.replaceChildren();
+    return;
+  }
+
+  inventoryItemName.textContent = item.name;
+  inventoryItemType.textContent = `${item.type} · ${item.rarity === 'legendary' ? 'Легендарный' : item.rarity === 'epic' ? 'Эпический' : item.rarity === 'rare' ? 'Редкий' : 'Обычный'}`;
+  inventoryItemDescription.textContent = item.description;
+
+  inventoryItemStats.replaceChildren();
+  Object.entries(item.stats).forEach(([key, value]) => {
+    const term = document.createElement('dt');
+    term.textContent = key;
+    const def = document.createElement('dd');
+    def.textContent = value;
+    inventoryItemStats.append(term, def);
+  });
+}
+
+function renderInventory() {
+  if (!inventoryGrid) return;
+  inventoryGrid.replaceChildren();
+  inventoryState.items.forEach((item) => {
+    const slot = document.createElement('button');
+    slot.type = 'button';
+    slot.className = 'inventory-slot';
+    slot.dataset.rarity = item.rarity;
+    slot.dataset.qty = item.quantity > 1 ? item.quantity : '';
+    slot.dataset.itemId = item.id;
+    slot.innerHTML = `
+      <span class="inventory-slot__icon">${item.icon}</span>
+      <span class="inventory-slot__label">${item.short}</span>
+    `;
+    slot.addEventListener('click', () => {
+      clearInventorySelection();
+      activeInventorySlot = slot;
+      slot.classList.add('is-active');
+      renderInventoryDetails(item);
+    });
+    inventoryGrid.append(slot);
+  });
+}
+
+function openInventory() {
+  if (!inventoryModal) return;
+  inventoryModal.classList.remove('is-hidden');
+  inventoryModal.setAttribute('aria-hidden', 'false');
+  syncInventoryResources();
+  updateInventoryWeight();
+  renderInventory();
+  if (inventoryState.items.length) {
+    const firstSlot = inventoryGrid?.querySelector('.inventory-slot');
+    if (firstSlot) {
+      firstSlot.click();
+    }
+  } else {
+    renderInventoryDetails(null);
+  }
+}
+
+function closeInventory() {
+  if (!inventoryModal) return;
+  inventoryModal.classList.add('is-hidden');
+  inventoryModal.setAttribute('aria-hidden', 'true');
+  clearInventorySelection();
+  renderInventoryDetails(null);
 }
 
 function appendCombatLog(message) {
@@ -827,10 +1073,67 @@ if (chatForm) {
 if (commandButtons.length) {
   commandButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      appendChatLog(`<strong>Система</strong>: Раздел «${button.textContent}» пока в разработке.`);
+      const command = button.dataset.command;
+      switch (command) {
+        case 'inventory':
+          openInventory();
+          break;
+        case 'map':
+          appendChatLog('<strong>Система</strong>: Центр карты уже активен.');
+          break;
+        case 'quests':
+          appendChatLog('<strong>Система</strong>: Квестовая доска обновится в следующем патче.');
+          break;
+        case 'help':
+          appendChatLog('<strong>Система</strong>: /roll — бросок куба, /dance — станцевать победный танец.');
+          break;
+        default:
+          appendChatLog(`<strong>Система</strong>: Раздел «${button.textContent}» пока в разработке.`);
+          break;
+      }
     });
   });
 }
+
+if (inventoryModal) {
+  inventoryModal.addEventListener('click', (event) => {
+    if (!(event.target instanceof HTMLElement)) return;
+    if (event.target === inventoryModal || event.target.matches('[data-dismiss="inventory"]')) {
+      closeInventory();
+    }
+  });
+}
+
+if (inventoryCloseButton) {
+  inventoryCloseButton.addEventListener('click', () => closeInventory());
+}
+
+if (inventoryActions.length) {
+  inventoryActions.forEach((button) => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.inventoryAction;
+      if (!activeInventorySlot) {
+        appendChatLog('<strong>Система</strong>: Сначала выберите предмет.');
+        return;
+      }
+      const itemId = activeInventorySlot.dataset.itemId;
+      const item = inventoryState.items.find((entry) => entry.id === itemId);
+      if (!item) return;
+      const actionText = {
+        equip: 'готовится экипировать',
+        use: 'готовится использовать',
+        drop: 'прикидывает, стоит ли выбросить'
+      }[action] ?? 'взаимодействует с';
+      appendCombatLog(`Вы ${actionText.toLowerCase()} предмет «${item.name}».`);
+    });
+  });
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && inventoryModal && !inventoryModal.classList.contains('is-hidden')) {
+    closeInventory();
+  }
+});
 
 if (logTabs.length && logPanels.length) {
   logTabs.forEach((tab) => {

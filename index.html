@@ -201,6 +201,41 @@
           </section>
         </div>
       </div>
+
+      <div class="modal-layer is-hidden" id="inventory-modal" role="dialog" aria-modal="true" aria-labelledby="inventory-title" aria-hidden="true">
+        <div class="modal-backdrop" data-dismiss="inventory"></div>
+        <div class="modal-window inventory-window" role="document">
+          <header class="modal-header">
+            <h2 id="inventory-title">Инвентарь</h2>
+            <button type="button" class="modal-close" id="inventory-close" aria-label="Закрыть инвентарь">✕</button>
+          </header>
+          <div class="inventory-body">
+            <aside class="inventory-summary">
+              <div class="inventory-weight">
+                <span class="inventory-weight__label">Вес</span>
+                <span class="inventory-weight__value" id="inventory-weight">48 / 120</span>
+              </div>
+              <ul class="inventory-resources" id="inventory-resources">
+                <li><span>Золото</span><span id="inventory-gold">1 250</span></li>
+                <li><span>Эссенция</span><span id="inventory-essence">9 870</span></li>
+                <li><span>Кристаллы</span><span id="inventory-crystals">1 240</span></li>
+              </ul>
+            </aside>
+            <div class="inventory-grid" id="inventory-grid" role="list" aria-label="Содержимое рюкзака"></div>
+            <section class="inventory-details" aria-live="polite">
+              <h3 id="inventory-item-name">Выберите предмет</h3>
+              <p id="inventory-item-type" class="inventory-item-meta"></p>
+              <p id="inventory-item-description" class="inventory-item-description">Кликните на ячейку, чтобы увидеть подробности.</p>
+              <dl class="inventory-item-stats" id="inventory-item-stats"></dl>
+              <div class="inventory-actions">
+                <button type="button" class="inventory-action" data-inventory-action="equip">Экипировать</button>
+                <button type="button" class="inventory-action" data-inventory-action="use">Использовать</button>
+                <button type="button" class="inventory-action" data-inventory-action="drop">Выбросить</button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
       <div class="client-footer">
         <span class="footer-badge">v 4.0.1</span>
         <span class="footer-text">Blood Legends · Окно клиента</span>
