@@ -10,39 +10,90 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="page">
-    <header class="header">
-      <div class="header__meta">
-        <div class="resource">
-          <svg class="resource__icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2c3.866 0 7 3.134 7 7 0 5.25-7 13-7 13S5 14.25 5 9c0-3.866 3.134-7 7-7z" />
-          </svg>
-          <span class="resource__label">Эссенция</span>
-          <span class="resource__value" id="essence-counter">9 870</span>
-        </div>
-        <div class="resource">
-          <svg class="resource__icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3l8 5v8l-8 5-8-5V8l8-5zm0 2.18L6.5 8.1v7.8l5.5 2.93 5.5-2.93V8.1L12 5.18z" />
-          </svg>
-          <span class="resource__label">Кристаллы</span>
-          <span class="resource__value" id="crystal-counter">1 240</span>
-        </div>
-        <div class="resource">
-          <svg class="resource__icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2l2.09 6.26H20l-5.17 3.76 2.09 6.26L12 14.52l-4.92 3.76 2.09-6.26L4 8.26h5.91L12 2z" />
-          </svg>
-          <span class="resource__label">Слава</span>
-          <span class="resource__value" id="renown-counter">42 600</span>
-        </div>
-        <div class="header__time" aria-live="polite" id="server-time">00:00</div>
+  <header class="hud">
+    <div class="hud__title">
+      <h1 class="hud__logo">Blood Legends</h1>
+      <p class="hud__subtitle">Хроники Кровавого Полумесяца</p>
+    </div>
+    <div class="hud__meta">
+      <div class="resource">
+        <svg class="resource__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2c3.866 0 7 3.134 7 7 0 5.25-7 13-7 13S5 14.25 5 9c0-3.866 3.134-7 7-7z" />
+        </svg>
+        <span class="resource__label">Эссенция</span>
+        <span class="resource__value" id="essence-counter">9 870</span>
       </div>
-      <h1 class="title">Blood Legends</h1>
-      <p class="subtitle">Хроники Кровавого Полумесяца</p>
-    </header>
+      <div class="resource">
+        <svg class="resource__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3l8 5v8l-8 5-8-5V8l8-5zm0 2.18L6.5 8.1v7.8l5.5 2.93 5.5-2.93V8.1L12 5.18z" />
+        </svg>
+        <span class="resource__label">Кристаллы</span>
+        <span class="resource__value" id="crystal-counter">1 240</span>
+      </div>
+      <div class="resource">
+        <svg class="resource__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2l2.09 6.26H20l-5.17 3.76 2.09 6.26L12 14.52l-4.92 3.76 2.09-6.26L4 8.26h5.91L12 2z" />
+        </svg>
+        <span class="resource__label">Слава</span>
+        <span class="resource__value" id="renown-counter">42 600</span>
+      </div>
+      <div class="hud__time" aria-live="polite" id="server-time">00:00</div>
+    </div>
+  </header>
 
-    <main class="layout">
-      <section class="panel player">
-        <header class="panel__header">
+  <main class="game-stage">
+    <div class="stage-surface">
+      <section class="stage-map" aria-label="Лабиринт Империи">
+        <div class="map-window">
+          <div class="map-window__chrome">
+            <span class="map-window__title">Лабиринт Империи</span>
+            <span class="map-window__readout" id="map-coords" aria-live="polite">Центральная цитадель · Шаг [07:07]</span>
+          </div>
+          <div class="map-window__viewport">
+            <div class="map-viewport">
+              <canvas id="world-map-canvas" width="560" height="360" role="img" aria-label="Лабиринт Империи Кровавого Полумесяца"></canvas>
+              <ul class="map-nodes" id="map-node-layer" aria-label="Точки перемещения по карте"></ul>
+              <div class="map-avatar" id="map-avatar" aria-hidden="true">
+                <span class="map-avatar__pulse"></span>
+                <span class="map-avatar__icon">✢</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="map-overlay map-overlay--legend">
+          <div class="map-legend">
+            <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--stronghold"></span> Центральные узлы</div>
+            <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--step"></span> Переходы лабиринта</div>
+            <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--encounter"></span> Боевые встречи</div>
+            <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--treasure"></span> Сокровищницы</div>
+            <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--sanctum"></span> Святилища</div>
+            <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--gate"></span> Заставы и ворота</div>
+            <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--boss"></span> Боссы локаций</div>
+            <div class="map-legend__item"><span class="map-legend__swatch"></span> Сектора локаций</div>
+          </div>
+        </div>
+        <div class="map-overlay map-overlay--controls" aria-label="Управление перемещением по карте">
+          <div class="map-controls__status">
+            <span class="map-controls__label">Текущая точка</span>
+            <strong class="map-controls__value" id="map-location">Цитадель Алого Сумрака</strong>
+          </div>
+          <div class="map-controls__pad" role="group" aria-label="Стрелки перемещения">
+            <button type="button" class="map-control map-control--north" data-direction="north" aria-label="Шаг к северу"><span>⬆</span></button>
+            <button type="button" class="map-control map-control--west" data-direction="west" aria-label="Шаг к западу"><span>⬅</span></button>
+            <button type="button" class="map-control map-control--origin" data-direction="origin" aria-label="Вернуться в центр"><span>⦿</span></button>
+            <button type="button" class="map-control map-control--east" data-direction="east" aria-label="Шаг к востоку"><span>➡</span></button>
+            <button type="button" class="map-control map-control--south" data-direction="south" aria-label="Шаг к югу"><span>⬇</span></button>
+          </div>
+          <p class="map-controls__hint">Используйте стрелки, WASD или клики по точкам, чтобы продвигаться. Переходы могут вызвать случайные бои по уровню сектора.</p>
+        </div>
+        <ol class="map-overlay map-overlay--trail map-trail" id="map-trail" aria-live="polite">
+          <li class="map-trail__item">Цитадель Алого Сумрака</li>
+        </ol>
+        <div class="map-overlay map-overlay--intel map-intel" id="map-intel" role="status">Центральная цитадель. Угроза: 12. Сердце Империи ждёт ваших приказов.</div>
+      </section>
+
+      <section class="overlay overlay--hero" aria-label="Параметры героя">
+        <header class="overlay__header">
           <h2>Кровавый Лорд</h2>
           <span class="tag">Вампир · Уровень <span id="player-level">12</span></span>
         </header>
@@ -77,8 +128,8 @@
         </dl>
       </section>
 
-      <section class="panel quests">
-        <header class="panel__header">
+      <section class="overlay overlay--quests" aria-label="Квесты">
+        <header class="overlay__header">
           <h2>Квесты</h2>
         </header>
         <div class="quest-filters" role="tablist" aria-label="Фильтр квестов">
@@ -126,118 +177,65 @@
         </ul>
       </section>
 
-      <section class="panel world-map">
-        <header class="panel__header">
-          <h2>Карта мира</h2>
-          <p class="panel__subtitle">Катакомбы Империи Кровавого Полумесяца</p>
-        </header>
-        <div class="map-window">
-          <div class="map-window__chrome">
-            <span class="map-window__title">Лабиринт Империи</span>
-            <span class="map-window__readout" id="map-coords" aria-live="polite">Центральная цитадель · Шаг [07:07]</span>
-          </div>
-          <div class="map-window__viewport">
-            <div class="map-viewport">
-              <canvas id="world-map-canvas" width="560" height="360" role="img" aria-label="Лабиринт Империи Кровавого Полумесяца"></canvas>
-              <ul class="map-nodes" id="map-node-layer" aria-label="Точки перемещения по карте"></ul>
-              <div class="map-avatar" id="map-avatar" aria-hidden="true">
-                <span class="map-avatar__pulse"></span>
-                <span class="map-avatar__icon">✢</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="map-legend">
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--stronghold"></span> Центральные узлы</div>
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--step"></span> Переходы лабиринта</div>
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--encounter"></span> Боевые встречи</div>
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--treasure"></span> Сокровищницы</div>
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--sanctum"></span> Святилища</div>
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--gate"></span> Заставы и ворота</div>
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--boss"></span> Боссы локаций</div>
-          <div class="map-legend__item"><span class="map-legend__swatch"></span> Сектора локаций</div>
-        </div>
-        <div class="map-controls" aria-label="Управление перемещением по карте">
-          <div class="map-controls__status">
-            <span class="map-controls__label">Текущая точка</span>
-            <strong class="map-controls__value" id="map-location">Цитадель Алого Сумрака</strong>
-          </div>
-          <div class="map-controls__pad" role="group" aria-label="Стрелки перемещения">
-            <button type="button" class="map-control map-control--north" data-direction="north" aria-label="Шаг к северу"><span>⬆</span></button>
-            <button type="button" class="map-control map-control--west" data-direction="west" aria-label="Шаг к западу"><span>⬅</span></button>
-            <button type="button" class="map-control map-control--origin" data-direction="origin" aria-label="Вернуться в центр"><span>⦿</span></button>
-            <button type="button" class="map-control map-control--east" data-direction="east" aria-label="Шаг к востоку"><span>➡</span></button>
-            <button type="button" class="map-control map-control--south" data-direction="south" aria-label="Шаг к югу"><span>⬇</span></button>
-          </div>
-          <p class="map-controls__hint">Используйте стрелки, WASD или клики по точкам, чтобы продвигаться. Переходы могут вызвать случайные бои по уровню сектора.</p>
-        </div>
-        <ol class="map-trail" id="map-trail" aria-live="polite">
-          <li class="map-trail__item">Цитадель Алого Сумрака</li>
-        </ol>
-        <div class="map-intel" id="map-intel" role="status">Центральная цитадель. Угроза: 12. Сердце Империи ждёт ваших приказов.</div>
-      </section>
-      <section class="panel combat-suite">
-        <header class="panel__header">
+      <section class="overlay overlay--combat" aria-label="Боевой центр">
+        <header class="overlay__header">
           <h2>Боевой центр</h2>
-          <p class="panel__subtitle">Управление боем и трофеями в одном месте</p>
+          <p class="overlay__subtitle">Управление боем и трофеями</p>
         </header>
-        <div class="combat-suite__body">
-          <div class="combat-suite__block combat-suite__block--enemy">
-            <h3 class="combat-suite__block-title">Противник</h3>
-            <div class="enemy-card">
-              <div class="enemy-card__info">
-                <h3>Скелет-воин</h3>
-                <span class="tag">Уровень <span id="enemy-level">8</span></span>
-              </div>
-              <div class="bar">
-                <label>НР</label>
-                <div class="bar__track">
-                  <div class="bar__value bar__value--hp" data-bar="enemy-hp" data-current="320" data-max="500" style="--value: 0.64"></div>
-                  <span class="bar__text" data-bar-text="enemy-hp">320 / 500</span>
-                </div>
-              </div>
-              <div class="enemy-card__status" id="enemy-status">Скелет оценивает ваши манёвры.</div>
+        <div class="combat-suite__block combat-suite__block--enemy">
+          <h3 class="combat-suite__block-title">Противник</h3>
+          <div class="enemy-card">
+            <div class="enemy-card__info">
+              <h3>Скелет-воин</h3>
+              <span class="tag">Уровень <span id="enemy-level">8</span></span>
             </div>
-          </div>
-          <div class="combat-suite__block combat-suite__block--actions">
-            <h3 class="combat-suite__block-title">Действия</h3>
-            <div class="action-grid">
-              <button class="action-button action-button--attack" data-action="attack">Атаковать</button>
-              <button class="action-button" data-action="defend">Защита</button>
-              <button class="action-button" data-action="skill">Умение</button>
-              <button class="action-button" data-action="heal">Лечение</button>
-            </div>
-            <div class="action-readout" id="action-readout" aria-live="polite">Выберите действие, чтобы начать раунд.</div>
-          </div>
-          <div class="combat-suite__block combat-suite__block--state">
-            <h3 class="combat-suite__block-title">Статусы боя</h3>
-            <div class="combat-state">
-              <div class="combat-state__row">
-                <span class="combat-state__label">Фаза</span>
-                <span class="combat-state__value combat-state__value--default" id="turn-indicator">Ваш ход</span>
-              </div>
-              <div class="combat-state__row">
-                <span class="combat-state__label">Стойка</span>
-                <span class="combat-state__value combat-state__value--default" id="stance-indicator">Наступление</span>
+            <div class="bar">
+              <label>НР</label>
+              <div class="bar__track">
+                <div class="bar__value bar__value--hp" data-bar="enemy-hp" data-current="320" data-max="500" style="--value: 0.64"></div>
+                <span class="bar__text" data-bar-text="enemy-hp">320 / 500</span>
               </div>
             </div>
+            <div class="enemy-card__status" id="enemy-status">Скелет оценивает ваши манёвры.</div>
           </div>
-          <div class="combat-suite__block combat-suite__block--loot">
-            <div class="combat-suite__block-heading">
-              <h3 class="combat-suite__block-title">Трофеи боя</h3>
-              <p class="combat-suite__block-subtitle">Последняя добыча</p>
+        </div>
+        <div class="combat-suite__block combat-suite__block--actions">
+          <h3 class="combat-suite__block-title">Действия</h3>
+          <div class="action-grid">
+            <button class="action-button action-button--attack" data-action="attack">Атаковать</button>
+            <button class="action-button" data-action="defend">Защита</button>
+            <button class="action-button" data-action="skill">Умение</button>
+            <button class="action-button" data-action="heal">Лечение</button>
+          </div>
+          <div class="action-readout" id="action-readout" aria-live="polite">Выберите действие, чтобы начать раунд.</div>
+        </div>
+        <div class="combat-suite__block combat-suite__block--state">
+          <h3 class="combat-suite__block-title">Статусы боя</h3>
+          <div class="combat-state">
+            <div class="combat-state__row">
+              <span class="combat-state__label">Фаза</span>
+              <span class="combat-state__value combat-state__value--default" id="turn-indicator">Ваш ход</span>
             </div>
-            <ul class="loot-list" id="loot-list">
-              <li class="loot-list__empty">Побеждайте врагов, чтобы собирать трофеи и артефакты.</li>
-            </ul>
+            <div class="combat-state__row">
+              <span class="combat-state__label">Стойка</span>
+              <span class="combat-state__value combat-state__value--default" id="stance-indicator">Наступление</span>
+            </div>
           </div>
+        </div>
+        <div class="combat-suite__block combat-suite__block--loot">
+          <div class="combat-suite__block-heading">
+            <h3 class="combat-suite__block-title">Трофеи боя</h3>
+            <p class="combat-suite__block-subtitle">Последняя добыча</p>
+          </div>
+          <ul class="loot-list" id="loot-list">
+            <li class="loot-list__empty">Побеждайте врагов, чтобы собирать трофеи и артефакты.</li>
+          </ul>
         </div>
       </section>
 
-      <section class="panel combat-log">
-        <header class="panel__header">
+      <section class="overlay overlay--log" aria-label="Журнал боя">
+        <header class="overlay__header">
           <h2>Журнал боя</h2>
-          <p class="panel__subtitle">Последние события схваток</p>
         </header>
         <ul class="log" id="combat-log">
           <li>Вы атакуете Скелета-воина! Вы наносите <strong>45</strong> урона.</li>
@@ -248,26 +246,9 @@
         </ul>
       </section>
 
-      <section class="panel chat">
-        <header class="panel__header">
-          <h2>Общий чат</h2>
-        </header>
-        <ul class="chat-log" id="chat-log">
-          <li><span class="chat-log__time">21:25</span> <span class="chat-log__name chat-log__name--mage">ТёмныйМаг:</span> Кто-нибудь хочет пойти на данж?</li>
-          <li><span class="chat-log__time">21:25</span> <span class="chat-log__name chat-log__name--warrior">КровавыйВоин:</span> Я готов! Какой уровень?</li>
-          <li><span class="chat-log__time">21:25</span> <span class="chat-log__system">Игрок «НочнойОхотник» вошёл в игру</span></li>
-          <li><span class="chat-log__time">21:25</span> <span class="chat-log__name chat-log__name--hunter">НочнойОхотник:</span> Всем привет! Есть кто для PvP?</li>
-        </ul>
-        <form class="chat-form" id="chat-form">
-          <input type="text" id="chat-input" placeholder="Введите сообщение..." required>
-          <button type="submit">Отправить</button>
-        </form>
-      </section>
-
-      <section class="panel inventory">
-        <header class="panel__header">
+      <section class="overlay overlay--inventory" aria-label="Инвентарь">
+        <header class="overlay__header">
           <h2>Инвентарь</h2>
-          <p class="panel__subtitle">Сумка героя</p>
         </header>
         <ul class="inventory-grid">
           <li class="inventory-item">
@@ -301,143 +282,23 @@
         </ul>
       </section>
 
-      <section class="panel guild">
-        <header class="panel__header">
-          <h2>Гильдия «Алая Клятва»</h2>
-          <p class="panel__subtitle">Текущая активность</p>
+      <section class="overlay overlay--chat" aria-label="Общий чат">
+        <header class="overlay__header">
+          <h2>Чат</h2>
         </header>
-        <ul class="guild-list">
-          <li class="guild-member guild-member--online">
-            <span>
-              <strong>Валерия Ноктис</strong>
-              <p>Архонт крови · Лидер гильдии</p>
-            </span>
-            <span class="guild-member__status">В онлайне</span>
-          </li>
-          <li class="guild-member guild-member--online">
-            <span>
-              <strong>Таррен Мор</strong>
-              <p>Рыцарь Полумесяца · Офицер рейдов</p>
-            </span>
-            <span class="guild-member__status">В данже</span>
-          </li>
-          <li class="guild-member guild-member--offline">
-            <span>
-              <strong>Исильдра</strong>
-              <p>Теневой маг · Хранитель знаний</p>
-            </span>
-            <span class="guild-member__status">Оффлайн</span>
-          </li>
-          <li class="guild-member guild-member--offline">
-            <span>
-              <strong>Грив Сталекров</strong>
-              <p>Берсерк · Капитан арены</p>
-            </span>
-            <span class="guild-member__status">Отдыхает</span>
-          </li>
+        <ul class="chat-log" id="chat-log">
+          <li><span class="chat-log__time">21:25</span> <span class="chat-log__name chat-log__name--mage">ТёмныйМаг:</span> Кто-нибудь хочет пойти на данж?</li>
+          <li><span class="chat-log__time">21:25</span> <span class="chat-log__name chat-log__name--warrior">КровавыйВоин:</span> Я готов! Какой уровень?</li>
+          <li><span class="chat-log__time">21:25</span> <span class="chat-log__system">Игрок «НочнойОхотник» вошёл в игру</span></li>
+          <li><span class="chat-log__time">21:25</span> <span class="chat-log__name chat-log__name--hunter">НочнойОхотник:</span> Всем привет! Есть кто для PvP?</li>
         </ul>
+        <form class="chat-form" id="chat-form">
+          <input type="text" id="chat-input" placeholder="Введите сообщение..." required>
+          <button type="submit">Отправить</button>
+        </form>
       </section>
-
-      <section class="panel events">
-        <header class="panel__header">
-          <h2>События</h2>
-          <p class="panel__subtitle">Кровавая ротация</p>
-        </header>
-        <ul class="event-list">
-          <li class="event" data-seconds="7200">
-            <div>
-              <strong>Осада Кровавого Замка</strong>
-              <p>Гильдии сражаются за трон Верховного Архонта.</p>
-            </div>
-            <span class="event__timer" aria-live="polite">02:00:00</span>
-          </li>
-          <li class="event" data-seconds="3600">
-            <div>
-              <strong>Турнир Ночного Пламени</strong>
-              <p>PvP-чемпионат на Арене Полумесяца.</p>
-            </div>
-            <span class="event__timer" aria-live="polite">01:00:00</span>
-          </li>
-          <li class="event" data-seconds="5400">
-            <div>
-              <strong>Поиск Реликвий Тьмы</strong>
-              <p>Соберите команды для исследования Катакомб Забвения.</p>
-            </div>
-            <span class="event__timer" aria-live="polite">01:30:00</span>
-          </li>
-        </ul>
-      </section>
-
-      <section class="panel arena">
-        <header class="panel__header">
-          <h2>Арена Полумесяца</h2>
-          <p class="panel__subtitle">Лестница славы</p>
-        </header>
-        <table class="arena-table">
-          <thead>
-            <tr>
-              <th scope="col">Место</th>
-              <th scope="col">Игрок</th>
-              <th scope="col">Рейтинг</th>
-              <th scope="col">Серия побед</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Валерия Ноктис</td>
-              <td>2 840</td>
-              <td>12</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>НочнойОхотник</td>
-              <td>2 610</td>
-              <td>7</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Грив Сталекров</td>
-              <td>2 420</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>Таррен Мор</td>
-              <td>2 170</td>
-              <td>4</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="panel lore">
-        <header class="panel__header">
-          <h2>Легенды Крови</h2>
-          <p class="panel__subtitle">Мифология Blood Legends</p>
-        </header>
-        <article class="lore__text">
-          <p>
-            После Ритуала Алых Врат мир Эйдолона разделился на зоны света и тени.
-            Вампирские князья, сдерживая поток кровавой магии, заключили договор с
-            смертными родами. Теперь, когда Кровавый Полумесяц поднимается над
-            горизонтом, на арену выходят новые герои, чтобы определить судьбу Империи.
-          </p>
-          <p>
-            В основе Blood Legends лежит борьба между орденом Лунных Жрецов и Советам
-            Крови. Игроки выбирают свой путь: служить тьме, хранить баланс или выжигать
-            корень зла. Каждое решение отражается на карте мира и открывает новые ветви
-            событий. Охота за реликвиями Алого Света принесёт силу, но пробудит древних
-            стражей, чьи имена забыты даже в Катакомбах Забвения.
-          </p>
-          <p>
-            Соберите союзников, отстройте собственный замок и раскройте тайны Кровавого
-            Полумесяца, пока не настал час Последней Ночи.
-          </p>
-        </article>
-      </section>
-    </main>
-  </div>
+    </div>
+  </main>
 
   <script src="script.js"></script>
 </body>
