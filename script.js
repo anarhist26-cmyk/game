@@ -30,6 +30,34 @@ const inventoryItemType = document.getElementById('inventory-item-type');
 const inventoryItemDescription = document.getElementById('inventory-item-description');
 const inventoryItemStats = document.getElementById('inventory-item-stats');
 const inventoryActions = document.querySelectorAll('[data-inventory-action]');
+const equipmentTableBody = document.getElementById('equipment-table-body');
+
+const gameData = {
+  loot: new Map(),
+  monsters: [],
+  monsterIndex: new Map(),
+  locations: [],
+  locationIndex: new Map()
+};
+
+const dataSources = {
+  loot: 'data/loot.json',
+  monsters: 'data/monsters.json',
+  locations: 'data/locations.json'
+};
+
+const rarityGlyphs = {
+  legendary: '✦',
+  легендарный: '✦',
+  epic: '✧',
+  эпический: '✧',
+  rare: '◆',
+  редкий: '◆',
+  uncommon: '⬗',
+  необычный: '⬗',
+  common: '⬖',
+  обычный: '⬖'
+};
 
 const inventoryState = {
   capacity: 120,
@@ -161,7 +189,131 @@ const inventoryState = {
   ]
 };
 
+const equipmentSlotsMeta = [
+  { id: 'helmet', label: 'Шлем' },
+  { id: 'amulet', label: 'Кулон' },
+  { id: 'gloves', label: 'Перчатки' },
+  { id: 'ring1', label: 'Кольцо I' },
+  { id: 'ring2', label: 'Кольцо II' },
+  { id: 'weapon', label: 'Оружие' },
+  { id: 'belt', label: 'Пояс' },
+  { id: 'boots', label: 'Обувь' },
+  { id: 'greaves', label: 'Поножи' },
+  { id: 'offhand', label: 'Щит / Второе оружие' },
+  { id: 'armor', label: 'Броня' },
+  { id: 'cloak', label: 'Плащ' }
+];
+
+const equipmentState = {
+  helmet: {
+    id: 'helm-eclipse',
+    name: 'Шлем Эйдолона',
+    icon: '🪖',
+    rarity: 'epic',
+    properties: {
+      Защита: '+28',
+      'Сопротивление тьме': '+15%'
+    }
+  },
+  amulet: {
+    id: 'amulet-scarlet',
+    name: 'Кулон Алого Сердца',
+    icon: '📿',
+    rarity: 'legendary',
+    properties: {
+      'Сила крови': '+20',
+      'Регенерация маны': '+6 ед./5 сек'
+    }
+  },
+  gloves: {
+    id: 'gloves-warden',
+    name: 'Перчатки Дозорного',
+    icon: '🧤',
+    rarity: 'rare',
+    properties: {
+      'Скорость атаки': '+8%',
+      Точность: '+6'
+    }
+  },
+  ring1: cloneInventoryItem('ring-storm'),
+  ring2: {
+    id: 'ring-warden',
+    name: 'Кольцо Стража',
+    icon: '💍',
+    rarity: 'rare',
+    properties: {
+      Защита: '+6',
+      'Сопротивление магии': '+10%'
+    }
+  },
+  weapon: cloneInventoryItem('blade-dawn'),
+  belt: {
+    id: 'belt-ember',
+    name: 'Пояс Жаркого ядра',
+    icon: '🪢',
+    rarity: 'epic',
+    properties: {
+      'Макс. выносливость': '+30',
+      'Сопротивление огню': '+8%'
+    }
+  },
+  boots: {
+    id: 'boots-shadow',
+    name: 'Сапоги Теневого шага',
+    icon: '🥾',
+    rarity: 'epic',
+    properties: {
+      'Скорость перемещения': '+12%',
+      'Беззвучный шаг': '+10%'
+    }
+  },
+  greaves: {
+    id: 'greaves-bastion',
+    name: 'Поножи Бастиона',
+    icon: '🦿',
+    rarity: 'rare',
+    properties: {
+      Броня: '+18',
+      Стойкость: '+6'
+    }
+  },
+  offhand: cloneInventoryItem('shield-obsidian'),
+  armor: {
+    id: 'armor-bloodguard',
+    name: 'Кираса Кровавой Стражи',
+    icon: '🛡️',
+    rarity: 'legendary',
+    properties: {
+      Броня: '+46',
+      'Поглощение урона': '+12%'
+    }
+  },
+  cloak: {
+    id: 'cloak-veil',
+    name: 'Плащ Багрового Покрова',
+    icon: '🧥',
+    rarity: 'epic',
+    properties: {
+      Скрытность: '+15%',
+      'Сопротивление мраку': '+12%'
+    }
+  }
+};
+
 let activeInventorySlot = null;
+
+function cloneInventoryItem(itemId) {
+  const item = inventoryState.items.find((entry) => entry.id === itemId);
+  if (!item) return null;
+  return {
+    id: item.id,
+    name: item.name,
+    icon: item.icon,
+    rarity: item.rarity,
+    properties: { ...item.stats },
+    description: item.description ?? ''
+  };
+}
 
 const turnIndicator = document.getElementById('turn-indicator');
 const stanceIndicator = document.getElementById('stance-indicator');
@@ -198,6 +350,124 @@ function formatNumber(value) {
 function timestamp() {
   const now = new Date();
   return now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+}
+
+function capitalize(text) {
+  if (!text) return '';
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+async function fetchJson(path) {
+  const response = await fetch(path);
+  if (!response.ok) {
+    throw new Error(`Не удалось загрузить ${path}: ${response.status}`);
+  }
+  return response.json();
+}
+
+function enrichLootEntry(raw) {
+  const rarityKey = raw.rarity?.toLowerCase();
+  const icon = raw.icon || rarityGlyphs[rarityKey] || '♦';
+  return {
+    ...raw,
+    icon,
+    properties: raw.properties ?? {}
+  };
+}
+
+function mergeQuantityRange(entry) {
+  if (!entry) return [1, 1];
+  if (Array.isArray(entry.quantityRange)) return entry.quantityRange;
+  if (typeof entry.min === 'number' && typeof entry.max === 'number') {
+    return [entry.min, entry.max];
+  }
+  if (typeof entry.quantity === 'number') {
+    return [entry.quantity, entry.quantity];
+  }
+  return [1, 1];
+}
+
+function describeMonsterIntro(monster) {
+  const rank = monster.rank ? capitalize(monster.rank) : 'Существо';
+  const habitat = monster.habitat ? `из локации ${monster.habitat}` : 'лабиринта';
+  const ability = monster.abilities?.length ? `Использует приёмы: ${monster.abilities.join(', ')}.` : 'Готов к атаке.';
+  return `${rank} ${habitat}. ${ability}`;
+}
+
+function transformMonster(rawMonster) {
+  const stats = rawMonster.stats ?? {};
+  const hp = stats.hp ?? 240;
+  const attack = stats.attack ?? 32;
+  const defense = stats.defense ?? 18;
+  const speed = stats.speed ?? 12;
+  const level = rawMonster.level ?? Math.max(1, Math.round((hp + attack + defense) / 40));
+  const xpReward = Math.round(60 + level * 18 + defense * 1.6 + speed * 1.2);
+  const goldBase = Math.round(45 + level * 6 + defense * 1.4);
+  const goldReward = [goldBase, Math.round(goldBase + level * 4 + hp / 10)];
+
+  const lootTable = (rawMonster.loot ?? []).map((entry) => {
+    const lootDef = gameData.loot.get(entry.itemId);
+    const rarityKey = lootDef?.rarity?.toLowerCase();
+    return {
+      id: entry.itemId,
+      name: lootDef?.name ?? entry.itemId,
+      rarity: lootDef?.rarity ?? 'обычный',
+      chance: entry.chance ?? lootDef?.dropChance ?? 0,
+      quantityRange: mergeQuantityRange(entry),
+      icon: lootDef?.icon ?? rarityGlyphs[rarityKey] ?? '♦',
+      properties: lootDef?.properties ?? null,
+      description: lootDef?.description ?? ''
+    };
+  });
+
+  return {
+    id: rawMonster.id,
+    name: rawMonster.name,
+    level,
+    maxHp: hp,
+    minDamage: Math.max(6, Math.round(attack * 0.65)),
+    maxDamage: Math.max(10, Math.round(attack * 1.12)),
+    xpReward,
+    goldReward,
+    intro: describeMonsterIntro(rawMonster),
+    lootTable,
+    alignment: rawMonster.alignment,
+    habitat: rawMonster.habitat,
+    abilities: rawMonster.abilities ?? [],
+    rank: rawMonster.rank ?? 'противник',
+    base: rawMonster
+  };
+}
+
+function registerLocations(locations) {
+  gameData.locations = locations;
+  gameData.locationIndex.clear();
+  locations.forEach((location) => {
+    gameData.locationIndex.set(location.id, location);
+  });
+}
+
+async function loadGameData() {
+  const [lootData, monsterData, locationData] = await Promise.all([
+    fetchJson(dataSources.loot),
+    fetchJson(dataSources.monsters),
+    fetchJson(dataSources.locations)
+  ]);
+
+  gameData.loot.clear();
+  lootData.forEach((entry) => {
+    const enriched = enrichLootEntry(entry);
+    gameData.loot.set(enriched.id, enriched);
+  });
+
+  gameData.monsterIndex.clear();
+  gameData.monsters = monsterData.map((monster) => {
+    const template = transformMonster(monster);
+    gameData.monsterIndex.set(template.id, template);
+    return template;
+  });
+
+  registerLocations(locationData);
 }
 
 function appendLog(target, text) {
@@ -251,6 +521,22 @@ function clearInventorySelection() {
   }
 }
 
+function findEquipmentSlotByItem(itemId) {
+  return (
+    Object.entries(equipmentState).find(([, entry]) => {
+      if (!entry) return false;
+      if (typeof entry === 'string') {
+        return entry === itemId;
+      }
+      return entry.id === itemId;
+    })?.[0] ?? null
+  );
+}
+
+function isItemEquipped(itemId) {
+  return Boolean(findEquipmentSlotByItem(itemId));
+}
+
 function renderInventoryDetails(item) {
   if (!inventoryItemName || !inventoryItemDescription || !inventoryItemStats || !inventoryItemType) return;
   if (!item) {
@@ -266,7 +552,8 @@ function renderInventoryDetails(item) {
   inventoryItemDescription.textContent = item.description;
 
   inventoryItemStats.replaceChildren();
-  Object.entries(item.stats).forEach(([key, value]) => {
+  const stats = item.stats ?? item.properties ?? {};
+  Object.entries(stats).forEach(([key, value]) => {
     const term = document.createElement('dt');
     term.textContent = key;
     const def = document.createElement('dd');
@@ -275,9 +562,11 @@ function renderInventoryDetails(item) {
   });
 }
 
-function renderInventory() {
+function renderInventory(selectedItemId = activeInventorySlot?.dataset.itemId ?? null) {
   if (!inventoryGrid) return;
   inventoryGrid.replaceChildren();
+  activeInventorySlot = null;
+  let selectedItem = null;
   inventoryState.items.forEach((item) => {
     const slot = document.createElement('button');
     slot.type = 'button';
@@ -289,6 +578,9 @@ function renderInventory() {
       <span class="inventory-slot__icon">${item.icon}</span>
       <span class="inventory-slot__label">${item.short}</span>
     `;
+    if (isItemEquipped(item.id)) {
+      slot.classList.add('is-equipped');
+    }
     slot.addEventListener('click', () => {
       clearInventorySelection();
       activeInventorySlot = slot;
@@ -296,7 +588,155 @@ function renderInventory() {
       renderInventoryDetails(item);
     });
     inventoryGrid.append(slot);
+    if (item.id === selectedItemId) {
+      slot.classList.add('is-active');
+      activeInventorySlot = slot;
+      selectedItem = item;
+    }
   });
+
+  if (activeInventorySlot && selectedItem) {
+    renderInventoryDetails(selectedItem);
+  } else if (!activeInventorySlot && inventoryGrid.firstElementChild instanceof HTMLElement) {
+    inventoryGrid.firstElementChild.click();
+  } else if (!inventoryState.items.length) {
+    renderInventoryDetails(null);
+  }
+}
+
+function formatPropertiesTooltip(entry) {
+  const lines = [];
+  if (entry.description) {
+    lines.push(entry.description);
+  }
+  const props = entry.properties ?? entry.stats ?? {};
+  const propLines = Object.entries(props).map(([key, value]) => `${key}: ${value}`);
+  if (propLines.length) {
+    if (lines.length) {
+      lines.push('');
+    }
+    lines.push(...propLines);
+  }
+  return lines.join('\n');
+}
+
+function getEquipmentDescriptor(entry) {
+  if (!entry) return null;
+  if (typeof entry === 'string') {
+    const fromInventory = cloneInventoryItem(entry);
+    if (fromInventory) return fromInventory;
+    const lootDef = gameData.loot.get(entry);
+    if (lootDef) {
+      return {
+        id: lootDef.id,
+        name: lootDef.name,
+        icon: lootDef.icon ?? rarityGlyphs[lootDef.rarity?.toLowerCase() ?? 'common'] ?? '⬖',
+        rarity: lootDef.rarity,
+        properties: lootDef.properties ?? {},
+        description: lootDef.description ?? ''
+      };
+    }
+    return null;
+  }
+  if (entry.properties || entry.stats) {
+    return {
+      id: entry.id,
+      name: entry.name,
+      icon: entry.icon ?? rarityGlyphs[entry.rarity?.toLowerCase() ?? 'common'] ?? '⬖',
+      rarity: entry.rarity,
+      properties: entry.properties ?? entry.stats ?? {},
+      description: entry.description ?? ''
+    };
+  }
+  return entry;
+}
+
+function renderEquipmentTable() {
+  if (!equipmentTableBody) return;
+  equipmentTableBody.replaceChildren();
+  equipmentSlotsMeta.forEach((slot) => {
+    const row = document.createElement('tr');
+    row.dataset.slot = slot.id;
+
+    const heading = document.createElement('th');
+    heading.scope = 'row';
+    heading.textContent = slot.label;
+
+    const cell = document.createElement('td');
+    const descriptor = getEquipmentDescriptor(equipmentState[slot.id]);
+    if (descriptor) {
+      const item = document.createElement('div');
+      item.className = 'equipment-item';
+      item.dataset.rarity = (descriptor.rarity ?? 'common').toLowerCase();
+      item.title = formatPropertiesTooltip(descriptor);
+
+      const icon = document.createElement('span');
+      icon.className = 'equipment-item__icon';
+      icon.textContent = descriptor.icon ?? rarityGlyphs[(descriptor.rarity ?? 'common').toLowerCase()] ?? '⬖';
+
+      const label = document.createElement('span');
+      label.textContent = descriptor.name;
+
+      item.append(icon, label);
+      cell.append(item);
+    } else {
+      cell.textContent = '—';
+      cell.classList.add('equipment-slot-empty');
+    }
+
+    row.append(heading, cell);
+    equipmentTableBody.append(row);
+  });
+}
+
+renderEquipmentTable();
+
+function getEquipmentSlotsForItem(item) {
+  const mapping = {
+    'Двуручный меч': ['weapon'],
+    'Щит': ['offhand'],
+    'Украшение': ['ring1', 'ring2'],
+    'Реликт': ['amulet', 'belt'],
+    'Катализатор': ['amulet'],
+    'Доспех': ['armor'],
+    'Броня': ['armor'],
+    'Оружие': ['weapon']
+  };
+  const key = item.type;
+  const slots = mapping[key];
+  if (!slots) {
+    return [];
+  }
+  return Array.isArray(slots) ? slots : [slots];
+}
+
+function equipItem(item) {
+  const alreadyEquipped = findEquipmentSlotByItem(item.id);
+  if (alreadyEquipped) {
+    return { success: false, reason: 'already', slot: alreadyEquipped };
+  }
+
+  const slots = getEquipmentSlotsForItem(item);
+  if (!slots.length) {
+    return { success: false, reason: 'incompatible' };
+  }
+
+  const targetSlot = slots.find((slot) => !equipmentState[slot]) ?? slots[0];
+
+  equipmentState[targetSlot] = {
+    id: item.id,
+    name: item.name,
+    icon: item.icon,
+    rarity: item.rarity,
+    properties: { ...(item.stats ?? item.properties ?? {}) },
+    description: item.description ?? ''
+  };
+
+  if (item.type === 'Двуручный меч' && targetSlot === 'weapon') {
+    equipmentState.offhand = null;
+  }
+
+  return { success: true, slot: targetSlot };
 }
 
 function openInventory() {
@@ -306,6 +746,7 @@ function openInventory() {
   syncInventoryResources();
   updateInventoryWeight();
   renderInventory();
+  renderEquipmentTable();
   if (inventoryState.items.length) {
     const firstSlot = inventoryGrid?.querySelector('.inventory-slot');
     if (firstSlot) {
@@ -363,76 +804,6 @@ const playerState = {
   skillRounds: 0
 };
 
-const enemyTemplates = [
-  {
-    id: 'skeleton',
-    name: 'Скелет-воин',
-    level: 8,
-    maxHp: 500,
-    minDamage: 18,
-    maxDamage: 36,
-    xpReward: 160,
-    goldReward: [85, 140],
-    intro: 'Скелет скрежещет клинками, выжидая момент для атаки.',
-    lootTable: [
-      { id: 'bone-shard', name: 'Костяной осколок', rarity: 'common', quantity: [2, 4], chance: 0.95, guaranteed: true, icon: '🦴' },
-      { id: 'grave-dust', name: 'Могильная пыль', rarity: 'uncommon', quantity: [1, 2], chance: 0.55, icon: '🕯️' },
-      { id: 'scarlet-signet', name: 'Алый перстень дозорного', rarity: 'rare', quantity: [1, 1], chance: 0.18, icon: '💍' },
-      { id: 'night-essence', name: 'Эссенция ночных стражей', rarity: 'epic', quantity: [1, 1], chance: 0.08, icon: '✨' }
-    ]
-  },
-  {
-    id: 'inquisitor',
-    name: 'Инквизитор Ночи',
-    level: 10,
-    maxHp: 620,
-    minDamage: 24,
-    maxDamage: 44,
-    xpReward: 210,
-    goldReward: [120, 200],
-    intro: 'Инквизитор окутан чёрным плащом и нашёптывает клятвы крови.',
-    lootTable: [
-      { id: 'obsidian-sigil', name: 'Обсидиановая печать', rarity: 'uncommon', quantity: [1, 2], chance: 0.75, guaranteed: true, icon: '🛡️' },
-      { id: 'blood-script', name: 'Писания кровавого дозора', rarity: 'rare', quantity: [1, 1], chance: 0.32, icon: '📜' },
-      { id: 'hex-ember', name: 'Уголь проклятия', rarity: 'epic', quantity: [1, 1], chance: 0.14, icon: '🔥' },
-      { id: 'dawn-mantle', name: 'Накидка Рассвета', rarity: 'legendary', quantity: [1, 1], chance: 0.06, icon: '🧥' }
-    ]
-  },
-  {
-    id: 'harpy',
-    name: 'Гарпия Рассвета',
-    level: 11,
-    maxHp: 540,
-    minDamage: 20,
-    maxDamage: 38,
-    xpReward: 195,
-    goldReward: [100, 170],
-    intro: 'Гарпия кружит над ареной, рассыпая перья с огненной кромкой.',
-    lootTable: [
-      { id: 'razor-plume', name: 'Лезвийное перо', rarity: 'common', quantity: [3, 5], chance: 0.88, guaranteed: true, icon: '🪶' },
-      { id: 'sky-glass', name: 'Осколок небесного стекла', rarity: 'uncommon', quantity: [1, 2], chance: 0.48, icon: '🔮' },
-      { id: 'storm-rune', name: 'Руна штормового визга', rarity: 'rare', quantity: [1, 1], chance: 0.2, icon: '🌀' },
-      { id: 'crescent-lyre', name: 'Лира Полуночного ветра', rarity: 'epic', quantity: [1, 1], chance: 0.08, icon: '🎼' }
-    ]
-  },
-  {
-    id: 'warlord',
-    name: 'Полководец Багровой Стражи',
-    level: 13,
-    maxHp: 720,
-    minDamage: 28,
-    maxDamage: 52,
-    xpReward: 280,
-    goldReward: [180, 260],
-    intro: 'Полководец поднимает клинок, призывая вас к решающей дуэли.',
-    lootTable: [
-      { id: 'blood-signet', name: 'Печать багрового командора', rarity: 'uncommon', quantity: [1, 2], chance: 0.8, guaranteed: true, icon: '🗡️' },
-      { id: 'legion-banner', name: 'Знамя Алой Стражи', rarity: 'rare', quantity: [1, 1], chance: 0.28, icon: '🚩' },
-      { id: 'moonsteel-ingot', name: 'Слиток лунной стали', rarity: 'epic', quantity: [1, 2], chance: 0.18, icon: '⚒️' },
-      { id: 'sovereign-crest', name: 'Герб Верховного Архонта', rarity: 'legendary', quantity: [1, 1], chance: 0.06, icon: '👑' }
-    ]
-  }
-];
 
 const combatPhrases = {
   attack: [
@@ -489,6 +860,8 @@ function ensureNode(x, y) {
 }
 
 function buildLabyrinth() {
+  mapState.nodes.clear();
+
   const segments = [
     [[6, 4], [6, 3], [6, 2], [6, 1]],
     [[6, 4], [6, 5], [6, 6], [6, 7]],
@@ -507,103 +880,126 @@ function buildLabyrinth() {
     path.forEach(([x, y]) => ensureNode(x, y));
   });
 
-  const locationConfigs = {
-    '6,4': {
-      type: 'stronghold',
-      name: 'Цитадель Алого Сумрака',
-      intel: 'Центральная цитадель. Угроза: 12. Сердце Империи ждёт ваших приказов.',
-      threat: 12,
-      levelRange: [10, 12],
-      encounterChance: 0.6
+  const locationBindings = [
+    {
+      id: 'gloomwood',
+      nodes: [
+        [6, 1],
+        [6, 2],
+        [6, 3],
+        [5, 3],
+        [7, 3]
+      ],
+      anchor: '6,1'
     },
-    '6,1': {
-      type: 'stronghold',
-      name: 'Врата Рассвета',
-      intel: 'Узкий проход, ведущий к верхним террасам. Патрули Орденов усилили караулы.',
-      threat: 9,
-      levelRange: [8, 10],
-      encounterChance: 0.4
+    {
+      id: 'abyssal_catacombs',
+      nodes: [
+        [5, 5],
+        [4, 5],
+        [3, 5],
+        [2, 5],
+        [3, 6],
+        [3, 7],
+        [3, 8]
+      ],
+      anchor: '3,6'
     },
-    '2,5': {
-      type: 'stronghold',
-      name: 'Хранилище Пепла',
-      intel: 'Сводчатая зала с барханами праха. В каждом вихре скрывается реликвия.',
-      threat: 15,
-      levelRange: [11, 14],
-      encounterChance: 0.5
+    {
+      id: 'ember_forge',
+      nodes: [
+        [8, 4],
+        [9, 4],
+        [10, 4],
+        [11, 4],
+        [9, 5],
+        [9, 6],
+        [9, 7],
+        [8, 6],
+        [8, 7],
+        [8, 8]
+      ],
+      anchor: '9,5'
     },
-    '3,7': {
-      type: 'encounter',
-      name: 'Катакомбы Эха',
-      intel: 'Отголоски шагов мешают ориентироваться. Нечисть любит засады на поворотах.',
-      threat: 16,
-      levelRange: [12, 15],
-      encounterChance: 0.65
-    },
-    '9,6': {
-      type: 'stronghold',
-      name: 'Святилище Лунных клинков',
-      intel: 'Алтарь, где перековывают клинки из светящегося камня. Магия ослепляет врагов.',
-      threat: 18,
-      levelRange: [12, 16],
-      encounterChance: 0.55
-    },
-    '8,2': {
-      type: 'stronghold',
-      name: 'Бастион Лестницы',
-      intel: 'Каменные площадки, перерезанные лучами небесного света. Отличный ориентир.',
-      threat: 11,
-      levelRange: [9, 12],
-      encounterChance: 0.45
-    },
-    '11,4': {
-      type: 'encounter',
-      name: 'Обелиск Заката',
-      intel: 'Шпиль переливается золотом. Говорят, у подножия обитают элитные дозорные.',
-      threat: 22,
-      levelRange: [14, 17],
-      encounterChance: 0.72
-    },
-    '3,8': {
-      type: 'treasure',
-      name: 'Зал трофеев',
-      intel: 'Древние сундуки. Можно найти ценные эссенции, если пережить ловушки.',
-      threat: 15,
-      levelRange: [12, 15],
-      encounterChance: 0.3
+    {
+      id: 'noctus_expanse',
+      nodes: [
+        [6, 6],
+        [6, 7],
+        [5, 6],
+        [5, 7],
+        [4, 7],
+        [8, 7]
+      ],
+      anchor: '6,7'
     }
-  };
+  ];
 
-  Object.entries(locationConfigs).forEach(([key, config]) => {
-    const node = mapState.nodes.get(key);
-    if (!node) return;
-    node.type = config.type;
-    node.name = config.name;
-    node.intel = config.intel;
-    node.threat = config.threat;
-    node.levelRange = config.levelRange;
-    node.encounterChance = config.encounterChance;
+  locationBindings.forEach((binding) => {
+    const location = gameData.locationIndex.get(binding.id);
+    if (!location) return;
+    const [minLevel, maxLevel] = location.levelRange ?? [1, 1];
+    const baseThreat = Math.round((minLevel + maxLevel) / 2 + (location.threatRating ?? 0) * 2);
+    const encounterChance = Math.min(0.9, 0.24 + (location.threatRating ?? 1) * 0.1);
+    binding.nodes.forEach(([x, y]) => {
+      const node = ensureNode(x, y);
+      const key = `${x},${y}`;
+      node.locationId = binding.id;
+      node.sector = location.sector;
+      node.levelRange = location.levelRange;
+      node.threat = baseThreat;
+      node.encounterChance = encounterChance;
+      const index = binding.nodes.findIndex(([nx, ny]) => nx === x && ny === y);
+      const poi = location.pointsOfInterest?.[index % (location.pointsOfInterest.length || 1)] ?? null;
+      const travelEvent = location.travelEvents?.[index % (location.travelEvents.length || 1)] ?? null;
+      node.type = key === binding.anchor ? 'stronghold' : node.type === 'treasure' ? 'treasure' : 'encounter';
+      const intelParts = [location.description];
+      if (poi) intelParts.push(`Точка интереса: ${poi}.`);
+      if (travelEvent?.description) intelParts.push(`Событие: ${travelEvent.description}`);
+      node.intel = intelParts.join(' ');
+      node.name = key === binding.anchor ? location.name : `${location.name} · ${poi ?? 'Коридор'}`;
+    });
   });
 
-  const encounterBoost = {
-    '6,3': 0.55,
-    '6,5': 0.48,
-    '9,5': 0.52,
-    '7,6': 0.42,
-    '5,7': 0.4,
-    '8,7': 0.58,
-    '4,5': 0.38,
-    '3,6': 0.5
-  };
+  const citadel = ensureNode(6, 4);
+  citadel.type = 'stronghold';
+  citadel.name = 'Цитадель Алого Сумрака';
+  citadel.intel = 'Центральный командный пост. Здесь планируются рейды и собираются отчёты разведки.';
+  citadel.threat = 14;
+  citadel.levelRange = [12, 14];
+  citadel.encounterChance = 0.55;
 
-  Object.entries(encounterBoost).forEach(([key, chance]) => {
-    const node = mapState.nodes.get(key);
-    if (!node) return;
-    node.type = node.type === 'stronghold' ? node.type : 'encounter';
-    node.encounterChance = chance;
-  });
+  const forwardBase = ensureNode(6, 5);
+  if (!forwardBase.locationId) {
+    forwardBase.type = 'encounter';
+    forwardBase.name = 'Плац нижнего яруса';
+    forwardBase.intel = 'Соединительный плац между цитаделью и внешними секторами. Гарнизон предупреждает о частых засадах.';
+    forwardBase.threat = 13;
+    forwardBase.levelRange = [11, 13];
+    forwardBase.encounterChance = 0.48;
+  }
+
+  const treasure = mapState.nodes.get('3,8');
+  if (treasure) {
+    treasure.type = 'treasure';
+    treasure.name = treasure.name ?? 'Зал трофеев';
+    treasure.intel = 'Древние сундуки под охраной ловушек. Здесь можно найти редкие эссенции и чертежи.';
+    treasure.encounterChance = 0.35;
+  }
 
   mapState.nodes.forEach((node) => {
+    if (!node.levelRange) {
+      node.levelRange = [10, 12];
+    }
+    if (!node.threat) {
+      node.threat = Math.round((node.levelRange[0] + node.levelRange[1]) / 2);
+    }
+    if (!node.encounterChance) {
+      node.encounterChance = 0.28;
+    }
+    if (!node.name) {
+      node.name = `Переход лабиринта [${String(node.x + 1).padStart(2, '0')}:${String(node.y + 1).padStart(2, '0')}]`;
+    }
     node.neighbors = [];
   });
 
@@ -704,11 +1100,20 @@ function renderNodes() {
     element.type = 'button';
     element.className = 'map-node';
     element.dataset.type = node.type;
+    if (node.locationId) {
+      element.dataset.location = node.locationId;
+    }
     const { x, y } = gridToPixel(node.x, node.y);
     element.style.left = `${x}px`;
     element.style.top = `${y}px`;
-    const label = node.name ? `${node.name}` : `Переход [${String(node.x + 1).padStart(2, '0')}:${String(node.y + 1).padStart(2, '0')}]`;
-    element.title = `${label}\nУгроза: ${node.threat}`;
+    const location = node.locationId ? gameData.locationIndex.get(node.locationId) : null;
+    const label = node.name ? `${node.name}` : location ? location.name : `Переход [${String(node.x + 1).padStart(2, '0')}:${String(node.y + 1).padStart(2, '0')}]`;
+    const details = [label];
+    if (location?.sector) {
+      details.push(`Сектор: ${location.sector}`);
+    }
+    details.push(`Угроза: ${node.threat}`);
+    element.title = details.join('\n');
     element.addEventListener('click', () => attemptMove(node));
     mapOverlay.append(element);
     node.element = element;
@@ -724,6 +1129,12 @@ function updateAvatarPosition(node) {
 
 function describeNode(node) {
   if (node.intel) return node.intel;
+  if (node.locationId) {
+    const location = gameData.locationIndex.get(node.locationId);
+    if (location) {
+      return `${location.name}. Угроза: ${node.threat}. Диапазон уровней: ${location.levelRange?.join('–') ?? 'неизвестно'}.`;
+    }
+  }
   if (node.type === 'treasure') {
     return 'Малый зал с сундуками. Враги могут притаиться в тени. Угроза: ' + node.threat;
   }
@@ -792,7 +1203,7 @@ function resolveEncounter(node, previous) {
   })();
 
   if (shouldSpawn) {
-    spawnEnemyForThreat(node.threat, node.name);
+    spawnEnemyForThreat(node.threat, node.name, node.locationId);
   } else {
     appendCombatLog('Разведка сообщает: в коридоре тихо, можно двигаться дальше.');
   }
@@ -804,11 +1215,25 @@ const currentEnemy = {
   maxHp: 0
 };
 
-function selectTemplateForThreat(threat) {
-  const sorted = [...enemyTemplates].sort((a, b) => Math.abs(a.level - threat) - Math.abs(b.level - threat));
-  const pool = sorted.filter((template) => Math.abs(template.level - threat) <= 4);
-  const candidates = pool.length ? pool.slice(0, 3) : sorted.slice(0, 3);
-  return candidates[Math.floor(Math.random() * candidates.length)];
+function selectTemplateForThreat(threat, locationId) {
+  const pool = gameData.monsters.length ? [...gameData.monsters] : [];
+  if (!pool.length) return null;
+  let candidates = pool;
+  if (locationId) {
+    const location = gameData.locationIndex.get(locationId);
+    if (location?.encounters?.length) {
+      const allowed = new Set(location.encounters);
+      const filtered = pool.filter((monster) => allowed.has(monster.id));
+      if (filtered.length) {
+        candidates = filtered;
+      }
+    }
+  }
+  const targetLevel = threat ?? 10;
+  candidates.sort((a, b) => Math.abs(a.level - targetLevel) - Math.abs(b.level - targetLevel));
+  const closeMatches = candidates.filter((monster) => Math.abs(monster.level - targetLevel) <= 4);
+  const selection = closeMatches.length ? closeMatches : candidates;
+  return selection[Math.floor(Math.random() * selection.length)] ?? candidates[0];
 }
 
 function updateEnemyUI() {
@@ -825,14 +1250,21 @@ function updateEnemyUI() {
   setProgress('enemy-hp', currentEnemy.hp, currentEnemy.maxHp);
 }
 
-function spawnEnemyForThreat(threat, locationName) {
-  const template = selectTemplateForThreat(threat);
+function spawnEnemyForThreat(threat, locationName, locationId) {
+  const template = selectTemplateForThreat(threat, locationId);
+  if (!template) {
+    appendCombatLog('Данные о противниках отсутствуют. Разведка будет обновлена позже.');
+    return;
+  }
   currentEnemy.template = template;
   currentEnemy.hp = template.maxHp;
   currentEnemy.maxHp = template.maxHp;
   updateEnemyUI();
   setPlayerTurn(true);
-  appendCombatLog(`В локации <strong>${locationName || 'Лабиринт'}</strong> появляется ${template.name}.`);
+  const sector = locationId ? gameData.locationIndex.get(locationId)?.sector : null;
+  const introLocation = locationName || 'Лабиринт';
+  const sectorSuffix = sector ? ` (${sector})` : '';
+  appendCombatLog(`В локации <strong>${introLocation}${sectorSuffix}</strong> появляется ${template.name}.`);
   if (stanceIndicator) {
     stanceIndicator.textContent = 'Стойка: Бастион';
   }
@@ -840,7 +1272,8 @@ function spawnEnemyForThreat(threat, locationName) {
   playerState.skillBonus = 0;
   playerState.skillRounds = 0;
   if (enemyStatusElement) {
-    enemyStatusElement.textContent = template.intro;
+    const abilityNote = template.abilities?.length ? ` Приёмы: ${template.abilities.join(', ')}.` : '';
+    enemyStatusElement.textContent = `${template.intro}${abilityNote}`;
   }
 }
 
@@ -886,17 +1319,21 @@ function grantLoot(template) {
   if (!lootList) return;
   const dropSet = [];
   template.lootTable.forEach((loot) => {
-    const guaranteed = loot.guaranteed || Math.random() < loot.chance;
+    const chance = loot.chance ?? 0;
+    const guaranteed = loot.guaranteed || Math.random() < chance;
     if (!guaranteed) return;
-    const min = loot.quantity[0];
-    const max = loot.quantity[1];
+    const range = loot.quantityRange ?? [1, 1];
+    const min = range[0];
+    const max = range[1] ?? range[0];
     const amount = randomBetween(min, max);
     dropSet.push({
       id: loot.id,
       name: loot.name,
       rarity: loot.rarity,
       quantity: amount,
-      icon: loot.icon || '♦'
+      icon: loot.icon || rarityGlyphs[loot.rarity?.toLowerCase() ?? 'common'] || '♦',
+      description: loot.description ?? '',
+      properties: loot.properties ?? null
     });
   });
 
@@ -915,6 +1352,11 @@ function grantLoot(template) {
     quantity.textContent = `×${item.quantity}`;
 
     entry.append(name, quantity);
+    if (item.properties) {
+      entry.title = formatPropertiesTooltip(item);
+    } else if (item.description) {
+      entry.title = item.description;
+    }
     lootList.prepend(entry);
   });
 
@@ -955,7 +1397,8 @@ function handleVictory() {
   setTimeout(() => {
     setPlayerTurn(true);
     appendCombatLog('Новый противник готовится к атаке.');
-    spawnEnemyForThreat(mapState.current ? mapState.current.threat : template.level, mapState.current ? mapState.current.name : undefined);
+    const currentNode = mapState.current;
+    spawnEnemyForThreat(currentNode ? currentNode.threat : template.level, currentNode ? currentNode.name : undefined, currentNode?.locationId);
   }, 1500);
 }
 
@@ -1119,8 +1562,22 @@ if (inventoryActions.length) {
       const itemId = activeInventorySlot.dataset.itemId;
       const item = inventoryState.items.find((entry) => entry.id === itemId);
       if (!item) return;
+      if (action === 'equip') {
+        const result = equipItem(item);
+        if (result.success) {
+          const slotLabel = equipmentSlotsMeta.find((meta) => meta.id === result.slot)?.label ?? result.slot;
+          renderEquipmentTable();
+          renderInventory(item.id);
+          appendCombatLog(`Вы экипируете «${item.name}» в слот <strong>${slotLabel}</strong>.`);
+        } else if (result.reason === 'already') {
+          const slotLabel = equipmentSlotsMeta.find((meta) => meta.id === result.slot)?.label ?? result.slot;
+          appendCombatLog(`«${item.name}» уже экипирован в слоте <strong>${slotLabel}</strong>.`);
+        } else {
+          appendCombatLog(`«${item.name}» не подходит для экипировки.`);
+        }
+        return;
+      }
       const actionText = {
-        equip: 'готовится экипировать',
         use: 'готовится использовать',
         drop: 'прикидывает, стоит ли выбросить'
       }[action] ?? 'взаимодействует с';
@@ -1211,18 +1668,35 @@ setInterval(() => {
 
 updateResources();
 
-buildLabyrinth();
-drawMap();
-renderNodes();
+async function initializeGame() {
+  try {
+    await loadGameData();
+  } catch (error) {
+    console.error(error);
+    renderEquipmentTable();
+    appendCombatLog('Не удалось загрузить игровые каталоги. Попробуйте обновить страницу.');
+    appendChatLog('<strong>Система</strong>: Ошибка загрузки монстров или лута.');
+    updatePlayerUI();
+    setPlayerTurn(true);
+    return;
+  }
 
-const originNode = mapState.nodes.get('6,4') || mapState.nodes.values().next().value;
-if (originNode) {
-  updateMapState(originNode);
-  spawnEnemyForThreat(originNode.threat, originNode.name);
+  renderEquipmentTable();
+  buildLabyrinth();
+  drawMap();
+  renderNodes();
+
+  const originNode = mapState.nodes.get('6,4') || mapState.nodes.values().next().value;
+  if (originNode) {
+    updateMapState(originNode);
+    spawnEnemyForThreat(originNode.threat, originNode.name, originNode.locationId);
+  }
+
+  appendCombatLog('Добро пожаловать в Blood Legends. Лабиринт ждёт ваших решений.');
+  appendChatLog('<strong>Система</strong>: Канал связи с отрядом активирован.');
+
+  updatePlayerUI();
+  setPlayerTurn(true);
 }
 
-appendCombatLog('Добро пожаловать в Blood Legends. Лабиринт ждёт ваших решений.');
-appendChatLog('<strong>Система</strong>: Канал связи с отрядом активирован.');
-
-updatePlayerUI();
-setPlayerTurn(true);
+initializeGame();
