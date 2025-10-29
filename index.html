@@ -244,6 +244,47 @@
           </div>
         </div>
       </div>
+      <div class="modal-layer is-hidden" id="quests-modal" role="dialog" aria-modal="true" aria-labelledby="quests-title" aria-hidden="true">
+        <div class="modal-backdrop" data-dismiss="quests"></div>
+        <div class="modal-window quests-window" role="document">
+          <header class="modal-header quests-header">
+            <h2 id="quests-title">Квестовая доска</h2>
+            <div class="quests-filters" role="tablist">
+              <button type="button" class="quests-filter is-active" role="tab" aria-selected="true" data-quest-filter="active">Активные</button>
+              <button type="button" class="quests-filter" role="tab" aria-selected="false" data-quest-filter="available">Доступные</button>
+              <button type="button" class="quests-filter" role="tab" aria-selected="false" data-quest-filter="completed">Завершённые</button>
+              <button type="button" class="quests-filter" role="tab" aria-selected="false" data-quest-filter="all">Все</button>
+            </div>
+            <button type="button" class="modal-close" id="quests-close" aria-label="Закрыть квестовую доску">✕</button>
+          </header>
+          <div class="quests-body">
+            <aside class="quests-list" aria-label="Список заданий">
+              <ul id="quests-list" class="quests-entries" role="listbox" aria-labelledby="quests-title"></ul>
+            </aside>
+            <section class="quests-details" aria-live="polite">
+              <header class="quests-details__header">
+                <div class="quests-details__title">
+                  <h3 id="quests-entry-name">Выберите задание</h3>
+                  <p id="quests-entry-meta" class="quests-entry-meta"></p>
+                </div>
+                <span id="quests-entry-status" class="quests-status-badge">—</span>
+              </header>
+              <p id="quests-entry-description" class="quests-entry-description">Откройте запись слева, чтобы увидеть цели и награды.</p>
+              <section class="quests-section" aria-labelledby="quests-objectives-title">
+                <h4 id="quests-objectives-title">Задачи</h4>
+                <ul id="quests-objectives" class="quests-objectives"></ul>
+              </section>
+              <section class="quests-section" aria-labelledby="quests-rewards-title">
+                <h4 id="quests-rewards-title">Награды</h4>
+                <ul id="quests-rewards" class="quests-rewards"></ul>
+              </section>
+              <div class="quests-actions">
+                <button type="button" class="quests-action" id="quest-track-button">Отслеживать</button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
       <div class="client-footer">
         <span class="footer-badge">v 4.0.1</span>
         <span class="footer-text">Blood Legends · Окно клиента</span>

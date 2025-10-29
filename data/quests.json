@@ -1,0 +1,133 @@
+[
+  {
+    "id": "shadow_watch",
+    "name": "Тени над дозором",
+    "type": "охота",
+    "status": "active",
+    "giver": "Капитан дозора Элиан",
+    "recommendedLevel": 7,
+    "locationId": "gloomwood",
+    "summary": "В дозорном посту Сумрачного леса пропали ночные патрули. Нужно разобраться, что скрывается в тумане.",
+    "description": "Капитан Элиан просит очистить лесные тропы от теневых волков и собрать образцы их шкур для алхимиков.",
+    "objectives": [
+      {
+        "id": "recon_post",
+        "type": "investigate",
+        "description": "Осмотреть разрушенный дозорный пост",
+        "locationId": "gloomwood",
+        "progress": 1,
+        "required": 1
+      },
+      {
+        "id": "wolf_pack",
+        "type": "hunt",
+        "targetId": "shadow_wolf",
+        "required": 6,
+        "progress": 3
+      },
+      {
+        "id": "wolf_samples",
+        "type": "collect",
+        "targetId": "wolf_pelt",
+        "required": 3,
+        "progress": 1
+      }
+    ],
+    "rewards": {
+      "xp": 780,
+      "gold": 220,
+      "reputation": {
+        "faction": "Дозор Сумрака",
+        "amount": 45
+      },
+      "loot": [
+        { "itemId": "moon_shard", "quantity": 1, "chance": 1.0 },
+        { "itemId": "blood_vial", "quantity": 1, "chance": 0.25 }
+      ]
+    },
+    "tags": ["сюжет", "патруль"],
+    "urgency": "средняя"
+  },
+  {
+    "id": "catacomb_echoes",
+    "name": "Эхо катакомб",
+    "type": "разведка",
+    "status": "available",
+    "giver": "Архивариус Лисандр",
+    "recommendedLevel": 12,
+    "locationId": "abyssal_catacombs",
+    "summary": "Соберите хроники из Зала забытых королей и нейтрализуйте стражей некрополя.",
+    "description": "Лисандр уверен, что в Катакомбах Бездны пробудились старые заклинания. Ему нужны записи и образцы костяных талисманов.",
+    "objectives": [
+      {
+        "id": "royal_hall",
+        "type": "explore",
+        "description": "Добраться до Зала забытых королей",
+        "locationId": "abyssal_catacombs",
+        "progress": 0,
+        "required": 1
+      },
+      {
+        "id": "legionnaires",
+        "type": "hunt",
+        "targetId": "skeleton_warrior",
+        "required": 4,
+        "progress": 0
+      },
+      {
+        "id": "talismans",
+        "type": "collect",
+        "targetId": "bone_talisman",
+        "required": 2,
+        "progress": 0
+      }
+    ],
+    "rewards": {
+      "xp": 1220,
+      "gold": 360,
+      "loot": [
+        { "itemId": "ashen_scroll", "quantity": 1, "chance": 0.18 },
+        { "itemId": "cursed_relic", "quantity": 1, "chance": 0.12 }
+      ]
+    },
+    "tags": ["подземелье", "архив"]
+  },
+  {
+    "id": "ember_heart",
+    "name": "Сердце кузницы",
+    "type": "подвиг",
+    "status": "completed",
+    "giver": "Лорд-командор Каэлин",
+    "recommendedLevel": 18,
+    "locationId": "ember_forge",
+    "summary": "Сопроводите караван через Огненную кузницу и уничтожьте Угольного колосса.",
+    "description": "Вы остановили поставку оружия Легиона, проведя караван сквозь лавовые туннели и низвергнув Колосса.",
+    "objectives": [
+      {
+        "id": "escort",
+        "type": "escort",
+        "description": "Сопроводить караван через зал угольных стражей",
+        "locationId": "ember_forge",
+        "progress": 1,
+        "required": 1
+      },
+      {
+        "id": "colossus",
+        "type": "defeat",
+        "targetId": "ember_colossus",
+        "required": 1,
+        "progress": 1
+      }
+    ],
+    "rewards": {
+      "xp": 1840,
+      "gold": 540,
+      "loot": [
+        { "itemId": "ember_core", "quantity": 1, "chance": 1.0 },
+        { "itemId": "iron_fang", "quantity": 1, "chance": 0.5 }
+      ]
+    },
+    "tags": ["легендарный", "история"],
+    "urgency": "низкая"
+  }
+]

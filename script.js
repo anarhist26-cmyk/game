@@ -42,12 +42,26 @@ const codexEntryDescription = document.getElementById('codex-entry-description')
 const codexEntryStats = document.getElementById('codex-entry-stats');
 const codexEntryExtra = document.getElementById('codex-entry-extra');
 
+const questsModal = document.getElementById('quests-modal');
+const questsCloseButton = document.getElementById('quests-close');
+const questFilterButtons = document.querySelectorAll('[data-quest-filter]');
+const questsListElement = document.getElementById('quests-list');
+const questsEntryName = document.getElementById('quests-entry-name');
+const questsEntryMeta = document.getElementById('quests-entry-meta');
+const questsEntryStatus = document.getElementById('quests-entry-status');
+const questsEntryDescription = document.getElementById('quests-entry-description');
+const questsObjectivesList = document.getElementById('quests-objectives');
+const questsRewardsList = document.getElementById('quests-rewards');
+const questTrackButton = document.getElementById('quest-track-button');
+
 const gameData = {
   loot: new Map(),
   monsters: [],
   monsterIndex: new Map(),
   locations: [],
-  locationIndex: new Map()
+  locationIndex: new Map(),
+  quests: [],
+  questIndex: new Map()
 };
 
 const codexState = {
@@ -55,10 +69,24 @@ const codexState = {
   selectionId: null
 };
 
+const questBoardState = {
+  filter: 'active',
+  selectionId: null,
+  trackedId: null
+};
+
+const questStatusLabels = {
+  active: 'Активно',
+  available: 'Доступно',
+  completed: 'Завершено',
+  failed: 'Провалено'
+};
+
 const dataSources = {
   loot: 'data/loot.json',
   monsters: 'data/monsters.json',
-  locations: 'data/locations.json'
+  locations: 'data/locations.json',
+  quests: 'data/quests.json'
 };
 
 const fallbackCatalogs = {
@@ -333,9 +361,88 @@ const fallbackCatalogs = {
       pointsOfInterest: ['Караульная башня', 'Ритуальный кратер', 'Колыбель титанов'],
       encounters: ['blood_sentinel', 'ember_colossus'],
       travelEvents: [
-        { type: 'кровавый шторм', description: 'Алые искры усиливают ярость монстров.', dangerLevel: 5 },
-        { type: 'призрачный караван', description: 'Торговцы призраки предлагают сделки.', dangerLevel: 3 }
+    { type: 'кровавый шторм', description: 'Алые искры усиливают ярость монстров.', dangerLevel: 5 },
+    { type: 'призрачный караван', description: 'Торговцы призраки предлагают сделки.', dangerLevel: 3 }
       ]
+    }
+  ],
+  quests: [
+    {
+      id: 'shadow_watch',
+      name: 'Тени над дозором',
+      type: 'охота',
+      status: 'active',
+      giver: 'Капитан дозора Элиан',
+      recommendedLevel: 7,
+      locationId: 'gloomwood',
+      summary: 'Расследуйте исчезновение патрулей в туманных тропах Сумрачного леса.',
+      description: 'Элиан просит зачистить тропы от теневых волков и собрать образцы шкур для алхимиков.',
+      objectives: [
+        { id: 'recon_post', type: 'investigate', description: 'Осмотреть разрушенный дозорный пост', locationId: 'gloomwood', required: 1, progress: 1 },
+        { id: 'wolf_pack', type: 'hunt', targetId: 'shadow_wolf', required: 6, progress: 3 },
+        { id: 'wolf_samples', type: 'collect', targetId: 'wolf_pelt', required: 3, progress: 1 }
+      ],
+      rewards: {
+        xp: 780,
+        gold: 220,
+        reputation: { faction: 'Дозор Сумрака', amount: 45 },
+        loot: [
+          { itemId: 'moon_shard', quantity: 1, chance: 1 },
+          { itemId: 'blood_vial', quantity: 1, chance: 0.25 }
+        ]
+      },
+      tags: ['сюжет', 'патруль'],
+      urgency: 'средняя'
+    },
+    {
+      id: 'catacomb_echoes',
+      name: 'Эхо катакомб',
+      type: 'разведка',
+      status: 'available',
+      giver: 'Архивариус Лисандр',
+      recommendedLevel: 12,
+      locationId: 'abyssal_catacombs',
+      summary: 'Соберите хроники из зала забытых королей и подавите костяных стражей.',
+      description: 'Лисандру нужны записи и костяные талисманы, чтобы закрыть порталы некрополя.',
+      objectives: [
+        { id: 'royal_hall', type: 'explore', description: 'Добраться до Зала забытых королей', locationId: 'abyssal_catacombs', required: 1, progress: 0 },
+        { id: 'legionnaires', type: 'hunt', targetId: 'skeleton_warrior', required: 4, progress: 0 },
+        { id: 'talismans', type: 'collect', targetId: 'bone_talisman', required: 2, progress: 0 }
+      ],
+      rewards: {
+        xp: 1220,
+        gold: 360,
+        loot: [
+          { itemId: 'ashen_scroll', quantity: 1, chance: 0.18 },
+          { itemId: 'cursed_relic', quantity: 1, chance: 0.12 }
+        ]
+      },
+      tags: ['подземелье', 'архив']
+    },
+    {
+      id: 'ember_heart',
+      name: 'Сердце кузницы',
+      type: 'подвиг',
+      status: 'completed',
+      giver: 'Лорд-командор Каэлин',
+      recommendedLevel: 18,
+      locationId: 'ember_forge',
+      summary: 'Сопроводите караван через Огненную кузницу и повергните угольного колосса.',
+      description: 'Караван доставил реликвии, а колосс был низвергнут в лаву — поставки легиона сорваны.',
+      objectives: [
+        { id: 'escort', type: 'escort', description: 'Сопроводить караван через зал угольных стражей', locationId: 'ember_forge', required: 1, progress: 1 },
+        { id: 'colossus', type: 'defeat', targetId: 'ember_colossus', required: 1, progress: 1 }
+      ],
+      rewards: {
+        xp: 1840,
+        gold: 540,
+        loot: [
+          { itemId: 'ember_core', quantity: 1, chance: 1 },
+          { itemId: 'iron_fang', quantity: 1, chance: 0.5 }
+        ]
+      },
+      tags: ['легендарный', 'история'],
+      urgency: 'низкая'
     }
   ]
 };
@@ -733,12 +840,143 @@ function transformMonster(rawMonster) {
   };
 }
 
-function ingestCatalogs({ loot = [], monsters = [], locations = [] }) {
+function transformQuest(rawQuest) {
+  if (!rawQuest) return null;
+
+  const status = (rawQuest.status ?? 'available').toLowerCase();
+  const recommendedLevel = rawQuest.recommendedLevel ?? rawQuest.level ?? null;
+  const locationId = rawQuest.locationId ?? rawQuest.regionId ?? null;
+  const location = locationId ? gameData.locationIndex.get(locationId) : null;
+
+  const objectives = (rawQuest.objectives ?? []).map((objective, index) => {
+    const required = objective.required ?? objective.count ?? 1;
+    const progress = Math.max(0, Math.min(required, objective.progress ?? objective.completed ?? 0));
+    const targetId = objective.targetId ?? objective.monsterId ?? objective.itemId ?? null;
+    const objectiveLocationId = objective.locationId ?? locationId ?? null;
+    const objectiveLocation = objectiveLocationId ? gameData.locationIndex.get(objectiveLocationId) : null;
+    const typeKey = objective.type ?? 'objective';
+
+    let text = objective.description ?? '';
+    if (!text) {
+      if (['hunt', 'defeat'].includes(typeKey) && targetId) {
+        const monster = gameData.monsterIndex.get(targetId);
+        const monsterName = monster?.name ?? targetId;
+        text = `Победить ${required} × ${monsterName}`;
+      } else if (['collect', 'gather'].includes(typeKey) && targetId) {
+        const item = gameData.loot.get(targetId);
+        const itemName = item?.name ?? targetId;
+        text = `Собрать ${required} × ${itemName}`;
+      } else if (['explore', 'investigate'].includes(typeKey)) {
+        text = `Исследовать ${objectiveLocation?.name ?? 'локацию'}`;
+      } else if (typeKey === 'escort') {
+        text = 'Сопроводить союзников к цели';
+      } else {
+        text = 'Выполнить поставленную задачу';
+      }
+    }
+
+    return {
+      id: objective.id ?? `${rawQuest.id}-obj-${index + 1}`,
+      text,
+      type: typeKey,
+      targetId,
+      locationId: objectiveLocationId,
+      locationName: objectiveLocation?.name ?? null,
+      required,
+      progress,
+      isComplete: progress >= required,
+      optional: Boolean(objective.optional)
+    };
+  });
+
+  const completedObjectives = objectives.filter((objective) => objective.isComplete).length;
+  const overallComplete = status === 'completed' || (objectives.length > 0 && completedObjectives === objectives.length);
+  const progressPercent = objectives.length
+    ? Math.round((completedObjectives / objectives.length) * 100)
+    : overallComplete ? 100 : 0;
+
+  const lootRewards = (rawQuest.rewards?.loot ?? []).map((reward) => {
+    const itemId = reward.itemId ?? reward.id ?? null;
+    const item = itemId ? gameData.loot.get(itemId) : null;
+    const quantity = reward.quantity ?? reward.count ?? 1;
+    const chance = reward.chance ?? reward.dropChance ?? item?.dropChance ?? null;
+    return {
+      id: itemId,
+      name: item?.name ?? itemId ?? 'Неизвестный трофей',
+      icon: item?.icon ?? '♦',
+      quantity,
+      chance,
+      rarity: item?.rarity ?? null
+    };
+  });
+
+  return {
+    id: rawQuest.id,
+    name: rawQuest.name ?? rawQuest.title ?? 'Неизвестное задание',
+    status,
+    type: rawQuest.type ?? 'задание',
+    giver: rawQuest.giver ?? rawQuest.client ?? '',
+    recommendedLevel,
+    locationId,
+    locationName: location?.name ?? rawQuest.location ?? '',
+    locationSector: location?.sector ?? rawQuest.sector ?? '',
+    summary: rawQuest.summary ?? '',
+    description: rawQuest.description ?? rawQuest.summary ?? '',
+    objectives,
+    rewards: {
+      xp: rawQuest.rewards?.xp ?? null,
+      gold: rawQuest.rewards?.gold ?? null,
+      loot: lootRewards,
+      reputation: rawQuest.rewards?.reputation ?? null
+    },
+    tags: rawQuest.tags ?? [],
+    urgency: rawQuest.urgency ?? '',
+    overallComplete,
+    progressPercent
+  };
+}
+
+function registerQuests(quests = []) {
+  gameData.questIndex.clear();
+  gameData.quests = quests
+    .map((quest) => transformQuest(quest))
+    .filter((quest) => quest !== null);
+
+  gameData.quests.forEach((quest) => {
+    gameData.questIndex.set(quest.id, quest);
+  });
+
+  if (questBoardState.selectionId && !gameData.questIndex.has(questBoardState.selectionId)) {
+    questBoardState.selectionId = null;
+  }
+
+  if (!questBoardState.selectionId && gameData.quests.length) {
+    const preferred = gameData.quests.find((quest) => quest.status === 'active') ?? gameData.quests[0];
+    questBoardState.selectionId = preferred?.id ?? null;
+  } else if (!gameData.quests.length) {
+    questBoardState.selectionId = null;
+  }
+
+  if (questBoardState.trackedId && !gameData.questIndex.has(questBoardState.trackedId)) {
+    questBoardState.trackedId = null;
+  }
+
+  if (!questBoardState.trackedId && questBoardState.selectionId) {
+    questBoardState.trackedId = questBoardState.selectionId;
+  } else if (!questBoardState.trackedId && gameData.quests.length) {
+    const activeQuest = gameData.quests.find((quest) => quest.status === 'active') ?? gameData.quests[0];
+    questBoardState.trackedId = activeQuest?.id ?? null;
+  }
+}
+
+function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [] }) {
   gameData.loot.clear();
   loot.forEach((entry) => {
     const enriched = enrichLootEntry(entry);
     gameData.loot.set(enriched.id, enriched);
   });
+
+  registerLocations(locations);
 
   gameData.monsterIndex.clear();
   gameData.monsters = monsters.map((monster) => {
@@ -747,8 +985,9 @@ function ingestCatalogs({ loot = [], monsters = [], locations = [] }) {
     return template;
   });
 
-  registerLocations(locations);
+  registerQuests(quests);
   syncCodexAfterDataUpdate();
+  syncQuestBoardAfterDataUpdate();
 }
 
 function registerLocations(locations) {
@@ -760,12 +999,13 @@ function registerLocations(locations) {
 }
 
 async function loadGameData() {
-  const [lootData, monsterData, locationData] = await Promise.all([
+  const [lootData, monsterData, locationData, questData] = await Promise.all([
     fetchJson(dataSources.loot),
     fetchJson(dataSources.monsters),
-    fetchJson(dataSources.locations)
+    fetchJson(dataSources.locations),
+    fetchJson(dataSources.quests)
   ]);
-  ingestCatalogs({ loot: lootData, monsters: monsterData, locations: locationData });
+  ingestCatalogs({ loot: lootData, monsters: monsterData, locations: locationData, quests: questData });
 }
 
 function loadFallbackData() {
@@ -1415,6 +1655,263 @@ function closeCodex() {
   codexModal.setAttribute('aria-hidden', 'true');
 }
 
+function buildQuestDataset(filter = questBoardState.filter) {
+  const quests = [...gameData.quests];
+  if (filter === 'all') return quests;
+  return quests.filter((quest) => {
+    if (filter === 'active') return quest.status === 'active';
+    if (filter === 'available') return quest.status === 'available';
+    if (filter === 'completed') return quest.status === 'completed';
+    if (filter === 'failed') return quest.status === 'failed';
+    return true;
+  });
+}
+
+function setQuestFilterActive(filter) {
+  if (!questFilterButtons.length) return;
+  questFilterButtons.forEach((button) => {
+    const isActive = button.dataset.questFilter === filter;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+}
+
+function renderQuestBoard() {
+  if (!questsListElement) return;
+  setQuestFilterActive(questBoardState.filter);
+
+  const dataset = buildQuestDataset(questBoardState.filter);
+  questsListElement.replaceChildren();
+
+  if (!dataset.length) {
+    const placeholder = document.createElement('li');
+    placeholder.className = 'quests-placeholder';
+    placeholder.textContent = 'Нет заданий для выбранного фильтра.';
+    questsListElement.append(placeholder);
+    renderQuestDetails(null);
+    return;
+  }
+
+  if (!dataset.some((quest) => quest.id === questBoardState.selectionId)) {
+    questBoardState.selectionId = dataset[0].id;
+  }
+
+  dataset.forEach((quest) => {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'quests-entry';
+    button.dataset.questId = quest.id;
+
+    if (quest.id === questBoardState.selectionId) {
+      button.classList.add('is-active');
+    }
+    if (quest.id === questBoardState.trackedId) {
+      button.classList.add('is-tracked');
+    }
+
+    const title = document.createElement('div');
+    title.className = 'quests-entry__title';
+    const name = document.createElement('span');
+    name.className = 'quests-entry__name';
+    name.textContent = quest.name;
+    const statusBadge = document.createElement('span');
+    statusBadge.className = 'quests-entry__status';
+    statusBadge.textContent = questStatusLabels[quest.status] ?? capitalize(quest.status ?? '—');
+    title.append(name, statusBadge);
+
+    const meta = document.createElement('div');
+    meta.className = 'quests-entry__meta';
+    const metaParts = [];
+    if (quest.type) metaParts.push(capitalize(quest.type));
+    if (quest.recommendedLevel) metaParts.push(`Ур. ${quest.recommendedLevel}`);
+    if (quest.locationName) metaParts.push(quest.locationName);
+    meta.textContent = metaParts.join(' · ');
+
+    const progress = document.createElement('div');
+    progress.className = 'quests-entry__progress';
+    const progressLabel = document.createElement('span');
+    progressLabel.textContent = 'Прогресс';
+    const progressValue = document.createElement('span');
+    progressValue.textContent = `${quest.progressPercent}%`;
+    progress.append(progressLabel, progressValue);
+
+    button.append(title, meta, progress);
+    item.append(button);
+    questsListElement.append(item);
+  });
+
+  const activeQuest = questBoardState.selectionId ? gameData.questIndex.get(questBoardState.selectionId) : null;
+  renderQuestDetails(activeQuest ?? dataset[0]);
+}
+
+function renderQuestDetails(quest) {
+  if (!questsEntryName || !questsEntryDescription || !questsEntryStatus) return;
+
+  if (!quest) {
+    questsEntryName.textContent = 'Выберите задание';
+    if (questsEntryMeta) questsEntryMeta.textContent = '';
+    questsEntryStatus.textContent = '—';
+    questsEntryStatus.dataset.status = 'none';
+    questsEntryDescription.textContent = 'Откройте запись слева, чтобы увидеть цели и награды.';
+    if (questsObjectivesList) questsObjectivesList.replaceChildren();
+    if (questsRewardsList) questsRewardsList.replaceChildren();
+    if (questTrackButton) {
+      questTrackButton.disabled = true;
+      questTrackButton.textContent = 'Отслеживать';
+      questTrackButton.classList.remove('is-tracked');
+      questTrackButton.removeAttribute('data-quest-id');
+      questTrackButton.setAttribute('aria-pressed', 'false');
+    }
+    return;
+  }
+
+  questsEntryName.textContent = quest.name;
+  if (questsEntryMeta) {
+    const metaParts = [];
+    if (quest.type) metaParts.push(capitalize(quest.type));
+    if (quest.recommendedLevel) metaParts.push(`Рекомендуемый уровень: ${quest.recommendedLevel}`);
+    if (quest.locationName) metaParts.push(quest.locationName);
+    questsEntryMeta.textContent = metaParts.join(' · ');
+  }
+  questsEntryStatus.textContent = questStatusLabels[quest.status] ?? capitalize(quest.status ?? '—');
+  questsEntryStatus.dataset.status = quest.status ?? 'unknown';
+  questsEntryDescription.textContent = quest.description || quest.summary || 'Описание отсутствует.';
+
+  if (questsObjectivesList) {
+    questsObjectivesList.replaceChildren();
+    if (!quest.objectives.length) {
+      const placeholder = document.createElement('li');
+      placeholder.className = 'quests-placeholder';
+      placeholder.textContent = 'Задачи не назначены.';
+      questsObjectivesList.append(placeholder);
+    } else {
+      quest.objectives.forEach((objective) => {
+        const li = document.createElement('li');
+        li.className = 'quests-objective';
+        if (objective.isComplete) li.classList.add('is-complete');
+        if (objective.optional) li.classList.add('is-optional');
+
+        const text = document.createElement('span');
+        text.className = 'quests-objective__text';
+        text.textContent = objective.text;
+
+        const progress = document.createElement('span');
+        progress.className = 'quests-objective__progress';
+        progress.textContent = `${objective.progress}/${objective.required}`;
+
+        const bar = document.createElement('div');
+        bar.className = 'quests-objective__bar';
+        const fill = document.createElement('span');
+        const ratio = objective.required > 0 ? Math.min(1, objective.progress / objective.required) : 0;
+        fill.style.setProperty('--value', ratio);
+        bar.append(fill);
+
+        li.append(text, progress, bar);
+        questsObjectivesList.append(li);
+      });
+    }
+  }
+
+  if (questsRewardsList) {
+    questsRewardsList.replaceChildren();
+    const rewards = quest.rewards ?? {};
+    const rewardItems = [];
+
+    if (typeof rewards.xp === 'number') {
+      rewardItems.push({ text: `Опыт: ${formatNumber(rewards.xp)}` });
+    }
+    if (typeof rewards.gold === 'number') {
+      rewardItems.push({ text: `Золото: ${formatNumber(rewards.gold)}` });
+    }
+    if (rewards.reputation) {
+      const rep = rewards.reputation;
+      if (typeof rep === 'object') {
+        const amount = rep.amount ?? rep.value ?? 0;
+        const label = rep.faction ? `${rep.faction}: +${amount}` : `Репутация: +${amount}`;
+        rewardItems.push({ text: label });
+      } else if (typeof rep === 'number') {
+        rewardItems.push({ text: `Репутация: +${rep}` });
+      }
+    }
+
+    if (Array.isArray(rewards.loot) && rewards.loot.length) {
+      rewards.loot.forEach((entry) => {
+        const parts = [];
+        if (entry.icon) parts.push(entry.icon);
+        parts.push(entry.name);
+        const quantity = entry.quantity ?? 1;
+        if (quantity > 1) parts.push(`×${quantity}`);
+        if (entry.chance != null) {
+          parts.push(`(${formatChance(entry.chance)})`);
+        }
+        rewardItems.push({ text: parts.join(' '), className: 'quests-reward--loot' });
+      });
+    }
+
+    if (!rewardItems.length) {
+      const placeholder = document.createElement('li');
+      placeholder.className = 'quests-placeholder';
+      placeholder.textContent = 'Наград нет.';
+      questsRewardsList.append(placeholder);
+    } else {
+      rewardItems.forEach((reward) => {
+        const li = document.createElement('li');
+        li.className = 'quests-reward';
+        if (reward.className) li.classList.add(reward.className);
+        li.textContent = reward.text;
+        questsRewardsList.append(li);
+      });
+    }
+  }
+
+  if (questTrackButton) {
+    const isTracked = questBoardState.trackedId === quest.id;
+    questTrackButton.disabled = isTracked;
+    questTrackButton.classList.toggle('is-tracked', isTracked);
+    questTrackButton.textContent = isTracked ? 'Отслеживается' : 'Отслеживать';
+    questTrackButton.dataset.questId = quest.id;
+    questTrackButton.setAttribute('aria-pressed', isTracked ? 'true' : 'false');
+  }
+}
+
+function openQuestBoard() {
+  if (!questsModal) return;
+  questsModal.classList.remove('is-hidden');
+  questsModal.setAttribute('aria-hidden', 'false');
+  renderQuestBoard();
+}
+
+function closeQuestBoard() {
+  if (!questsModal) return;
+  questsModal.classList.add('is-hidden');
+  questsModal.setAttribute('aria-hidden', 'true');
+}
+
+function getTrackedQuest() {
+  if (!questBoardState.trackedId) return null;
+  return gameData.questIndex.get(questBoardState.trackedId) ?? null;
+}
+
+function syncQuestBoardAfterDataUpdate() {
+  const dataset = buildQuestDataset(questBoardState.filter);
+  if (questBoardState.selectionId && !gameData.questIndex.has(questBoardState.selectionId)) {
+    questBoardState.selectionId = dataset[0]?.id ?? gameData.quests[0]?.id ?? null;
+  }
+  if (!questBoardState.selectionId && dataset.length) {
+    questBoardState.selectionId = dataset[0].id;
+  }
+  if (questBoardState.trackedId && !gameData.questIndex.has(questBoardState.trackedId)) {
+    questBoardState.trackedId = questBoardState.selectionId ?? dataset[0]?.id ?? null;
+  }
+
+  if (questsModal && !questsModal.classList.contains('is-hidden')) {
+    renderQuestBoard();
+  }
+
+  updateQuestHighlights();
+}
+
 function appendCombatLog(message) {
   appendLog(combatLog, message);
 }
@@ -1768,6 +2265,8 @@ function renderNodes() {
     mapOverlay.append(element);
     node.element = element;
   });
+
+  updateQuestHighlights();
 }
 
 function updateAvatarPosition(node) {
@@ -1794,6 +2293,36 @@ function describeNode(node) {
   return 'Переход лабиринта. Потенциальная угроза: ' + node.threat;
 }
 
+function buildNodeIntel(node, trackedQuest = getTrackedQuest()) {
+  const base = describeNode(node);
+  if (!trackedQuest) return base;
+
+  const relevant = (() => {
+    if (!trackedQuest) return false;
+    if (trackedQuest.locationId && node.locationId === trackedQuest.locationId) return true;
+    return trackedQuest.objectives.some((objective) => objective.locationId && objective.locationId === node.locationId);
+  })();
+
+  if (!relevant) return base;
+  return `${base} Отслеживаемое задание: «${trackedQuest.name}».`;
+}
+
+function updateQuestHighlights() {
+  const tracked = getTrackedQuest();
+  mapState.nodes.forEach((node) => {
+    if (!node.element) return;
+    const relevant = Boolean(tracked && (
+      (tracked.locationId && node.locationId === tracked.locationId) ||
+      tracked.objectives.some((objective) => objective.locationId && objective.locationId === node.locationId)
+    ));
+    node.element.classList.toggle('has-quest', relevant);
+  });
+
+  if (mapIntel && mapState.current) {
+    mapIntel.textContent = buildNodeIntel(mapState.current, tracked);
+  }
+}
+
 function updateMapState(node) {
   mapState.current = node;
   updateAvatarPosition(node);
@@ -1809,7 +2338,7 @@ function updateMapState(node) {
   }
 
   if (mapIntel) {
-    mapIntel.textContent = describeNode(node);
+    mapIntel.textContent = buildNodeIntel(node);
   }
 
   mapState.nodes.forEach((entry) => {
@@ -1818,6 +2347,8 @@ function updateMapState(node) {
     const isNeighbor = node.neighbors.includes(entry.key);
     entry.element.classList.toggle('is-adjacent', isNeighbor);
   });
+
+  updateQuestHighlights();
 }
 
 function attemptMove(target) {
@@ -2178,7 +2709,7 @@ if (commandButtons.length) {
           appendChatLog('<strong>Система</strong>: Центр карты уже активен.');
           break;
         case 'quests':
-          appendChatLog('<strong>Система</strong>: Квестовая доска обновится в следующем патче.');
+          openQuestBoard();
           break;
         case 'help':
           appendChatLog('<strong>Система</strong>: /roll — бросок куба, /dance — станцевать победный танец.');
@@ -2209,6 +2740,15 @@ if (codexModal) {
   });
 }
 
+if (questsModal) {
+  questsModal.addEventListener('click', (event) => {
+    if (!(event.target instanceof HTMLElement)) return;
+    if (event.target === questsModal || event.target.matches('[data-dismiss="quests"]')) {
+      closeQuestBoard();
+    }
+  });
+}
+
 if (inventoryCloseButton) {
   inventoryCloseButton.addEventListener('click', () => closeInventory());
 }
@@ -2217,12 +2757,27 @@ if (codexCloseButton) {
   codexCloseButton.addEventListener('click', () => closeCodex());
 }
 
+if (questsCloseButton) {
+  questsCloseButton.addEventListener('click', () => closeQuestBoard());
+}
+
 if (codexTabs.length) {
   codexTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       const category = tab.dataset.codexTab ?? 'monsters';
       codexState.selectionId = null;
       renderCodex(category);
+    });
+  });
+}
+
+if (questFilterButtons.length) {
+  questFilterButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const filter = button.dataset.questFilter ?? 'all';
+      questBoardState.filter = filter;
+      questBoardState.selectionId = null;
+      renderQuestBoard();
     });
   });
 }
@@ -2262,12 +2817,41 @@ if (inventoryActions.length) {
   });
 }
 
+if (questsListElement) {
+  questsListElement.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const button = target.closest('[data-quest-id]');
+    if (!(button instanceof HTMLElement)) return;
+    const questId = button.dataset.questId;
+    if (!questId || questId === questBoardState.selectionId) return;
+    questBoardState.selectionId = questId;
+    renderQuestBoard();
+  });
+}
+
+if (questTrackButton) {
+  questTrackButton.addEventListener('click', () => {
+    const questId = questTrackButton.dataset.questId;
+    if (!questId) return;
+    questBoardState.trackedId = questId;
+    const quest = gameData.questIndex.get(questId);
+    if (quest) {
+      appendChatLog(`<strong>Система</strong>: Отслеживается задание «${quest.name}».`);
+    }
+    renderQuestBoard();
+    updateQuestHighlights();
+  });
+}
+
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     if (inventoryModal && !inventoryModal.classList.contains('is-hidden')) {
       closeInventory();
     } else if (codexModal && !codexModal.classList.contains('is-hidden')) {
       closeCodex();
+    } else if (questsModal && !questsModal.classList.contains('is-hidden')) {
+      closeQuestBoard();
     }
   }
 });

@@ -424,6 +424,15 @@ html, body {
   box-shadow: 0 0 14px rgba(255, 255, 255, 0.8);
 }
 
+.map-node.has-quest {
+  border-color: rgba(236, 196, 112, 0.85);
+  box-shadow: 0 0 14px rgba(236, 196, 112, 0.6);
+}
+
+.map-node.is-current.has-quest {
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.85), 0 0 20px rgba(236, 196, 112, 0.55);
+}
+
 .map-avatar {
   position: absolute;
   width: 18px;
@@ -842,6 +851,355 @@ html, body {
   align-items: stretch;
   gap: 24px;
   padding: 26px;
+}
+
+.quests-window {
+  width: min(980px, 92vw);
+  max-height: min(640px, 90vh);
+  display: flex;
+  flex-direction: column;
+  border-image: linear-gradient(180deg, rgba(212, 154, 84, 0.6), rgba(96, 52, 24, 0.6)) 1;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.quests-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.quests-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(44, 32, 18, 0.8);
+  border: 1px solid rgba(222, 162, 102, 0.35);
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.42);
+}
+
+.quests-filter {
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(244, 204, 154, 0.7);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.quests-filter.is-active {
+  background: linear-gradient(135deg, rgba(204, 132, 64, 0.88), rgba(132, 64, 24, 0.88));
+  color: #fff5e6;
+  box-shadow: 0 6px 16px rgba(68, 34, 14, 0.35);
+}
+
+.quests-body {
+  display: grid;
+  grid-template-columns: minmax(240px, 280px) 1fr;
+  gap: 26px;
+  padding: 26px;
+}
+
+.quests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(46, 28, 20, 0.82), rgba(20, 12, 8, 0.92));
+  border: 1px solid rgba(214, 154, 84, 0.32);
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.45);
+}
+
+.quests-entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 430px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.quests-entries::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quests-entries::-webkit-scrollbar-thumb {
+  background: rgba(204, 150, 94, 0.55);
+  border-radius: 999px;
+}
+
+.quests-entry {
+  width: 100%;
+  padding: 12px 14px;
+  text-align: left;
+  border-radius: 12px;
+  border: 1px solid rgba(214, 154, 84, 0.18);
+  background: linear-gradient(135deg, rgba(68, 44, 30, 0.72), rgba(30, 20, 14, 0.92));
+  color: rgba(255, 226, 198, 0.86);
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quests-entry:hover {
+  transform: translateX(4px);
+  border-color: rgba(214, 154, 84, 0.42);
+  box-shadow: 0 10px 16px rgba(22, 10, 4, 0.4);
+}
+
+.quests-entry.is-active {
+  border-color: rgba(236, 176, 112, 0.85);
+  box-shadow: 0 12px 20px rgba(32, 16, 6, 0.55);
+}
+
+.quests-entry.is-tracked {
+  position: relative;
+}
+
+.quests-entry.is-tracked::after {
+  content: '●';
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  color: rgba(236, 196, 132, 0.9);
+  font-size: 0.6rem;
+}
+
+.quests-entry__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.quests-entry__name {
+  flex: 1;
+}
+
+.quests-entry__status {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(214, 154, 84, 0.24);
+  color: rgba(255, 226, 198, 0.78);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.quests-entry__meta {
+  color: rgba(255, 230, 210, 0.64);
+  font-size: 0.74rem;
+}
+
+.quests-entry__progress {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: rgba(255, 224, 198, 0.62);
+}
+
+.quests-details {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(30, 22, 18, 0.86), rgba(14, 10, 8, 0.94));
+  border: 1px solid rgba(214, 154, 84, 0.28);
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.42);
+}
+
+.quests-details__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.quests-entry-meta {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: rgba(255, 224, 198, 0.68);
+}
+
+.quests-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(214, 154, 84, 0.24);
+  color: rgba(255, 226, 198, 0.82);
+  border: 1px solid rgba(214, 154, 84, 0.4);
+}
+
+.quests-status-badge[data-status="completed"] {
+  background: rgba(134, 202, 126, 0.2);
+  color: rgba(214, 244, 210, 0.9);
+  border-color: rgba(134, 202, 126, 0.45);
+}
+
+.quests-status-badge[data-status="available"] {
+  background: rgba(214, 194, 84, 0.24);
+  color: rgba(255, 240, 180, 0.86);
+}
+
+.quests-entry-description {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(255, 236, 214, 0.78);
+}
+
+.quests-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quests-section h4 {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 226, 198, 0.76);
+}
+
+.quests-objectives,
+.quests-rewards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quests-objective {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(42, 28, 20, 0.72);
+  border: 1px solid rgba(214, 154, 84, 0.2);
+  position: relative;
+}
+
+.quests-objective.is-complete {
+  background: rgba(34, 68, 44, 0.7);
+  border-color: rgba(126, 192, 132, 0.45);
+  color: rgba(214, 244, 210, 0.88);
+}
+
+.quests-objective.is-optional::after {
+  content: 'опция';
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(214, 154, 84, 0.72);
+}
+
+.quests-objective__text {
+  font-size: 0.82rem;
+}
+
+.quests-objective__progress {
+  font-size: 0.76rem;
+  color: rgba(255, 224, 198, 0.64);
+}
+
+.quests-objective__bar {
+  grid-column: 1 / -1;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 236, 214, 0.16);
+  overflow: hidden;
+}
+
+.quests-objective__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(214, 154, 84, 0.85), rgba(134, 64, 26, 0.85));
+  transform-origin: left;
+  transform: scaleX(var(--value, 0));
+  transition: transform 0.3s ease;
+}
+
+.quests-reward {
+  font-size: 0.82rem;
+  color: rgba(255, 226, 198, 0.86);
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(44, 26, 18, 0.6);
+  border: 1px solid rgba(214, 154, 84, 0.22);
+}
+
+.quests-reward--loot {
+  border-color: rgba(214, 154, 84, 0.4);
+}
+
+.quests-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.quests-action {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 154, 84, 0.45);
+  background: linear-gradient(135deg, rgba(68, 44, 30, 0.85), rgba(30, 18, 12, 0.85));
+  color: rgba(255, 226, 198, 0.88);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quests-action:hover {
+  transform: translateY(-2px);
+  border-color: rgba(236, 176, 112, 0.7);
+  box-shadow: 0 10px 18px rgba(32, 16, 6, 0.5);
+}
+
+.quests-action:disabled,
+.quests-action.is-tracked {
+  cursor: default;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+}
+
+.quests-placeholder {
+  font-size: 0.78rem;
+  color: rgba(255, 224, 198, 0.58);
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(38, 24, 18, 0.5);
+  border: 1px dashed rgba(214, 154, 84, 0.25);
+  text-align: center;
 }
 
 .codex-list {
