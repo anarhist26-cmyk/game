@@ -12,6 +12,7 @@ let mapNodes = [];
 const mapAvatar = document.querySelector('#map-avatar');
 const mapIntel = document.querySelector('#map-intel');
 const mapLocation = document.querySelector('#map-location');
+const mapCoords = document.querySelector('#map-coords');
 const mapTrailElement = document.querySelector('#map-trail');
 const mapControlButtons = document.querySelectorAll('.map-control');
 const lootList = document.querySelector('#loot-list');
@@ -577,351 +578,630 @@ function spawnEnemy(template) {
 }
 
 
-const labyrinthNodes = [
-  {
-    id: 'citadel',
+function buildLabyrinthNode(config) {
+  const { id, label, type, position, connections, location, threat, description, grid } = config;
+  const intelParts = [];
+  if (location) intelParts.push(location);
+  if (threat) intelParts.push(`Угроза: ${threat}`);
+  if (description) intelParts.push(description);
+  return {
+    id,
+    label,
+    type,
+    position,
+    connections,
+    location,
+    threat,
+    description,
+    grid,
+    intel: intelParts.join(' · ')
+  };
+}
+
+
+const MAP_GRID = { cols: 15, rows: 15, margin: 0.06 };
+
+function gridToPosition(col, row) {
+  const { cols, rows, margin } = MAP_GRID;
+  const effectiveWidth = 1 - margin * 2;
+  return [
+    margin + (col / (cols - 1)) * effectiveWidth,
+    margin + (row / (rows - 1)) * effectiveWidth
+  ];
+}
+
+function gridArea(colStart, colEnd, rowStart, rowEnd) {
+  const { cols, rows, margin } = MAP_GRID;
+  const effectiveWidth = 1 - margin * 2;
+  const cellWidth = effectiveWidth / (cols - 1);
+  const cellHeight = effectiveWidth / (rows - 1);
+  const x = Math.max(0, margin + colStart * cellWidth - cellWidth * 0.5);
+  const y = Math.max(0, margin + rowStart * cellHeight - cellHeight * 0.5);
+  const x2 = Math.min(1, margin + colEnd * cellWidth + cellWidth * 0.5);
+  const y2 = Math.min(1, margin + rowEnd * cellHeight + cellHeight * 0.5);
+  return { x, y, w: x2 - x, h: y2 - y };
+}
+
+const labyrinthBlueprintEntries = {
+  'citadel-core': {
     label: 'Цитадель Алого Сумрака',
+    type: 'stronghold',
+    grid: [7, 7],
+    location: 'Центральная цитадель',
+    threat: '12',
+    description: 'Сердце Империи, где сходятся приказы и порталы.'
+  },
+  'ring-north': {
+    label: 'Северная галерея',
+    type: 'step',
+    grid: [7, 6],
+    location: 'Центральная цитадель',
+    threat: '12',
+    description: 'Стражи контролируют вход к бастионам.'
+  },
+  'ring-south': {
+    label: 'Южная галерея',
+    type: 'step',
+    grid: [7, 8],
+    location: 'Центральная цитадель',
+    threat: '12',
+    description: 'Жар катакомб подсвечивает этот участок.'
+  },
+  'ring-east': {
+    label: 'Восточный балкон',
+    type: 'step',
+    grid: [8, 7],
+    location: 'Центральная цитадель',
+    threat: '12',
+    description: 'Отсюда слышны гул торговых площадей.'
+  },
+  'ring-west': {
+    label: 'Западный бастион',
+    type: 'step',
+    grid: [6, 7],
+    location: 'Центральная цитадель',
+    threat: '12',
+    description: 'Надзиратели следят за кузнечными залами.'
+  },
+  'ring-northeast': {
+    label: 'Угол рунических лучей',
+    type: 'step',
+    grid: [8, 6],
+    location: 'Центральная цитадель',
+    threat: '12',
+    description: 'Глифы усиливают сигнал к рынкам рун.'
+  },
+  'ring-northwest': {
+    label: 'Угол каменных гласов',
+    type: 'step',
+    grid: [6, 6],
+    location: 'Центральная цитадель',
+    threat: '12',
+    description: 'Гранитные статуи благословляют северный отряд.'
+  },
+  'ring-southeast': {
+    label: 'Угол багровых свечей',
+    type: 'step',
+    grid: [8, 8],
+    location: 'Центральная цитадель',
+    threat: '12',
+    description: 'Пламя ламп указывает путь к рынкам и катакомбам.'
+  },
+  'ring-southwest': {
+    label: 'Угол кузнечных печей',
+    type: 'step',
+    grid: [6, 8],
+    location: 'Центральная цитадель',
+    threat: '12',
+    description: 'Тепло печей смешивается с гарью катакомб.'
+  },
+  'north-threshold': {
+    label: 'Врата стылых шагов',
+    type: 'step',
+    grid: [7, 5],
+    location: 'Северные бастионы',
+    threat: '13',
+    description: 'Ледяные лучники проверяют каждого путника.'
+  },
+  'north-void': {
+    label: 'Хрустальный пролёт',
+    type: 'step',
+    grid: [7, 4],
+    location: 'Северные бастионы',
+    threat: '13',
+    description: 'Пустой коридор, в котором мерцают снежные искры.'
+  },
+  'north-patrol': {
+    label: 'Патруль ледяных караулов',
+    type: 'encounter',
+    grid: [7, 3],
+    location: 'Северные бастионы',
+    threat: '13-14',
+    description: 'Дозорные выслеживают нарушителей на каждом шагу.'
+  },
+  'north-gate': {
+    label: 'Барьер северного дозора',
+    type: 'gate',
+    grid: [7, 2],
+    location: 'Северные бастионы',
+    threat: '14',
+    description: 'Руны холода удерживают стылых духов внутри.'
+  },
+  'north-sanctum': {
+    label: 'Святилище полярной тени',
+    type: 'sanctum',
+    grid: [7, 1],
+    location: 'Северные бастионы',
+    threat: '14',
+    description: 'Лёд усиливает вашу защиту перед решающей битвой.'
+  },
+  'north-lair': {
+    label: 'Трон Ледяного архонта',
     type: 'boss',
-    position: [0.5, 0.5],
-    intel: 'Сердце Империи пульсирует эссенцией и управляет портальными нитями лабиринта.',
-    connections: { north: 'inner-north', south: 'inner-south', east: 'inner-east', west: 'inner-west' }
+    grid: [7, 0],
+    location: 'Северные бастионы',
+    threat: '15',
+    description: 'Архонт холода командует штормами из своей цитадели.'
   },
-  {
-    id: 'inner-north',
-    label: 'Кольцо Воронов',
-    type: 'path',
-    position: [0.5, 0.42],
-    intel: 'Переход к северным воротам. Караул проверяет печати крови на каждой связке.',
-    connections: { south: 'citadel', north: 'north-gate', east: 'portal-north-east', west: 'portal-north-west' }
+  'north-cache': {
+    label: 'Камера стылых запасов',
+    type: 'treasure',
+    grid: [6, 3],
+    location: 'Северные бастионы',
+    threat: '13',
+    description: 'Сундуки с эссенцией и ледяными чарами.'
   },
-  {
-    id: 'inner-south',
-    label: 'Галерея Огней',
-    type: 'path',
-    position: [0.5, 0.58],
-    intel: 'Коридор ведёт к нижним ярусам катакомб и мастерским алхимиков.',
-    connections: { north: 'citadel', south: 'south-gate', east: 'portal-south-east', west: 'portal-south-west' }
+  'north-icehall': {
+    label: 'Галерея инея',
+    type: 'encounter',
+    grid: [8, 3],
+    location: 'Северные бастионы',
+    threat: '13-14',
+    description: 'Пол скользит, а из тумана выходят тени караула.'
   },
-  {
-    id: 'inner-east',
-    label: 'Артерия восточного крыла',
-    type: 'path',
-    position: [0.58, 0.5],
-    intel: 'Поток мерцающей эссенции ведёт к рынку рун и торговцам древними печатями.',
-    connections: { west: 'citadel', east: 'east-gate', north: 'portal-north-east', south: 'portal-south-east' }
-  },
-  {
-    id: 'inner-west',
-    label: 'Тоннель теней',
-    type: 'path',
-    position: [0.42, 0.5],
-    intel: 'Спрятанный путь к мастерским гильдии и оружейным кузницам.',
-    connections: { east: 'citadel', west: 'west-gate', north: 'portal-north-west', south: 'portal-south-west' }
-  },
-  {
-    id: 'north-gate',
-    label: 'Северные ворота',
-    type: 'gate',
-    position: [0.5, 0.32],
-    intel: 'Караул следит за каждым путником, ведущим к ледяным покоям архонтов.',
-    connections: { south: 'inner-north', north: 'north-ward', east: 'portal-north-east', west: 'portal-north-west' }
-  },
-  {
-    id: 'south-gate',
-    label: 'Южные ворота',
-    type: 'gate',
-    position: [0.5, 0.68],
-    intel: 'Запечатанный вход в алтарные склепы и рынки алхимиков.',
-    connections: { north: 'inner-south', south: 'south-ward', east: 'portal-south-east', west: 'portal-south-west' }
-  },
-  {
-    id: 'east-gate',
-    label: 'Восточные ворота',
-    type: 'gate',
-    position: [0.68, 0.5],
-    intel: 'Патрули гильдий охраняют порталы к торговым кварталам.',
-    connections: { west: 'inner-east', east: 'east-ward', north: 'portal-north-east', south: 'portal-south-east' }
-  },
-  {
-    id: 'west-gate',
-    label: 'Западные ворота',
-    type: 'gate',
-    position: [0.32, 0.5],
-    intel: 'Ведут в кузницы и склады оружия.',
-    connections: { east: 'inner-west', west: 'west-ward', north: 'portal-north-west', south: 'portal-south-west' }
-  },
-  {
-    id: 'north-ward',
-    label: 'Ледяной карниз',
-    type: 'portal',
-    position: [0.5, 0.22],
-    intel: 'Ворота к обледеневшим террасам архонтов.',
-    connections: { south: 'north-gate', north: 'north-sanctum', east: 'north-east-ward', west: 'north-west-ward' }
-  },
-  {
-    id: 'north-sanctum',
-    label: 'Святилище Полуночного ветра',
+  'north-shrine': {
+    label: 'Алтарь вечного ветра',
     type: 'sanctum',
-    position: [0.5, 0.12],
-    intel: 'Здесь звучит хорал, открывающий древние клятвы.',
-    connections: { south: 'north-ward' }
+    grid: [6, 2],
+    location: 'Северные бастионы',
+    threat: '14',
+    description: 'Дары ветра укрепляют ваши отражения урона.'
   },
-  {
-    id: 'north-east-ward',
-    label: 'Казармы ледяных стражей',
+  'north-windbridge': {
+    label: 'Мост холодных звёзд',
+    type: 'step',
+    grid: [8, 2],
+    location: 'Северные бастионы',
+    threat: '14',
+    description: 'Здесь охотятся ледяные фантомы.'
+  },
+  'north-wardens': {
+    label: 'Склад хранителей печатей',
     type: 'treasure',
-    position: [0.62, 0.24],
-    intel: 'Командиры прячут здесь редкие руны и замороженные трофеи.',
-    connections: { west: 'north-ward', east: 'outer-north-east' }
+    grid: [6, 1],
+    location: 'Северные бастионы',
+    threat: '14',
+    description: 'Редкие обереги ждут тех, кто очистит сторожку.'
   },
-  {
-    id: 'north-west-ward',
-    label: 'Обитель вороних дозоров',
-    type: 'treasure',
-    position: [0.38, 0.24],
-    intel: 'Сюда свозят перья и маски ночного дозора.',
-    connections: { east: 'north-ward', west: 'outer-north-west' }
+  'north-aurora': {
+    label: 'Зал северного сияния',
+    type: 'step',
+    grid: [8, 1],
+    location: 'Северные бастионы',
+    threat: '14-15',
+    description: 'Сияние искажает тени противников.'
   },
-  {
-    id: 'outer-north-east',
-    label: 'Рубеж Стылой Луны',
+  'east-threshold': {
+    label: 'Перевал рунических лавок',
+    type: 'step',
+    grid: [9, 7],
+    location: 'Рынки рун',
+    threat: '13',
+    description: 'Торговцы встречают отряды из цитадели.'
+  },
+  'east-arcade': {
+    label: 'Холл арканных витрин',
+    type: 'step',
+    grid: [10, 7],
+    location: 'Рынки рун',
+    threat: '13',
+    description: 'Ряд лавок с редкими глифами.'
+  },
+  'east-market': {
+    label: 'Патруль торговых рядов',
+    type: 'encounter',
+    grid: [11, 7],
+    location: 'Рынки рун',
+    threat: '13-14',
+    description: 'Наёмники проверяют лицензии и кошели гостей.'
+  },
+  'east-gate': {
+    label: 'Рунный таможенный барьер',
     type: 'gate',
-    position: [0.72, 0.24],
-    intel: 'Открывает путь к ледяным бастионам спутников.',
-    connections: { west: 'north-east-ward' }
+    grid: [12, 7],
+    location: 'Рынки рун',
+    threat: '14',
+    description: 'Перекрывает путь к сокровищнице рун.'
   },
-  {
-    id: 'outer-north-west',
-    label: 'Застава Чернокрылых',
-    type: 'gate',
-    position: [0.28, 0.24],
-    intel: 'Пропускает только тех, кто принесёт кровь врагов.',
-    connections: { east: 'north-west-ward' }
-  },
-  {
-    id: 'south-ward',
-    label: 'Алый колодец',
-    type: 'portal',
-    position: [0.5, 0.78],
-    intel: 'Сердце ритуалов крови и доступа к нижним катакомбам.',
-    connections: { north: 'south-gate', south: 'south-sanctum', east: 'south-east-ward', west: 'south-west-ward' }
-  },
-  {
-    id: 'south-sanctum',
-    label: 'Святилище Жар-птицы',
+  'east-sanctum': {
+    label: 'Святилище торгового гильдмастера',
     type: 'sanctum',
-    position: [0.5, 0.88],
-    intel: 'Пламя восстанавливает павших героев.',
-    connections: { north: 'south-ward' }
+    grid: [13, 7],
+    location: 'Рынки рун',
+    threat: '14',
+    description: 'Заключаются сделки на кровь и кристаллы.'
   },
-  {
-    id: 'south-east-ward',
-    label: 'Алхимическая пристань',
+  'east-lair': {
+    label: 'Трон Рунной матриархи',
+    type: 'boss',
+    grid: [14, 7],
+    location: 'Рынки рун',
+    threat: '15',
+    description: 'Владычица рун оберегает реликвии торговцев.'
+  },
+  'east-bazaar': {
+    label: 'Базар сияющих глифов',
     type: 'treasure',
-    position: [0.62, 0.76],
-    intel: 'Хранятся редкие эликсиры и реагенты.',
-    connections: { west: 'south-ward', east: 'outer-south-east' }
+    grid: [11, 6],
+    location: 'Рынки рун',
+    threat: '13',
+    description: 'Горят витрины с концентратами силы.'
   },
-  {
-    id: 'south-west-ward',
-    label: 'Гранитные склады',
+  'east-warehouse': {
+    label: 'Склад теневых сделок',
+    type: 'encounter',
+    grid: [11, 8],
+    location: 'Рынки рун',
+    threat: '13-14',
+    description: 'Контрабандисты охраняют тайные сундуки.'
+  },
+  'east-vault': {
+    label: 'Руническая казна',
     type: 'treasure',
-    position: [0.38, 0.76],
-    intel: 'Запасы металла и эссенции для осад.',
-    connections: { east: 'south-ward', west: 'outer-south-west' }
+    grid: [12, 6],
+    location: 'Рынки рун',
+    threat: '14',
+    description: 'Хранилище с усиленными печатями.'
   },
-  {
-    id: 'outer-south-east',
-    label: 'Врата Горящего Полумесяца',
-    type: 'gate',
-    position: [0.72, 0.76],
-    intel: 'Выводят к пламенеющим аренам кланов.',
-    connections: { west: 'south-east-ward' }
+  'east-ward': {
+    label: 'Застава излучающих штурмовиков',
+    type: 'encounter',
+    grid: [12, 8],
+    location: 'Рынки рун',
+    threat: '14',
+    description: 'Боевые маги тренируются в ближнем бою.'
   },
-  {
-    id: 'outer-south-west',
-    label: 'Лазурный редут',
-    type: 'gate',
-    position: [0.28, 0.76],
-    intel: 'Отсюда открываются подземные ходы в ущелья.',
-    connections: { east: 'south-west-ward' }
-  },
-  {
-    id: 'east-ward',
-    label: 'Зеркало торговцев',
-    type: 'portal',
-    position: [0.78, 0.5],
-    intel: 'Мерцающий портал ведёт к рынку реликвий.',
-    connections: { west: 'east-gate', east: 'east-sanctum', north: 'east-north-ward', south: 'east-south-ward' }
-  },
-  {
-    id: 'east-sanctum',
-    label: 'Хранилище рун',
+  'east-spire': {
+    label: 'Спираль небесных витрин',
     type: 'sanctum',
-    position: [0.88, 0.5],
-    intel: 'Место, где заключены договоры с духами торговли.',
-    connections: { west: 'east-ward' }
+    grid: [13, 6],
+    location: 'Рынки рун',
+    threat: '14',
+    description: 'Глифы усиливают магические атаки.'
   },
-  {
-    id: 'east-north-ward',
-    label: 'Терраса арбитров',
-    type: 'treasure',
-    position: [0.76, 0.38],
-    intel: 'Арбитры проводят сюда победителей арены.',
-    connections: { south: 'east-ward', north: 'outer-east-north' }
+  'east-orb': {
+    label: 'Зал зеркальных сфер',
+    type: 'step',
+    grid: [13, 8],
+    location: 'Рынки рун',
+    threat: '14-15',
+    description: 'Сферы отражают входящих, раскрывая слабости.'
   },
-  {
-    id: 'east-south-ward',
-    label: 'Лаборатория рунных мастеров',
-    type: 'treasure',
-    position: [0.76, 0.62],
-    intel: 'Тоннели наполнены руническими искрами.',
-    connections: { north: 'east-ward', south: 'outer-east-south' }
+  'south-threshold': {
+    label: 'Переход багровых стражей',
+    type: 'step',
+    grid: [7, 9],
+    location: 'Катакомбы Жар-птицы',
+    threat: '13',
+    description: 'Гарнизон осматривает входящих на следы жара.'
   },
-  {
-    id: 'outer-east-north',
-    label: 'Портал к облачным мостам',
+  'south-corridor': {
+    label: 'Термальный коридор',
+    type: 'step',
+    grid: [7, 10],
+    location: 'Катакомбы Жар-птицы',
+    threat: '13',
+    description: 'Лава под полом согревает воздух.'
+  },
+  'south-patrol': {
+    label: 'Патруль огненных караулов',
+    type: 'encounter',
+    grid: [7, 11],
+    location: 'Катакомбы Жар-птицы',
+    threat: '13-14',
+    description: 'Сюда стекаются элитные палачи катакомб.'
+  },
+  'south-gate': {
+    label: 'Бастион вулканических печатей',
     type: 'gate',
-    position: [0.76, 0.28],
-    intel: 'Ведёт к парящим укреплениям над бездной.',
-    connections: { south: 'east-north-ward' }
+    grid: [7, 12],
+    location: 'Катакомбы Жар-птицы',
+    threat: '14',
+    description: 'Печати из магмы блокируют путь к святилищу.'
   },
-  {
-    id: 'outer-east-south',
-    label: 'Терраса огненных клятв',
-    type: 'gate',
-    position: [0.76, 0.72],
-    intel: 'Пропускает только носителей священных печатей.',
-    connections: { north: 'east-south-ward' }
-  },
-  {
-    id: 'west-ward',
-    label: 'Туннель мастеров',
-    type: 'portal',
-    position: [0.22, 0.5],
-    intel: 'Связь между кузницами и центральными складами.',
-    connections: { east: 'west-gate', west: 'west-sanctum', north: 'west-north-ward', south: 'west-south-ward' }
-  },
-  {
-    id: 'west-sanctum',
-    label: 'Святилище Каменной клятвы',
+  'south-sanctum': {
+    label: 'Святилище возрождающего пламени',
     type: 'sanctum',
-    position: [0.12, 0.5],
-    intel: 'Оплот кузнецов, создающих артефакты.',
-    connections: { east: 'west-ward' }
+    grid: [7, 13],
+    location: 'Катакомбы Жар-птицы',
+    threat: '14',
+    description: 'Предвестники Жар-птицы дарят временную невосприимчивость.'
   },
-  {
-    id: 'west-north-ward',
-    label: 'Гнездо рыцарей сумрака',
+  'south-lair': {
+    label: 'Гнездо Жар-птицы',
+    type: 'boss',
+    grid: [7, 14],
+    location: 'Катакомбы Жар-птицы',
+    threat: '15',
+    description: 'Пепельная императрица оберегает сокровища клана.'
+  },
+  'south-furnace': {
+    label: 'Топка пепельных кузнецов',
     type: 'treasure',
-    position: [0.24, 0.38],
-    intel: 'Они накапливают редкие пластины брони.',
-    connections: { south: 'west-ward', north: 'outer-west-north' }
+    grid: [6, 11],
+    location: 'Катакомбы Жар-птицы',
+    threat: '13-14',
+    description: 'Содержит инготы, пропитанные пламенем.'
   },
-  {
-    id: 'west-south-ward',
-    label: 'Склепы Алатара',
+  'south-chasm': {
+    label: 'Расщелина пламенных духов',
+    type: 'encounter',
+    grid: [8, 11],
+    location: 'Катакомбы Жар-птицы',
+    threat: '14',
+    description: 'Из трещин вырываются вспышки огня.'
+  },
+  'south-ember': {
+    label: 'Галерея раскалённых руин',
+    type: 'step',
+    grid: [6, 12],
+    location: 'Катакомбы Жар-птицы',
+    threat: '14',
+    description: 'Пепел скрывает ловушки на полу.'
+  },
+  'south-crypt': {
+    label: 'Крипта горящих саркофагов',
     type: 'treasure',
-    position: [0.24, 0.62],
-    intel: 'Хранятся филактерии павших генералов.',
-    connections: { north: 'west-ward', south: 'outer-west-south' }
+    grid: [8, 12],
+    location: 'Катакомбы Жар-птицы',
+    threat: '14',
+    description: 'Саркофаги шепчут о забытых ритуалах.'
   },
-  {
-    id: 'outer-west-north',
-    label: 'Башня дымных крыльев',
+  'south-altar': {
+    label: 'Алтарь жаркого посвящения',
+    type: 'sanctum',
+    grid: [6, 13],
+    location: 'Катакомбы Жар-птицы',
+    threat: '14',
+    description: 'Усиляет сопротивление огню на время похода.'
+  },
+  'south-pyres': {
+    label: 'Кострища угольных жрецов',
+    type: 'encounter',
+    grid: [8, 13],
+    location: 'Катакомбы Жар-птицы',
+    threat: '14-15',
+    description: 'Жрецы проводят ритуалы, привлекая элементалей.'
+  },
+  'west-threshold': {
+    label: 'Плац западных мастеров',
+    type: 'step',
+    grid: [5, 7],
+    location: 'Кузнечные пределы',
+    threat: '13',
+    description: 'Ударные бригады встречают возвращающихся.'
+  },
+  'west-corridor': {
+    label: 'Галерея наковален',
+    type: 'step',
+    grid: [4, 7],
+    location: 'Кузнечные пределы',
+    threat: '13',
+    description: 'Искры подсвечивают путь к кузням.'
+  },
+  'west-patrol': {
+    label: 'Патруль кованых дозорных',
+    type: 'encounter',
+    grid: [3, 7],
+    location: 'Кузнечные пределы',
+    threat: '13-14',
+    description: 'Механические големы проверяют допуск.'
+  },
+  'west-gate': {
+    label: 'Западная герметичная врата',
     type: 'gate',
-    position: [0.24, 0.28],
-    intel: 'Скрытая обсерватория воздушной разведки.',
-    connections: { south: 'west-north-ward' }
+    grid: [2, 7],
+    location: 'Кузнечные пределы',
+    threat: '14',
+    description: 'Грубые цепи и печати удерживают тепло внутри.'
   },
-  {
-    id: 'outer-west-south',
-    label: 'Форт подземной реки',
-    type: 'gate',
-    position: [0.24, 0.72],
-    intel: 'Ведёт в подземные катакомбы реки крови.',
-    connections: { north: 'west-south-ward' }
+  'west-sanctum': {
+    label: 'Святилище каленых искр',
+    type: 'sanctum',
+    grid: [1, 7],
+    location: 'Кузнечные пределы',
+    threat: '14',
+    description: 'Оружие полируется огнём крови.'
   },
-  {
-    id: 'portal-north-east',
-    label: 'Перекрёсток стихий',
-    type: 'portal',
-    position: [0.62, 0.38],
-    intel: 'Магические лучи соединяют ворота с рынками.',
-    connections: { west: 'inner-north', south: 'inner-east', north: 'north-gate', east: 'east-gate' }
+  'west-lair': {
+    label: 'Трон Костолома',
+    type: 'boss',
+    grid: [0, 7],
+    location: 'Кузнечные пределы',
+    threat: '15',
+    description: 'Предводитель кузнецов командует тяжелыми големами.'
   },
-  {
-    id: 'portal-north-west',
-    label: 'Зеркало Чернокрыла',
-    type: 'portal',
-    position: [0.38, 0.38],
-    intel: 'Чернокрылая стража наблюдает за северо-западным крылом.',
-    connections: { east: 'inner-north', south: 'inner-west', north: 'north-gate', west: 'west-gate' }
+  'west-forge': {
+    label: 'Кузница скальных клятв',
+    type: 'treasure',
+    grid: [3, 6],
+    location: 'Кузнечные пределы',
+    threat: '13-14',
+    description: 'Содержит чертежи редких клинков.'
   },
-  {
-    id: 'portal-south-east',
-    label: 'Кристальный перекрёсток',
-    type: 'portal',
-    position: [0.62, 0.62],
-    intel: 'Своды мерцают алым стеклом и ведут в торжище алхимиков.',
-    connections: { north: 'inner-east', west: 'inner-south', east: 'east-gate', south: 'south-gate' }
+  'west-depot': {
+    label: 'Склад боевых сплавов',
+    type: 'encounter',
+    grid: [3, 8],
+    location: 'Кузнечные пределы',
+    threat: '14',
+    description: 'На складах дежурят стражи с молотами.'
   },
-  {
-    id: 'portal-south-west',
-    label: 'Огненный дозор',
-    type: 'portal',
-    position: [0.38, 0.62],
-    intel: 'Гильдия следит за юго-западными тоннелями.',
-    connections: { north: 'inner-west', east: 'inner-south', south: 'south-gate', west: 'west-gate' }
+  'west-smelter': {
+    label: 'Плавильная камера',
+    type: 'step',
+    grid: [2, 6],
+    location: 'Кузнечные пределы',
+    threat: '14',
+    description: 'Жар пламени усиливает противников.'
+  },
+  'west-wardens': {
+    label: 'Арсенал стражей пламени',
+    type: 'treasure',
+    grid: [2, 8],
+    location: 'Кузнечные пределы',
+    threat: '14',
+    description: 'Можно отыскать редкие детали брони.'
+  },
+  'west-ore-hoard': {
+    label: 'Тайник рудных жил',
+    type: 'treasure',
+    grid: [1, 6],
+    location: 'Кузнечные пределы',
+    threat: '14',
+    description: 'Слитки аурихалка сияют под слоем пыли.'
+  },
+  'west-gloom': {
+    label: 'Грот коптящихся теней',
+    type: 'step',
+    grid: [1, 8],
+    location: 'Кузнечные пределы',
+    threat: '14',
+    description: 'Укромный проход с редкими трофеями.'
   }
+};
+
+const labyrinthBlueprints = new Map();
+Object.entries(labyrinthBlueprintEntries).forEach(([id, blueprint]) => {
+  labyrinthBlueprints.set(id, {
+    ...blueprint,
+    id,
+    position: gridToPosition(blueprint.grid[0], blueprint.grid[1]),
+    connections: {}
+  });
+});
+
+const connectionPairs = [
+  ['citadel-core', 'ring-north'],
+  ['citadel-core', 'ring-south'],
+  ['citadel-core', 'ring-east'],
+  ['citadel-core', 'ring-west'],
+  ['ring-north', 'ring-northeast'],
+  ['ring-north', 'ring-northwest'],
+  ['ring-south', 'ring-southeast'],
+  ['ring-south', 'ring-southwest'],
+  ['ring-east', 'ring-northeast'],
+  ['ring-east', 'ring-southeast'],
+  ['ring-west', 'ring-northwest'],
+  ['ring-west', 'ring-southwest'],
+  ['ring-north', 'north-threshold'],
+  ['north-threshold', 'north-void'],
+  ['north-void', 'north-patrol'],
+  ['north-patrol', 'north-gate'],
+  ['north-gate', 'north-sanctum'],
+  ['north-sanctum', 'north-lair'],
+  ['north-patrol', 'north-cache'],
+  ['north-patrol', 'north-icehall'],
+  ['north-gate', 'north-shrine'],
+  ['north-gate', 'north-windbridge'],
+  ['north-sanctum', 'north-wardens'],
+  ['north-sanctum', 'north-aurora'],
+  ['ring-east', 'east-threshold'],
+  ['east-threshold', 'east-arcade'],
+  ['east-arcade', 'east-market'],
+  ['east-market', 'east-gate'],
+  ['east-gate', 'east-sanctum'],
+  ['east-sanctum', 'east-lair'],
+  ['east-market', 'east-bazaar'],
+  ['east-market', 'east-warehouse'],
+  ['east-gate', 'east-vault'],
+  ['east-gate', 'east-ward'],
+  ['east-sanctum', 'east-spire'],
+  ['east-sanctum', 'east-orb'],
+  ['ring-south', 'south-threshold'],
+  ['south-threshold', 'south-corridor'],
+  ['south-corridor', 'south-patrol'],
+  ['south-patrol', 'south-gate'],
+  ['south-gate', 'south-sanctum'],
+  ['south-sanctum', 'south-lair'],
+  ['south-patrol', 'south-furnace'],
+  ['south-patrol', 'south-chasm'],
+  ['south-gate', 'south-ember'],
+  ['south-gate', 'south-crypt'],
+  ['south-sanctum', 'south-altar'],
+  ['south-sanctum', 'south-pyres'],
+  ['ring-west', 'west-threshold'],
+  ['west-threshold', 'west-corridor'],
+  ['west-corridor', 'west-patrol'],
+  ['west-patrol', 'west-gate'],
+  ['west-gate', 'west-sanctum'],
+  ['west-sanctum', 'west-lair'],
+  ['west-patrol', 'west-forge'],
+  ['west-patrol', 'west-depot'],
+  ['west-gate', 'west-smelter'],
+  ['west-gate', 'west-wardens'],
+  ['west-sanctum', 'west-ore-hoard'],
+  ['west-sanctum', 'west-gloom']
 ];
 
-const originNodeId = 'citadel';
+const oppositeDirections = { north: 'south', south: 'north', east: 'west', west: 'east' };
+
+function directionBetween(from, to) {
+  const [cx, cy] = from.grid;
+  const [tx, ty] = to.grid;
+  const dx = tx - cx;
+  const dy = ty - cy;
+  if (dx === 0 && dy === -1) return 'north';
+  if (dx === 0 && dy === 1) return 'south';
+  if (dy === 0 && dx === 1) return 'east';
+  if (dy === 0 && dx === -1) return 'west';
+  return null;
+}
+
+connectionPairs.forEach(([fromId, toId]) => {
+  const from = labyrinthBlueprints.get(fromId);
+  const to = labyrinthBlueprints.get(toId);
+  if (!from || !to) return;
+  const direction = directionBetween(from, to);
+  if (!direction) return;
+  from.connections[direction] = toId;
+  to.connections[oppositeDirections[direction]] = fromId;
+});
+
+const labyrinthNodes = Array.from(labyrinthBlueprints.values()).map((node) =>
+  buildLabyrinthNode(node)
+);
+
+const originNodeId = 'citadel-core';
 const labyrinthNodeMap = new Map(labyrinthNodes.map((node) => [node.id, node]));
 
-const labyrinthChambers = [
-  { x: 0.42, y: 0.42, w: 0.16, h: 0.16 },
-  { x: 0.32, y: 0.32, w: 0.1, h: 0.1 },
-  { x: 0.58, y: 0.32, w: 0.1, h: 0.1 },
-  { x: 0.32, y: 0.58, w: 0.1, h: 0.1 },
-  { x: 0.58, y: 0.58, w: 0.1, h: 0.1 },
-  { x: 0.32, y: 0.44, w: 0.1, h: 0.08 },
-  { x: 0.58, y: 0.44, w: 0.1, h: 0.08 },
-  { x: 0.44, y: 0.32, w: 0.08, h: 0.1 },
-  { x: 0.44, y: 0.58, w: 0.08, h: 0.1 },
-  { x: 0.2, y: 0.2, w: 0.1, h: 0.1 },
-  { x: 0.7, y: 0.2, w: 0.1, h: 0.1 },
-  { x: 0.2, y: 0.7, w: 0.1, h: 0.1 },
-  { x: 0.7, y: 0.7, w: 0.1, h: 0.1 },
-  { x: 0.2, y: 0.44, w: 0.1, h: 0.12 },
-  { x: 0.7, y: 0.44, w: 0.1, h: 0.12 },
-  { x: 0.44, y: 0.2, w: 0.12, h: 0.1 },
-  { x: 0.44, y: 0.7, w: 0.12, h: 0.1 },
-  { x: 0.18, y: 0.18, w: 0.06, h: 0.06 },
-  { x: 0.76, y: 0.18, w: 0.06, h: 0.06 },
-  { x: 0.18, y: 0.76, w: 0.06, h: 0.06 },
-  { x: 0.76, y: 0.76, w: 0.06, h: 0.06 },
-  { x: 0.2, y: 0.32, w: 0.06, h: 0.06 },
-  { x: 0.74, y: 0.32, w: 0.06, h: 0.06 },
-  { x: 0.2, y: 0.62, w: 0.06, h: 0.06 },
-  { x: 0.74, y: 0.62, w: 0.06, h: 0.06 },
-  { x: 0.44, y: 0.1, w: 0.12, h: 0.06 },
-  { x: 0.44, y: 0.84, w: 0.12, h: 0.06 }
+const labyrinthRegions = [
+  { id: 'central', name: 'Центральная цитадель', bounds: gridArea(5, 9, 5, 9), tint: 'rgba(242, 77, 109, 0.16)', border: 'rgba(242, 77, 109, 0.38)' },
+  { id: 'north', name: 'Северные бастионы', bounds: gridArea(5, 9, 0, 5), tint: 'rgba(108, 196, 255, 0.15)', border: 'rgba(108, 196, 255, 0.35)' },
+  { id: 'east', name: 'Рынки рун', bounds: gridArea(9, 14, 5, 9), tint: 'rgba(192, 149, 255, 0.16)', border: 'rgba(192, 149, 255, 0.34)' },
+  { id: 'south', name: 'Катакомбы Жар-птицы', bounds: gridArea(5, 9, 9, 14), tint: 'rgba(255, 180, 102, 0.18)', border: 'rgba(255, 180, 102, 0.34)' },
+  { id: 'west', name: 'Кузнечные пределы', bounds: gridArea(0, 5, 5, 9), tint: 'rgba(255, 126, 103, 0.16)', border: 'rgba(255, 126, 103, 0.32)' }
 ];
 
 const labyrinthGlyphs = [
-  { position: [0.5, 0.36], icon: '⚔️', glow: 'rgba(242, 77, 109, 0.55)', core: 'rgba(39, 10, 21, 0.92)' },
-  { position: [0.5, 0.64], icon: '🛡️', glow: 'rgba(108, 196, 255, 0.5)', core: 'rgba(13, 22, 38, 0.92)' },
-  { position: [0.36, 0.5], icon: '🔮', glow: 'rgba(192, 149, 255, 0.6)', core: 'rgba(25, 16, 36, 0.9)' },
-  { position: [0.64, 0.5], icon: '🜂', glow: 'rgba(255, 150, 102, 0.55)', core: 'rgba(36, 20, 14, 0.92)' },
-  { position: [0.36, 0.36], icon: '☠️', glow: 'rgba(255, 255, 255, 0.28)', core: 'rgba(20, 20, 28, 0.92)' },
-  { position: [0.64, 0.36], icon: '🧪', glow: 'rgba(81, 224, 192, 0.55)', core: 'rgba(12, 31, 28, 0.9)' },
-  { position: [0.36, 0.64], icon: '🗝️', glow: 'rgba(255, 228, 118, 0.55)', core: 'rgba(34, 26, 14, 0.9)' },
-  { position: [0.64, 0.64], icon: '📜', glow: 'rgba(192, 149, 255, 0.5)', core: 'rgba(18, 16, 32, 0.92)' },
-  { position: [0.5, 0.5], icon: '⛬', glow: 'rgba(242, 77, 109, 0.7)', core: 'rgba(48, 12, 24, 0.95)', scale: 1.2 },
-  { position: [0.2, 0.5], icon: '⚙️', glow: 'rgba(148, 179, 255, 0.55)', core: 'rgba(16, 22, 38, 0.9)' },
-  { position: [0.8, 0.5], icon: '💰', glow: 'rgba(255, 208, 120, 0.6)', core: 'rgba(36, 24, 12, 0.9)' }
+  { position: gridToPosition(7, 2), icon: '❄️', glow: 'rgba(108, 196, 255, 0.5)', core: 'rgba(16, 24, 36, 0.92)' },
+  { position: gridToPosition(12, 7), icon: '💠', glow: 'rgba(192, 149, 255, 0.55)', core: 'rgba(22, 12, 36, 0.92)' },
+  { position: gridToPosition(7, 12), icon: '🔥', glow: 'rgba(255, 180, 102, 0.55)', core: 'rgba(38, 18, 12, 0.9)' },
+  { position: gridToPosition(2, 7), icon: '⚒️', glow: 'rgba(255, 126, 103, 0.55)', core: 'rgba(26, 16, 12, 0.92)' },
+  { position: gridToPosition(7, 7), icon: '⛬', glow: 'rgba(242, 77, 109, 0.7)', core: 'rgba(48, 12, 24, 0.95)', scale: 1.2 }
 ];
+
+
 
 const labyrinthEdges = [];
 const edgeRegistry = new Set();
@@ -957,9 +1237,33 @@ function createMapNodes() {
     button.type = 'button';
     button.className = `map-node map-node--${node.type}`;
     button.dataset.node = node.id;
-    if (node.intel) button.dataset.intel = node.intel;
-    button.setAttribute('aria-label', `${node.label}. ${node.intel}`);
-    button.innerHTML = '<span class="map-node__pip"></span><span class="map-node__label">' + node.label + '</span>';
+    const metaParts = [];
+    if (node.location) metaParts.push(node.location);
+    if (node.threat) metaParts.push(`ур. ${node.threat}`);
+    const metaLabel = metaParts.join(' · ');
+    const intelText = node.intel || metaLabel;
+    if (intelText) {
+      button.dataset.intel = intelText;
+      button.setAttribute('aria-label', `${node.label}. ${intelText}`);
+    } else {
+      button.setAttribute('aria-label', node.label);
+    }
+    const pip = document.createElement('span');
+    pip.className = 'map-node__pip';
+    const label = document.createElement('span');
+    label.className = 'map-node__label';
+    const title = document.createElement('span');
+    title.className = 'map-node__label-title';
+    title.textContent = node.label;
+    label.appendChild(title);
+    if (metaLabel) {
+      const meta = document.createElement('span');
+      meta.className = 'map-node__label-meta';
+      meta.textContent = metaLabel;
+      label.appendChild(meta);
+    }
+    button.appendChild(pip);
+    button.appendChild(label);
     item.appendChild(button);
     mapNodeLayer.appendChild(item);
   });
@@ -978,6 +1282,21 @@ function updateLocationLabel() {
   if (!mapLocation) return;
   const node = getNode(activeNodeId);
   mapLocation.textContent = node ? node.label : 'Неизвестная точка';
+}
+
+function updateMapReadout(nodeOverride) {
+  if (!mapCoords) return;
+  const node = nodeOverride ?? getNode(activeNodeId);
+  if (!node) {
+    mapCoords.textContent = 'Неизвестный сектор';
+    return;
+  }
+  const [col, row] = Array.isArray(node.grid) ? node.grid : [null, null];
+  const coordLabel = col !== null && row !== null
+    ? `Шаг [${String(col).padStart(2, '0')}:${String(row).padStart(2, '0')}]`
+    : 'Шаг [--:--]';
+  const location = node.location || 'Неизвестная зона';
+  mapCoords.textContent = `${location} · ${coordLabel}`;
 }
 
 function updateMapAvatarPosition() {
@@ -1049,6 +1368,7 @@ function moveToNode(targetId) {
   visitedNodeIds.add(targetId);
   syncMapNodeSelection();
   updateLocationLabel();
+  updateMapReadout();
   const node = getNode(targetId);
   if (node?.intel) setIntel(node.intel);
   if (!travelHistory.length || travelHistory[travelHistory.length - 1] !== targetId) {
@@ -1078,6 +1398,7 @@ function bindMapNodeEvents() {
       hoveredNodeId = nodeId;
       const node = getNode(nodeId);
       if (node?.intel) setIntel(node.intel);
+      updateMapReadout(node);
       drawMap();
     });
     button.addEventListener('mouseleave', () => {
@@ -1089,6 +1410,7 @@ function bindMapNodeEvents() {
       hoveredNodeId = nodeId;
       const node = getNode(nodeId);
       if (node?.intel) setIntel(node.intel);
+      updateMapReadout(node);
       drawMap();
     });
     button.addEventListener('blur', () => {
@@ -1121,15 +1443,56 @@ function drawLabyrinthBase(ctx, width, height) {
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
 
-  ctx.save();
-  ctx.fillStyle = 'rgba(28, 24, 44, 0.92)';
-  labyrinthChambers.forEach(({ x, y, w, h }) => {
+  drawLabyrinthRegions(ctx, width, height);
+  drawLabyrinthGrid(ctx, width, height);
+}
+
+function drawLabyrinthRegions(ctx, width, height) {
+  labyrinthRegions.forEach((region) => {
+    const { x, y, w, h } = region.bounds;
+    ctx.save();
+    ctx.fillStyle = region.tint;
     ctx.fillRect(x * width, y * height, w * width, h * height);
-  });
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.09)';
-  ctx.lineWidth = Math.max(width, height) * 0.0035;
-  labyrinthChambers.forEach(({ x, y, w, h }) => {
+    ctx.strokeStyle = region.border;
+    ctx.lineWidth = Math.max(width, height) * 0.003;
     ctx.strokeRect(x * width, y * height, w * width, h * height);
+    ctx.restore();
+  });
+}
+
+function drawLabyrinthGrid(ctx, width, height) {
+  const steps = 8;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+  ctx.lineWidth = 1;
+  for (let i = 1; i < steps; i += 1) {
+    const x = (width / steps) * i;
+    const y = (height / steps) * i;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawRegionLabels(ctx, width, height) {
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `${Math.max(width, height) * 0.036}px 'Raleway', sans-serif`;
+  labyrinthRegions.forEach((region) => {
+    const { x, y, w, h } = region.bounds;
+    const cx = (x + w / 2) * width;
+    const cy = (y + h / 2) * height;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+    ctx.shadowColor = 'rgba(5, 6, 14, 0.7)';
+    ctx.shadowBlur = Math.max(width, height) * 0.02;
+    ctx.fillText(region.name, cx, cy);
   });
   ctx.restore();
 }
@@ -1181,6 +1544,18 @@ function drawLabyrinthEdges(ctx, width, height) {
     const isHovered = hoveredNodeId && (edge.from === hoveredNodeId || edge.to === hoveredNodeId);
     const isVisited = visitedNodeIds.has(edge.from) && visitedNodeIds.has(edge.to);
     const baseWidth = Math.max(width, height) * 0.012;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(fx, fy);
+    ctx.lineTo(tx, ty);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(10, 13, 24, 0.9)';
+    ctx.lineWidth = baseWidth * 2.4;
+    ctx.shadowColor = 'rgba(5, 8, 20, 0.85)';
+    ctx.shadowBlur = baseWidth * 1.6;
+    ctx.stroke();
+    ctx.restore();
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(fx, fy);
@@ -1285,6 +1660,7 @@ function drawMap() {
 
   ctx.clearRect(0, 0, width, height);
   drawLabyrinthBase(ctx, width, height);
+  drawRegionLabels(ctx, width, height);
   drawLabyrinthGlyphs(ctx, width, height);
   drawLabyrinthEdges(ctx, width, height);
   drawTravelPath(ctx, width, height);
@@ -1309,6 +1685,7 @@ function initializeMapLayer() {
   }
   syncMapNodeSelection();
   updateLocationLabel();
+  updateMapReadout();
   travelHistory.length = 0;
   if (activeNodeId) travelHistory.push(activeNodeId);
   updateTravelTrail();
@@ -1633,6 +2010,7 @@ function restoreActiveIntel() {
   if (node?.intel) {
     setIntel(node.intel);
   }
+  updateMapReadout(node);
 }
 
 function formatDuration(seconds) {

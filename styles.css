@@ -393,6 +393,50 @@ body::before {
   display: none;
 }
 
+.map-window {
+  width: 100%;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(160deg, rgba(18, 22, 36, 0.92), rgba(9, 10, 20, 0.94));
+  box-shadow: 0 30px 48px rgba(5, 6, 14, 0.62);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-window__chrome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(242, 77, 109, 0.2), rgba(54, 62, 112, 0.65));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.map-window__title {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.map-window__readout {
+  font-size: 0.7rem;
+  color: rgba(178, 204, 255, 0.82);
+  letter-spacing: 0.08em;
+  text-align: right;
+}
+
+.map-window__viewport {
+  flex: 1;
+  padding: 18px;
+  background: radial-gradient(circle at 30% 20%, rgba(242, 77, 109, 0.12), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(88, 134, 215, 0.18), transparent 60%),
+    rgba(10, 12, 24, 0.9);
+  display: grid;
+  place-items: stretch;
+}
+
 .map-viewport {
   position: relative;
   border-radius: 18px;
@@ -425,6 +469,10 @@ body::before {
   display: block;
   filter: saturate(105%) contrast(110%);
   z-index: 1;
+}
+
+.map-window + .map-legend {
+  margin-top: 18px;
 }
 
 .map-nodes {
@@ -519,25 +567,48 @@ body::before {
   transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
+.map-node--stronghold .map-node__pip {
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 0 20px rgba(242, 77, 109, 0.75);
+}
+
 .map-node__label {
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translate(-50%, calc(30% + 10px));
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(10, 12, 24, 0.92);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.85);
   pointer-events: none;
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
+  min-width: 150px;
+  max-width: 200px;
   opacity: 0;
   transition: opacity 0.22s ease, transform 0.22s ease;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
   z-index: 5;
+}
+
+.map-node__label-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.map-node__label-meta {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.64);
+  letter-spacing: 0.04em;
 }
 
 .map-node:hover,
@@ -603,28 +674,32 @@ body::before {
   box-shadow: 0 0 24px rgba(242, 77, 109, 0.85);
 }
 
-.map-node--boss {
-  --node-color: #ff6f7c;
+.map-node--stronghold {
+  --node-color: #ff7a99;
 }
 
-.map-node--gate {
-  --node-color: #f2a65a;
+.map-node--step {
+  --node-color: #88a9ff;
 }
 
-.map-node--portal {
-  --node-color: #56c2ff;
+.map-node--encounter {
+  --node-color: #f28f6b;
 }
 
 .map-node--treasure {
   --node-color: #c095ff;
 }
 
-.map-node--path {
-  --node-color: #9aa8ff;
-}
-
 .map-node--sanctum {
   --node-color: #51e0c0;
+}
+
+.map-node--gate {
+  --node-color: #f2a65a;
+}
+
+.map-node--boss {
+  --node-color: #ff6f7c;
 }
 
 .map-legend {
@@ -655,14 +730,20 @@ body::before {
   box-shadow: 0 0 10px rgba(242, 77, 109, 0.55);
 }
 
-.map-legend__marker--gate {
-  background: linear-gradient(135deg, #f2a65a, #5a2d07);
-  box-shadow: 0 0 10px rgba(242, 166, 90, 0.45);
+
+.map-legend__marker--stronghold {
+  background: linear-gradient(135deg, #ff7a99, #5f1d2f);
+  box-shadow: 0 0 12px rgba(242, 77, 109, 0.5);
 }
 
-.map-legend__marker--portal {
-  background: linear-gradient(135deg, #56c2ff, #143d66);
-  box-shadow: 0 0 10px rgba(86, 194, 255, 0.45);
+.map-legend__marker--step {
+  background: linear-gradient(135deg, #88a9ff, #1e2b5a);
+  box-shadow: 0 0 12px rgba(136, 169, 255, 0.45);
+}
+
+.map-legend__marker--encounter {
+  background: linear-gradient(135deg, #f28f6b, #5a2b14);
+  box-shadow: 0 0 12px rgba(242, 143, 107, 0.45);
 }
 
 .map-legend__marker--treasure {
@@ -672,7 +753,27 @@ body::before {
 
 .map-legend__marker--sanctum {
   background: linear-gradient(135deg, #51e0c0, #10453b);
-  box-shadow: 0 0 10px rgba(81, 224, 192, 0.45);
+  box-shadow: 0 0 12px rgba(81, 224, 192, 0.45);
+}
+
+.map-legend__marker--gate {
+  background: linear-gradient(135deg, #ffa764, #4f2608);
+  box-shadow: 0 0 12px rgba(255, 167, 100, 0.5);
+}
+
+.map-legend__marker--boss {
+  background: linear-gradient(135deg, #ff6f7c, #5a1722);
+  box-shadow: 0 0 14px rgba(255, 111, 124, 0.55);
+}
+
+.map-legend__swatch {
+  display: inline-block;
+  width: 20px;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(242, 77, 109, 0.25), rgba(108, 196, 255, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 12px rgba(242, 77, 109, 0.25);
 }
 
 .map-legend__glyph {
@@ -884,6 +985,7 @@ body::before {
   animation: mapIntelPulse 0.6s ease;
 }
 
+
 .combat-suite__body {
   display: grid;
   gap: 20px;
@@ -892,6 +994,7 @@ body::before {
 .combat-suite__col {
   display: grid;
   gap: 20px;
+  align-content: start;
 }
 
 .combat-suite__block {
@@ -939,6 +1042,21 @@ body::before {
   flex: 1;
 }
 
+@media (min-width: 960px) {
+  .combat-suite__body {
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .combat-suite__col--left {
+    grid-auto-rows: minmax(0, auto);
+  }
+
+  .combat-suite__col--right {
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+}
+
 .combat-suite__block--actions .action-readout {
   margin-top: 0;
 }
@@ -947,13 +1065,9 @@ body::before {
   margin-top: 0;
 }
 
-@media (min-width: 960px) {
-  .combat-suite__body {
-    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
-  }
-
+@media (max-width: 959px) {
   .combat-suite__col--right {
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, auto);
   }
 }
 
