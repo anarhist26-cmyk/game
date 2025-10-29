@@ -15,7 +15,8 @@
     "bonuses": {
       "agility": 4
     },
-    "tags": ["уклонение", "скрытность"]
+    "tags": ["уклонение", "скрытность"],
+    "races": ["veilborn", "stormbound"]
   },
   {
     "id": "blood_edge",
@@ -33,7 +34,8 @@
     "bonuses": {
       "strength": 3
     },
-    "tags": ["урон", "крит"]
+    "tags": ["урон", "крит"],
+    "races": ["bloodborn", "veilborn", "emberforged"]
   },
   {
     "id": "scarlet_resolve",
@@ -52,7 +54,8 @@
       "defense": 4,
       "maxHp": 40
     },
-    "tags": ["выживание", "барьер"]
+    "tags": ["выживание", "барьер"],
+    "races": ["bloodborn", "emberforged", "stormbound"]
   },
   {
     "id": "veil_of_ashes",
@@ -72,7 +75,8 @@
       "agility": 2,
       "defense": 2
     },
-    "tags": ["скрытность", "разведка"]
+    "tags": ["скрытность", "разведка"],
+    "races": ["veilborn", "stormbound"]
   },
   {
     "id": "siphon_strike",
@@ -92,7 +96,8 @@
       "strength": 2,
       "maxHp": 30
     },
-    "tags": ["урон", "самоисцеление"]
+    "tags": ["урон", "самоисцеление"],
+    "races": ["bloodborn", "veilborn", "emberforged"]
   },
   {
     "id": "blood_barrier",
@@ -112,7 +117,8 @@
       "defense": 5,
       "maxHp": 50
     },
-    "tags": ["щит", "барьер"]
+    "tags": ["щит", "барьер"],
+    "races": ["bloodborn", "emberforged", "stormbound"]
   },
   {
     "id": "spectral_command",
@@ -132,7 +138,8 @@
       "agility": 2,
       "defense": 3
     },
-    "tags": ["разведка", "поддержка"]
+    "tags": ["разведка", "поддержка"],
+    "races": ["veilborn", "stormbound"]
   },
   {
     "id": "nightmare_blade",
@@ -152,7 +159,8 @@
       "strength": 4,
       "agility": 2
     },
-    "tags": ["урон", "контроль"]
+    "tags": ["урон", "контроль"],
+    "races": ["bloodborn", "veilborn", "emberforged"]
   },
   {
     "id": "crimson_vanguard",
@@ -172,7 +180,8 @@
       "defense": 6,
       "maxHp": 60
     },
-    "tags": ["поддержка", "выживание"]
+    "tags": ["поддержка", "выживание"],
+    "races": ["bloodborn", "emberforged", "stormbound"]
   },
   {
     "id": "avatar_of_legends",
@@ -195,6 +204,7 @@
       "maxHp": 80,
       "maxMp": 40
     },
-    "tags": ["синергия", "легендарный"]
+    "tags": ["синергия", "легендарный"],
+    "races": ["bloodborn", "emberforged"]
   }
 ]

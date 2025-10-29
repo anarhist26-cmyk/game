@@ -66,6 +66,16 @@ const skillDetailEffects = document.getElementById('skill-detail-effects');
 const skillDetailRequirements = document.getElementById('skill-detail-requirements');
 const skillActionButtons = document.querySelectorAll('[data-skill-action]');
 
+const raceModal = document.getElementById('race-modal');
+const raceCloseButton = document.getElementById('race-close');
+const raceListElement = document.getElementById('race-list');
+const raceDetailName = document.getElementById('race-detail-name');
+const raceDetailOrigin = document.getElementById('race-detail-origin');
+const raceDetailDescription = document.getElementById('race-detail-description');
+const raceDetailTraits = document.getElementById('race-detail-traits');
+const raceDetailSkills = document.getElementById('race-detail-skills');
+const raceConfirmButton = document.getElementById('race-confirm');
+
 const gameData = {
   loot: new Map(),
   monsters: [],
@@ -75,7 +85,10 @@ const gameData = {
   quests: [],
   questIndex: new Map(),
   skills: [],
-  skillIndex: new Map()
+  allSkills: [],
+  skillIndex: new Map(),
+  races: [],
+  raceIndex: new Map()
 };
 
 const codexState = {
@@ -95,6 +108,13 @@ const skillsState = {
   learned: new Set()
 };
 
+const raceState = {
+  highlightedId: null
+};
+
+const raceStorageKey = 'blood_legends_race';
+const storedRacePreference = safeGetStorageItem(raceStorageKey);
+
 const questStatusLabels = {
   active: 'Активно',
   available: 'Доступно',
@@ -107,10 +127,61 @@ const dataSources = {
   monsters: 'data/monsters.json',
   locations: 'data/locations.json',
   quests: 'data/quests.json',
+  races: 'data/races.json',
   skills: 'data/skills.json'
 };
 
 const fallbackCatalogs = {
+  races: [
+    {
+      id: 'bloodborn',
+      name: 'Алые наследники',
+      icon: '🩸',
+      description: 'Наследники алого легиона, укрепившие свою силу в ритуалах крови и защите цитаделей.',
+      origin: 'Цитадель Алого Сумрака',
+      traits: [
+        'Прирост силы и максимального здоровья',
+        'Мастерство кровавых клинков и защитных барьеров',
+        'Лояльность ордену Багрового бастиона'
+      ]
+    },
+    {
+      id: 'veilborn',
+      name: 'Сумеречные лисы',
+      icon: '🌒',
+      description: 'Кланы ночных охотников, скользящих по теням и управляющих страхом своих врагов.',
+      origin: 'Гроты Ноктуса',
+      traits: [
+        'Повышенная ловкость и скорость',
+        'Снижение шанса засад и ловушек',
+        'Специализация на скрытности и проклятых клинках'
+      ]
+    },
+    {
+      id: 'emberforged',
+      name: 'Пепельно-кованые',
+      icon: '🔥',
+      description: 'Гильдии кузнецов из Угольных Кузниц, несущие пламя и тяжёлые доспехи на поле боя.',
+      origin: 'Гарнизон Угольной Кузницы',
+      traits: [
+        'Повышенная защита и устойчивость',
+        'Усиленные кровавые бастионы и тяжелое оружие',
+        'Пламенные клятвы и дисциплина легионов'
+      ]
+    },
+    {
+      id: 'stormbound',
+      name: 'Штормовые кочевники',
+      icon: '⚡',
+      description: 'Странники грозового плато, обученные маневренным боям и внезапным ударам.',
+      origin: 'Плато Грозового дозора',
+      traits: [
+        'Сбалансированные показатели силы и защиты',
+        'Устойчивость к кровотечению и оглушению',
+        'Комбинируют разведку с фронтальными атаками'
+      ]
+    }
+  ],
   loot: [
     {
       id: 'wolf_pelt',
@@ -482,7 +553,8 @@ const fallbackCatalogs = {
       },
       bonuses: {
         agility: 4
-      }
+      },
+      races: ['veilborn', 'stormbound']
     },
     {
       id: 'blood_edge',
@@ -499,7 +571,8 @@ const fallbackCatalogs = {
       },
       bonuses: {
         strength: 3
-      }
+      },
+      races: ['bloodborn', 'veilborn', 'emberforged']
     },
     {
       id: 'scarlet_resolve',
@@ -517,7 +590,8 @@ const fallbackCatalogs = {
       bonuses: {
         defense: 4,
         maxHp: 40
-      }
+      },
+      races: ['bloodborn', 'emberforged', 'stormbound']
     },
     {
       id: 'veil_of_ashes',
@@ -536,7 +610,8 @@ const fallbackCatalogs = {
       bonuses: {
         agility: 2,
         defense: 2
-      }
+      },
+      races: ['veilborn', 'stormbound']
     },
     {
       id: 'siphon_strike',
@@ -555,7 +630,8 @@ const fallbackCatalogs = {
       bonuses: {
         strength: 2,
         maxHp: 30
-      }
+      },
+      races: ['bloodborn', 'veilborn', 'emberforged']
     },
     {
       id: 'blood_barrier',
@@ -574,7 +650,8 @@ const fallbackCatalogs = {
       bonuses: {
         defense: 5,
         maxHp: 50
-      }
+      },
+      races: ['bloodborn', 'emberforged', 'stormbound']
     },
     {
       id: 'nightmare_blade',
@@ -593,7 +670,8 @@ const fallbackCatalogs = {
       bonuses: {
         strength: 4,
         agility: 2
-      }
+      },
+      races: ['bloodborn', 'veilborn', 'emberforged']
     },
     {
       id: 'crimson_vanguard',
@@ -612,7 +690,8 @@ const fallbackCatalogs = {
       bonuses: {
         defense: 6,
         maxHp: 60
-      }
+      },
+      races: ['bloodborn', 'emberforged', 'stormbound']
     },
     {
       id: 'spectral_command',
@@ -631,7 +710,8 @@ const fallbackCatalogs = {
       bonuses: {
         agility: 2,
         defense: 3
-      }
+      },
+      races: ['veilborn', 'stormbound']
     },
     {
       id: 'avatar_of_legends',
@@ -653,7 +733,8 @@ const fallbackCatalogs = {
         defense: 4,
         maxHp: 80,
         maxMp: 40
-      }
+      },
+      races: ['bloodborn', 'emberforged']
     }
   ]
 };
@@ -940,6 +1021,7 @@ const serverTimeElement = document.getElementById('server-time');
 const essenceCounter = document.getElementById('essence-counter');
 const crystalCounter = document.getElementById('crystal-counter');
 const renownCounter = document.getElementById('renown-counter');
+const playerRaceElement = document.getElementById('player-race');
 
 const sidebarHpBar = document.getElementById('sidebar-hp');
 const sidebarMpBar = document.getElementById('sidebar-mp');
@@ -962,6 +1044,28 @@ function formatNumber(value) {
 function timestamp() {
   const now = new Date();
   return now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+}
+
+function safeGetStorageItem(key) {
+  try {
+    if (typeof localStorage === 'undefined') return null;
+    return localStorage.getItem(key);
+  } catch (error) {
+    return null;
+  }
+}
+
+function safeSetStorageItem(key, value) {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    if (value === null || value === undefined) {
+      localStorage.removeItem(key);
+    } else {
+      localStorage.setItem(key, value);
+    }
+  } catch (error) {
+    // ignore storage errors
+  }
 }
 
 function capitalize(text) {
@@ -1015,6 +1119,21 @@ function describeMonsterIntro(monster) {
   const habitat = monster.habitat ? `из локации ${monster.habitat}` : 'лабиринта';
   const ability = monster.abilities?.length ? `Использует приёмы: ${monster.abilities.join(', ')}.` : 'Готов к атаке.';
   return `${rank} ${habitat}. ${ability}`;
+}
+
+function transformRace(rawRace) {
+  if (!rawRace) return null;
+  const id = rawRace.id ?? slugify(rawRace.name ?? 'race', `race_${Math.random().toString(36).slice(2, 8)}`);
+  const traits = Array.isArray(rawRace.traits) ? rawRace.traits.filter(Boolean) : [];
+
+  return {
+    id,
+    name: rawRace.name ?? 'Неизвестная раса',
+    icon: rawRace.icon ?? '✹',
+    description: rawRace.description ?? 'Описание отсутствует.',
+    origin: rawRace.origin ?? '',
+    traits
+  };
 }
 
 function transformMonster(rawMonster) {
@@ -1083,7 +1202,8 @@ function transformSkill(rawSkill) {
     prerequisites,
     effects,
     bonuses,
-    tags: Array.isArray(rawSkill.tags) ? rawSkill.tags : []
+    tags: Array.isArray(rawSkill.tags) ? rawSkill.tags : [],
+    races: Array.isArray(rawSkill.races) ? rawSkill.races.filter(Boolean) : []
   };
 }
 
@@ -1216,13 +1336,14 @@ function registerQuests(quests = []) {
   }
 }
 
-function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [], skills = [] }) {
+function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [], skills = [], races = [] }) {
   gameData.loot.clear();
   loot.forEach((entry) => {
     const enriched = enrichLootEntry(entry);
     gameData.loot.set(enriched.id, enriched);
   });
 
+  registerRaces(races);
   registerLocations(locations);
 
   registerSkills(skills);
@@ -1240,6 +1361,34 @@ function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [],
   syncSkillsAfterDataUpdate();
 }
 
+function registerRaces(races) {
+  const entries = Array.isArray(races) ? races : [];
+  gameData.races = entries
+    .map((race) => transformRace(race))
+    .filter((race) => Boolean(race?.id));
+  gameData.raceIndex.clear();
+  gameData.races.forEach((race) => {
+    gameData.raceIndex.set(race.id, race);
+  });
+
+  if (playerState.raceId && !gameData.raceIndex.has(playerState.raceId)) {
+    playerState.raceId = null;
+    safeSetStorageItem(raceStorageKey, null);
+  }
+
+  if (!playerState.raceId && storedRacePreference && gameData.raceIndex.has(storedRacePreference)) {
+    playerState.raceId = storedRacePreference;
+  }
+
+  if (playerState.raceId && gameData.raceIndex.has(playerState.raceId)) {
+    raceState.highlightedId = playerState.raceId;
+  } else if (gameData.races.length) {
+    raceState.highlightedId = gameData.races[0].id;
+  } else {
+    raceState.highlightedId = null;
+  }
+}
+
 function registerLocations(locations) {
   gameData.locations = locations;
   gameData.locationIndex.clear();
@@ -1249,16 +1398,38 @@ function registerLocations(locations) {
 }
 
 function registerSkills(skills) {
-  gameData.skills = skills.map((skill) => transformSkill(skill));
-  gameData.skills.sort((a, b) => {
+  gameData.allSkills = skills.map((skill) => transformSkill(skill));
+  gameData.allSkills.sort((a, b) => {
     if (a.tier === b.tier) {
-      return a.column - b.column;
+      return (a.column ?? 1) - (b.column ?? 1);
     }
     return a.tier - b.tier;
   });
 
+  applyRaceSkillFilter({ preserveSelection: true });
+}
+
+function applyRaceSkillFilter({ preserveSelection = false } = {}) {
+  const allSkills = Array.isArray(gameData.allSkills) ? gameData.allSkills : [];
+  const hasRace = playerState.raceId && gameData.raceIndex.has(playerState.raceId);
+
+  if (playerState.raceId && !hasRace) {
+    playerState.raceId = null;
+    playerState.raceName = '—';
+    safeSetStorageItem(raceStorageKey, null);
+  }
+
+  const raceId = hasRace ? playerState.raceId : null;
+  const filtered = raceId
+    ? allSkills.filter((skill) => {
+        if (!skill.races || !skill.races.length) return true;
+        return skill.races.includes(raceId);
+      })
+    : [];
+
+  gameData.skills = filtered;
   gameData.skillIndex.clear();
-  gameData.skills.forEach((skill) => {
+  filtered.forEach((skill) => {
     gameData.skillIndex.set(skill.id, skill);
   });
 
@@ -1268,21 +1439,256 @@ function registerSkills(skills) {
     }
   });
 
-  if (skillsState.selectionId && !gameData.skillIndex.has(skillsState.selectionId)) {
-    skillsState.selectionId = null;
+  let selection = preserveSelection && skillsState.selectionId && gameData.skillIndex.has(skillsState.selectionId)
+    ? skillsState.selectionId
+    : null;
+
+  if (!selection && filtered.length) {
+    selection = filtered[0].id;
   }
 
-  if (!skillsState.selectionId && gameData.skills.length) {
-    skillsState.selectionId = gameData.skills[0].id;
+  skillsState.selectionId = selection ?? null;
+
+  const raceEntry = raceId ? gameData.raceIndex.get(raceId) : null;
+  playerState.raceName = raceEntry?.name ?? '—';
+
+  if (raceId) {
+    raceState.highlightedId = raceId;
+  } else if (!gameData.races.length) {
+    raceState.highlightedId = null;
+  }
+
+  applySkillBonuses();
+  updateSkillSummary();
+  renderSkillsTree();
+  renderRaceSelection();
+}
+
+function getSkillsForRace(raceId) {
+  if (!raceId) return [];
+  const allSkills = Array.isArray(gameData.allSkills) ? gameData.allSkills : [];
+  return allSkills
+    .filter((skill) => {
+      if (!skill.races || !skill.races.length) return true;
+      return skill.races.includes(raceId);
+    })
+    .map((skill) => skill.name);
+}
+
+function renderRaceSelection() {
+  if (!raceListElement) return;
+
+  raceListElement.replaceChildren();
+
+  if (!gameData.races.length) {
+    const placeholder = document.createElement('li');
+    placeholder.className = 'race-placeholder';
+    placeholder.textContent = 'Каталог рас не загружен.';
+    raceListElement.append(placeholder);
+    renderRaceDetails(null);
+    if (raceConfirmButton) {
+      raceConfirmButton.disabled = true;
+      raceConfirmButton.textContent = 'Подтвердить расу';
+    }
+    return;
+  }
+
+  if (!raceState.highlightedId || !gameData.raceIndex.has(raceState.highlightedId)) {
+    raceState.highlightedId = playerState.raceId && gameData.raceIndex.has(playerState.raceId)
+      ? playerState.raceId
+      : gameData.races[0].id;
+  }
+
+  gameData.races.forEach((race) => {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'race-card';
+    button.dataset.raceId = race.id;
+    button.setAttribute('role', 'option');
+    if (race.id === raceState.highlightedId) {
+      button.classList.add('is-active');
+      button.setAttribute('aria-selected', 'true');
+    } else {
+      button.setAttribute('aria-selected', 'false');
+    }
+
+    const icon = document.createElement('span');
+    icon.className = 'race-card__icon';
+    icon.textContent = race.icon ?? '✹';
+
+    const name = document.createElement('span');
+    name.className = 'race-card__name';
+    name.textContent = race.name;
+
+    button.append(icon, name);
+
+    button.addEventListener('click', () => {
+      if (raceState.highlightedId === race.id) return;
+      raceState.highlightedId = race.id;
+      renderRaceSelection();
+    });
+
+    item.append(button);
+    raceListElement.append(item);
+  });
+
+  const activeRace = gameData.raceIndex.get(raceState.highlightedId) ?? null;
+  renderRaceDetails(activeRace);
+}
+
+function renderRaceDetails(race) {
+  if (!raceDetailName || !raceDetailDescription || !raceDetailTraits || !raceDetailSkills) return;
+
+  if (!race) {
+    raceDetailName.textContent = 'Выберите расу';
+    if (raceDetailOrigin) {
+      raceDetailOrigin.textContent = '';
+    }
+    raceDetailDescription.textContent = 'Откройте карточку слева, чтобы увидеть особенности и доступные навыки.';
+    raceDetailTraits.replaceChildren();
+    raceDetailSkills.replaceChildren();
+
+    const traitsPlaceholder = document.createElement('li');
+    traitsPlaceholder.className = 'race-trait race-trait--empty';
+    traitsPlaceholder.textContent = 'Особенности будут показаны после выбора расы.';
+    raceDetailTraits.append(traitsPlaceholder);
+
+    const skillsPlaceholder = document.createElement('p');
+    skillsPlaceholder.className = 'race-skills__placeholder';
+    skillsPlaceholder.textContent = 'Навыки станут доступны после выбора расы.';
+    raceDetailSkills.append(skillsPlaceholder);
+
+    if (raceConfirmButton) {
+      raceConfirmButton.disabled = true;
+      raceConfirmButton.textContent = 'Подтвердить расу';
+    }
+    return;
+  }
+
+  const title = race.icon ? `${race.icon} ${race.name}`.trim() : race.name;
+  raceDetailName.textContent = title;
+  if (raceDetailOrigin) {
+    raceDetailOrigin.textContent = race.origin ? `Родные земли: ${race.origin}` : '';
+  }
+  raceDetailDescription.textContent = race.description ?? '';
+
+  raceDetailTraits.replaceChildren();
+  if (race.traits?.length) {
+    race.traits.forEach((trait) => {
+      const entry = document.createElement('li');
+      entry.className = 'race-trait';
+      entry.textContent = trait;
+      raceDetailTraits.append(entry);
+    });
+  } else {
+    const entry = document.createElement('li');
+    entry.className = 'race-trait race-trait--empty';
+    entry.textContent = 'Особенности будут уточнены позже.';
+    raceDetailTraits.append(entry);
+  }
+
+  raceDetailSkills.replaceChildren();
+  const skillsTitle = document.createElement('h4');
+  skillsTitle.className = 'race-skills__title';
+  skillsTitle.textContent = 'Навыки расовой школы';
+  raceDetailSkills.append(skillsTitle);
+
+  const availableSkills = getSkillsForRace(race.id);
+  if (availableSkills.length) {
+    const list = document.createElement('ul');
+    list.className = 'race-skills__list';
+    availableSkills.forEach((name) => {
+      const item = document.createElement('li');
+      item.textContent = name;
+      list.append(item);
+    });
+    raceDetailSkills.append(list);
+  } else {
+    const placeholder = document.createElement('p');
+    placeholder.className = 'race-skills__placeholder';
+    placeholder.textContent = 'Навыки для этой расы ещё в разработке.';
+    raceDetailSkills.append(placeholder);
+  }
+
+  if (raceConfirmButton) {
+    const isCurrent = race.id === playerState.raceId;
+    raceConfirmButton.disabled = isCurrent;
+    raceConfirmButton.textContent = isCurrent ? 'Уже выбрана' : 'Подтвердить расу';
   }
 }
 
+function openRaceSelection() {
+  if (!raceModal) return;
+  if (!gameData.races.length) {
+    appendChatLog('<strong>Система</strong>: Каталог рас не загружен.');
+    return;
+  }
+
+  if (!raceState.highlightedId || !gameData.raceIndex.has(raceState.highlightedId)) {
+    raceState.highlightedId = playerState.raceId && gameData.raceIndex.has(playerState.raceId)
+      ? playerState.raceId
+      : gameData.races[0].id;
+  }
+
+  renderRaceSelection();
+  raceModal.classList.remove('is-hidden');
+  raceModal.setAttribute('aria-hidden', 'false');
+}
+
+function closeRaceSelection() {
+  if (!raceModal) return;
+  raceModal.classList.add('is-hidden');
+  raceModal.setAttribute('aria-hidden', 'true');
+}
+
+function setPlayerRace(raceId, { silent = false } = {}) {
+  if (!raceId || !gameData.raceIndex.has(raceId)) {
+    appendChatLog('<strong>Система</strong>: Невозможно выбрать неизвестную расу.');
+    return false;
+  }
+
+  const previous = playerState.raceId;
+  playerState.raceId = raceId;
+  safeSetStorageItem(raceStorageKey, raceId);
+  raceState.highlightedId = raceId;
+
+  applyRaceSkillFilter();
+
+  if (!silent) {
+    if (previous === raceId) {
+      appendChatLog(`<strong>Система</strong>: Раса «${playerState.raceName}» уже активна.`);
+    } else {
+      appendChatLog(`<strong>Система</strong>: Вы выбрали расу «${playerState.raceName}».`);
+    }
+  }
+
+  closeRaceSelection();
+  return true;
+}
+
+function ensureRaceSelection() {
+  if (!gameData.races.length) return;
+
+  if (playerState.raceId && gameData.raceIndex.has(playerState.raceId)) {
+    raceState.highlightedId = playerState.raceId;
+    applyRaceSkillFilter({ preserveSelection: true });
+    return;
+  }
+
+  raceState.highlightedId = gameData.races[0]?.id ?? null;
+  renderRaceSelection();
+  openRaceSelection();
+  appendChatLog('<strong>Система</strong>: Выберите расу, чтобы разблокировать древо навыков.');
+}
+
 async function loadGameData() {
-  const [lootData, monsterData, locationData, questData, skillData] = await Promise.all([
+  const [lootData, monsterData, locationData, questData, raceData, skillData] = await Promise.all([
     fetchJson(dataSources.loot),
     fetchJson(dataSources.monsters),
     fetchJson(dataSources.locations),
     fetchJson(dataSources.quests),
+    fetchJson(dataSources.races),
     fetchJson(dataSources.skills)
   ]);
   ingestCatalogs({
@@ -1290,7 +1696,8 @@ async function loadGameData() {
     monsters: monsterData,
     locations: locationData,
     quests: questData,
-    skills: skillData
+    skills: skillData,
+    races: raceData
   });
 }
 
@@ -1978,9 +2385,17 @@ function getSkillDependants(skillId) {
   return dependants;
 }
 
+function isSkillAvailableForRace(skill, raceId = playerState.raceId) {
+  if (!skill) return false;
+  if (!raceId) return false;
+  if (!skill.races || !skill.races.length) return true;
+  return skill.races.includes(raceId);
+}
+
 function canLearnSkill(skill) {
   if (!skill) return false;
   if (skillsState.learned.has(skill.id)) return false;
+  if (!isSkillAvailableForRace(skill)) return false;
   if (!arePrerequisitesMet(skill)) return false;
   return getAvailableSkillPoints() >= skill.cost;
 }
@@ -2075,6 +2490,14 @@ function renderSkillDetails(skill) {
   }
   requirements.push(`Тип: ${skill.category ?? 'Навык'}`);
   requirements.push(`Уровень: ${skill.tier}`);
+  if (skill.races?.length) {
+    const raceNames = skill.races
+      .map((id) => gameData.raceIndex.get(id)?.name ?? id)
+      .join(', ');
+    requirements.push(`Расы: ${raceNames}`);
+  } else {
+    requirements.push('Расы: доступно всем путям');
+  }
 
   requirements.forEach((text) => {
     const line = document.createElement('p');
@@ -2098,12 +2521,29 @@ function renderSkillsTree() {
   if (!skillsTreeElement) return;
 
   skillsTreeElement.replaceChildren();
+  const raceId = playerState.raceId && gameData.raceIndex.has(playerState.raceId)
+    ? playerState.raceId
+    : null;
   const skills = [...gameData.skills];
 
-  if (!skills.length) {
+  if (!raceId) {
+    skillsState.selectionId = null;
+    skillsTreeElement.style.removeProperty('--skill-columns');
     const placeholder = document.createElement('p');
     placeholder.className = 'skills-placeholder';
-    placeholder.textContent = 'Каталог навыков не загружен.';
+    placeholder.textContent = 'Выберите расу, чтобы открыть древо навыков.';
+    skillsTreeElement.append(placeholder);
+    renderSkillDetails(null);
+    updateSkillSummary();
+    return;
+  }
+
+  if (!skills.length) {
+    skillsState.selectionId = null;
+    skillsTreeElement.style.removeProperty('--skill-columns');
+    const placeholder = document.createElement('p');
+    placeholder.className = 'skills-placeholder';
+    placeholder.textContent = 'Для выбранной расы навыки ещё не определены.';
     skillsTreeElement.append(placeholder);
     renderSkillDetails(null);
     updateSkillSummary();
@@ -2230,11 +2670,7 @@ function closeSkills() {
 }
 
 function syncSkillsAfterDataUpdate() {
-  if (skillsState.selectionId && !gameData.skillIndex.has(skillsState.selectionId)) {
-    skillsState.selectionId = gameData.skills[0]?.id ?? null;
-  }
-  applySkillBonuses();
-  renderSkillsTree();
+  applyRaceSkillFilter({ preserveSelection: true });
 }
 
 function buildQuestDataset(filter = questBoardState.filter) {
@@ -2531,7 +2967,9 @@ const playerState = {
   shield: 0,
   skillBonus: 0,
   skillRounds: 0,
-  skillPoints: 12
+  skillPoints: 12,
+  raceId: storedRacePreference ?? null,
+  raceName: '—'
 };
 
 const playerBaseAttributes = {
@@ -3087,6 +3525,10 @@ function updatePlayerUI() {
   if (sidebarMpBar) {
     sidebarMpBar.style.width = `${(playerState.mp / playerState.maxMp) * 100}%`;
   }
+
+  if (playerRaceElement) {
+    playerRaceElement.textContent = playerState.raceName ?? '—';
+  }
 }
 
 function grantLoot(template) {
@@ -3301,6 +3743,9 @@ if (commandButtons.length) {
         case 'skills':
           openSkills();
           break;
+        case 'race':
+          openRaceSelection();
+          break;
         case 'map':
           appendChatLog('<strong>Система</strong>: Центр карты уже активен.');
           break;
@@ -3354,6 +3799,15 @@ if (skillsModal) {
   });
 }
 
+if (raceModal) {
+  raceModal.addEventListener('click', (event) => {
+    if (!(event.target instanceof HTMLElement)) return;
+    if (event.target === raceModal || event.target.matches('[data-dismiss="race"]')) {
+      closeRaceSelection();
+    }
+  });
+}
+
 if (inventoryCloseButton) {
   inventoryCloseButton.addEventListener('click', () => closeInventory());
 }
@@ -3368,6 +3822,17 @@ if (questsCloseButton) {
 
 if (skillsCloseButton) {
   skillsCloseButton.addEventListener('click', () => closeSkills());
+}
+
+if (raceCloseButton) {
+  raceCloseButton.addEventListener('click', () => closeRaceSelection());
+}
+
+if (raceConfirmButton) {
+  raceConfirmButton.addEventListener('click', () => {
+    if (!raceState.highlightedId) return;
+    setPlayerRace(raceState.highlightedId);
+  });
 }
 
 if (skillActionButtons.length) {
@@ -3469,6 +3934,10 @@ document.addEventListener('keydown', (event) => {
       closeCodex();
     } else if (questsModal && !questsModal.classList.contains('is-hidden')) {
       closeQuestBoard();
+    } else if (skillsModal && !skillsModal.classList.contains('is-hidden')) {
+      closeSkills();
+    } else if (raceModal && !raceModal.classList.contains('is-hidden')) {
+      closeRaceSelection();
     }
   }
 });
@@ -3580,6 +4049,7 @@ async function initializeGame() {
     appendChatLog('<strong>Система</strong>: Активированы встроенные каталоги. Для редактирования файлов используйте запуск через локальный сервер.');
   }
 
+  ensureRaceSelection();
   updatePlayerUI();
   setPlayerTurn(true);
 }

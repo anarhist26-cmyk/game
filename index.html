@@ -78,6 +78,7 @@
                 <div><dt>Ловкость</dt><dd id="player-agility">52</dd></div>
                 <div><dt>Защита</dt><dd id="player-defense">38</dd></div>
                 <div><dt>Золото</dt><dd id="player-gold">1 250</dd></div>
+                <div><dt>Раса</dt><dd id="player-race">—</dd></div>
               </dl>
             </div>
             <div class="header-right">
@@ -195,6 +196,7 @@
                 <button type="button" class="command-button" data-command="inventory">Инвентарь</button>
                 <button type="button" class="command-button" data-command="codex">Кодекс</button>
                 <button type="button" class="command-button" data-command="skills">Навыки</button>
+                <button type="button" class="command-button" data-command="race">Раса</button>
                 <button type="button" class="command-button" data-command="quests">Квесты</button>
                 <button type="button" class="command-button" data-command="map">Карта</button>
                 <button type="button" class="command-button" data-command="help">Помощь</button>
@@ -204,6 +206,33 @@
         </div>
       </div>
 
+      <div class="modal-layer is-hidden" id="race-modal" role="dialog" aria-modal="true" aria-labelledby="race-title" aria-hidden="true">
+        <div class="modal-backdrop" data-dismiss="race"></div>
+        <div class="modal-window race-window" role="document">
+          <header class="modal-header race-header">
+            <div class="race-header__titles">
+              <h2 id="race-title">Выбор расы</h2>
+              <p class="race-subtitle">Каждая культура Blood Legends открывает собственные пути развития.</p>
+            </div>
+            <button type="button" class="modal-close" id="race-close" aria-label="Закрыть окно выбора расы">✕</button>
+          </header>
+          <div class="race-body">
+            <section class="race-selection" aria-label="Доступные расы">
+              <ul id="race-list" class="race-grid" role="listbox" aria-labelledby="race-title"></ul>
+            </section>
+            <section class="race-details" aria-live="polite">
+              <header class="race-details__header">
+                <h3 id="race-detail-name">Выберите расу</h3>
+                <p id="race-detail-origin" class="race-detail-meta"></p>
+              </header>
+              <p id="race-detail-description" class="race-detail-description">Откройте карточку слева, чтобы увидеть особенности и доступные навыки.</p>
+              <ul id="race-detail-traits" class="race-traits"></ul>
+              <div id="race-detail-skills" class="race-skills"></div>
+              <button type="button" class="race-confirm" id="race-confirm" disabled>Подтвердить расу</button>
+            </section>
+          </div>
+        </div>
+      </div>
       <div class="modal-layer is-hidden" id="inventory-modal" role="dialog" aria-modal="true" aria-labelledby="inventory-title" aria-hidden="true">
         <div class="modal-backdrop" data-dismiss="inventory"></div>
         <div class="modal-window inventory-window" role="document">
