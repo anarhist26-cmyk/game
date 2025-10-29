@@ -46,6 +46,285 @@ const dataSources = {
   locations: 'data/locations.json'
 };
 
+const fallbackCatalogs = {
+  loot: [
+    {
+      id: 'wolf_pelt',
+      name: 'Шкура теневого волка',
+      rarity: 'обычный',
+      type: 'Материал',
+      icon: '🐺',
+      description: 'Плотная шкура, пропитанная тенью. Используется для пошива скрытных плащей.',
+      properties: {
+        'Сопротивление тьме': '+6%',
+        'Уклонение': '+3%'
+      },
+      weight: 1.4,
+      dropChance: 0.35
+    },
+    {
+      id: 'moon_shard',
+      name: 'Осколок лунного стекла',
+      rarity: 'редкий',
+      type: 'Катализатор',
+      icon: '🌙',
+      description: 'Сияющий осколок, усиливающий навыки ночного дозора.',
+      properties: {
+        'Сила заклинаний': '+12',
+        'Крит. шанс': '+4%'
+      },
+      weight: 0.2,
+      dropChance: 0.1
+    },
+    {
+      id: 'ashen_scroll',
+      name: 'Пепельный свиток',
+      rarity: 'эпический',
+      type: 'Свиток',
+      icon: '📜',
+      description: 'Содержит потускневшие руны. После активации пробуждает пепельного фамильяра.',
+      properties: {
+        'Призыв фамильяра': 'Пепельный дух',
+        'Сила огня': '+16'
+      },
+      weight: 0.3,
+      dropChance: 0.05
+    },
+    {
+      id: 'cursed_relic',
+      name: 'Проклятый реликт',
+      rarity: 'эпический',
+      type: 'Артефакт',
+      icon: '🩸',
+      description: 'Осколок древнего обелиска, пьющий кровь владельца, но дарующий силу.',
+      properties: {
+        'Кровавый урон': '+18%',
+        'Стоимость умений': '+4 MP'
+      },
+      weight: 1.1,
+      dropChance: 0.22
+    },
+    {
+      id: 'bone_talisman',
+      name: 'Талисман костяного легиона',
+      rarity: 'необычный',
+      type: 'Талисман',
+      icon: '☠️',
+      description: 'Переплетённые кости легионеров защищают от некротической магии.',
+      properties: {
+        'Сопротивление некрозу': '+18%',
+        'Броня': '+6'
+      },
+      weight: 0.5,
+      dropChance: 0.32
+    },
+    {
+      id: 'rusted_gladius',
+      name: 'Ржавый гладиус легионера',
+      rarity: 'обычный',
+      type: 'Оружие',
+      icon: '🗡️',
+      description: 'Изношенный, но всё ещё опасный клинок.',
+      properties: {
+        'Физический урон': '+14',
+        'Шанс кровотечения': '+4%'
+      },
+      weight: 5,
+      dropChance: 0.18
+    },
+    {
+      id: 'ember_core',
+      name: 'Угольно-пламенное ядро',
+      rarity: 'редкий',
+      type: 'Сфера',
+      icon: '🔥',
+      description: 'Остывший осколок сердца элементаля.',
+      properties: {
+        'Огненный урон': '+22',
+        'Сопротивление холоду': '+8%'
+      },
+      weight: 1.8,
+      dropChance: 0.14
+    },
+    {
+      id: 'iron_fang',
+      name: 'Железный клык',
+      rarity: 'необычный',
+      type: 'Материал',
+      icon: '🦴',
+      description: 'Зазубренный клык элементаля, подходящий для ковки шипованных лат.',
+      properties: {
+        'Прочность брони': '+12%',
+        'Урон при блоке': '+6'
+      },
+      weight: 0.9,
+      dropChance: 0.18
+    },
+    {
+      id: 'blood_vial',
+      name: 'Фиал закалённой крови',
+      rarity: 'редкий',
+      type: 'Расходуемое',
+      icon: '🧪',
+      description: 'Укрепляет плоть, если выпить с молитвой Сангвинариуса.',
+      properties: {
+        'Восстановление HP': '180',
+        'Вампиризм': '+4%'
+      },
+      weight: 0.3,
+      dropChance: 0.12
+    },
+    {
+      id: 'withered_root',
+      name: 'Иссохший корень ведьмы',
+      rarity: 'обычный',
+      type: 'Компонент',
+      icon: '🌿',
+      description: 'Зловонный корень, впитывающий энергию болота.',
+      properties: {
+        'Ядовитый урон': '+10',
+        'Сопротивление яду': '+5%'
+      },
+      weight: 0.6,
+      dropChance: 0.4
+    }
+  ],
+  monsters: [
+    {
+      id: 'shadow_wolf',
+      name: 'Теневой волк',
+      rank: 'охотник',
+      level: 6,
+      habitat: 'Сумрачный лес',
+      alignment: 'дикарь',
+      stats: { hp: 180, attack: 24, defense: 12, speed: 30 },
+      abilities: ['Раздирающий укус', 'Затуманивание'],
+      loot: [
+        { itemId: 'wolf_pelt', chance: 0.35 },
+        { itemId: 'moon_shard', chance: 0.1 }
+      ]
+    },
+    {
+      id: 'rootbound_hag',
+      name: 'Корневая ведьма',
+      rank: 'жрица',
+      level: 9,
+      habitat: 'Болотные зеркала',
+      alignment: 'колдунья',
+      stats: { hp: 240, attack: 28, defense: 18, speed: 22 },
+      abilities: ['Гниющая хватка', 'Ядовитая тина'],
+      loot: [
+        { itemId: 'withered_root', chance: 0.4 },
+        { itemId: 'moon_shard', chance: 0.06 }
+      ]
+    },
+    {
+      id: 'skeleton_warrior',
+      name: 'Скелет-воин',
+      rank: 'нежить',
+      level: 13,
+      habitat: 'Катакомбы Бездны',
+      alignment: 'проклятый легион',
+      stats: { hp: 360, attack: 48, defense: 32, speed: 14 },
+      abilities: ['Костяной размах', 'Стена щитов'],
+      loot: [
+        { itemId: 'bone_talisman', chance: 0.32 },
+        { itemId: 'rusted_gladius', chance: 0.18, quantityRange: [1, 1] }
+      ]
+    },
+    {
+      id: 'blood_sentinel',
+      name: 'Кровавый страж',
+      rank: 'страж',
+      level: 15,
+      habitat: 'Бастион Сангвинариев',
+      alignment: 'легион',
+      stats: { hp: 560, attack: 46, defense: 40, speed: 16 },
+      abilities: ['Кара клинком', 'Кровавый щит'],
+      loot: [
+        { itemId: 'blood_vial', chance: 0.12 },
+        { itemId: 'cursed_relic', chance: 0.18 }
+      ]
+    },
+    {
+      id: 'ember_colossus',
+      name: 'Угольный колосс',
+      rank: 'босс',
+      level: 18,
+      habitat: 'Огненная кузница',
+      alignment: 'элементаль',
+      stats: { hp: 780, attack: 68, defense: 44, speed: 10 },
+      abilities: ['Всполох пламени', 'Обвал лавы'],
+      loot: [
+        { itemId: 'ember_core', chance: 0.14 },
+        { itemId: 'iron_fang', chance: 0.18 }
+      ]
+    }
+  ],
+  locations: [
+    {
+      id: 'gloomwood',
+      name: 'Сумрачный лес',
+      sector: 'Северные рубежи',
+      levelRange: [5, 8],
+      type: 'дикие земли',
+      threatRating: 2,
+      description: 'Туманные чащи и алтарь Лунного ветра скрывают следы волчьих стай.',
+      pointsOfInterest: ['Логово теневых волков', 'Разрушенный дозорный пост', 'Алтарь Лунного ветра'],
+      encounters: ['shadow_wolf', 'rootbound_hag'],
+      travelEvents: [
+        { type: 'засада', description: 'Стая волков пытается окружить отряд.', dangerLevel: 3 },
+        { type: 'обнаружение', description: 'Следы ведьминского ритуала ведут в чащу.', dangerLevel: 2 }
+      ]
+    },
+    {
+      id: 'abyssal_catacombs',
+      name: 'Катакомбы Бездны',
+      sector: 'Подземный шов',
+      levelRange: [10, 14],
+      type: 'подземелье',
+      threatRating: 4,
+      description: 'Тесные коридоры с эхом забытых голосов и костяными караулами.',
+      pointsOfInterest: ['Зал забытых королей', 'Провал к бездне', 'Алтарь затмения'],
+      encounters: ['skeleton_warrior', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'голос бездны', description: 'Шёпот обещает силу в обмен на кровь.', dangerLevel: 4 },
+        { type: 'коллапс', description: 'Потолок осыпается и перекрывает путь.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'ember_forge',
+      name: 'Огненная кузница',
+      sector: 'Вулканический хребет',
+      levelRange: [16, 20],
+      type: 'цитадель',
+      threatRating: 5,
+      description: 'Гул горнов и лавовые реки питают оружейные цеха легиона.',
+      pointsOfInterest: ['Зал угольных стражей', 'Жертвенный горн', 'Хранилище жароперстов'],
+      encounters: ['ember_colossus', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'жаркое дыхание', description: 'Поток раскалённого воздуха обжигает броню.', dangerLevel: 4 },
+        { type: 'лазутчик', description: 'Шпион предлагает обменять добычу на сведения.', dangerLevel: 2 }
+      ]
+    },
+    {
+      id: 'noctus_expanse',
+      name: 'Пределы Ноктуса',
+      sector: 'Пограничная пустошь',
+      levelRange: [20, 24],
+      type: 'пустошь',
+      threatRating: 5,
+      description: 'Багровые вихри и руины титанов скрывают патрули легиона.',
+      pointsOfInterest: ['Караульная башня', 'Ритуальный кратер', 'Колыбель титанов'],
+      encounters: ['blood_sentinel', 'ember_colossus'],
+      travelEvents: [
+        { type: 'кровавый шторм', description: 'Алые искры усиливают ярость монстров.', dangerLevel: 5 },
+        { type: 'призрачный караван', description: 'Торговцы призраки предлагают сделки.', dangerLevel: 3 }
+      ]
+    }
+  ]
+};
+
 const rarityGlyphs = {
   legendary: '✦',
   легендарный: '✦',
@@ -439,6 +718,23 @@ function transformMonster(rawMonster) {
   };
 }
 
+function ingestCatalogs({ loot = [], monsters = [], locations = [] }) {
+  gameData.loot.clear();
+  loot.forEach((entry) => {
+    const enriched = enrichLootEntry(entry);
+    gameData.loot.set(enriched.id, enriched);
+  });
+
+  gameData.monsterIndex.clear();
+  gameData.monsters = monsters.map((monster) => {
+    const template = transformMonster(monster);
+    gameData.monsterIndex.set(template.id, template);
+    return template;
+  });
+
+  registerLocations(locations);
+}
+
 function registerLocations(locations) {
   gameData.locations = locations;
   gameData.locationIndex.clear();
@@ -453,21 +749,11 @@ async function loadGameData() {
     fetchJson(dataSources.monsters),
     fetchJson(dataSources.locations)
   ]);
+  ingestCatalogs({ loot: lootData, monsters: monsterData, locations: locationData });
+}
 
-  gameData.loot.clear();
-  lootData.forEach((entry) => {
-    const enriched = enrichLootEntry(entry);
-    gameData.loot.set(enriched.id, enriched);
-  });
-
-  gameData.monsterIndex.clear();
-  gameData.monsters = monsterData.map((monster) => {
-    const template = transformMonster(monster);
-    gameData.monsterIndex.set(template.id, template);
-    return template;
-  });
-
-  registerLocations(locationData);
+function loadFallbackData() {
+  ingestCatalogs(fallbackCatalogs);
 }
 
 function appendLog(target, text) {
@@ -1669,16 +1955,13 @@ setInterval(() => {
 updateResources();
 
 async function initializeGame() {
+  let usedFallback = false;
   try {
     await loadGameData();
   } catch (error) {
     console.error(error);
-    renderEquipmentTable();
-    appendCombatLog('Не удалось загрузить игровые каталоги. Попробуйте обновить страницу.');
-    appendChatLog('<strong>Система</strong>: Ошибка загрузки монстров или лута.');
-    updatePlayerUI();
-    setPlayerTurn(true);
-    return;
+    loadFallbackData();
+    usedFallback = true;
   }
 
   renderEquipmentTable();
@@ -1690,10 +1973,17 @@ async function initializeGame() {
   if (originNode) {
     updateMapState(originNode);
     spawnEnemyForThreat(originNode.threat, originNode.name, originNode.locationId);
+  } else if (enemyStatusElement) {
+    enemyStatusElement.textContent = 'Разведка не обнаружила подходящих координат. Проверьте карту.';
   }
 
   appendCombatLog('Добро пожаловать в Blood Legends. Лабиринт ждёт ваших решений.');
   appendChatLog('<strong>Система</strong>: Канал связи с отрядом активирован.');
+
+  if (usedFallback) {
+    appendCombatLog('Игровые каталоги не удалось загрузить, используется встроенный набор данных. Запустите локальный сервер для работы с JSON.');
+    appendChatLog('<strong>Система</strong>: Активированы встроенные каталоги. Для редактирования файлов используйте запуск через локальный сервер.');
+  }
 
   updatePlayerUI();
   setPlayerTurn(true);
