@@ -194,6 +194,7 @@
               <div class="command-row">
                 <button type="button" class="command-button" data-command="inventory">Инвентарь</button>
                 <button type="button" class="command-button" data-command="codex">Кодекс</button>
+                <button type="button" class="command-button" data-command="skills">Навыки</button>
                 <button type="button" class="command-button" data-command="quests">Квесты</button>
                 <button type="button" class="command-button" data-command="map">Карта</button>
                 <button type="button" class="command-button" data-command="help">Помощь</button>
@@ -282,6 +283,37 @@
                 <button type="button" class="quests-action" id="quest-track-button">Отслеживать</button>
               </div>
             </section>
+          </div>
+        </div>
+      </div>
+      <div class="modal-layer is-hidden" id="skills-modal" role="dialog" aria-modal="true" aria-labelledby="skills-title" aria-hidden="true">
+        <div class="modal-backdrop" data-dismiss="skills"></div>
+        <div class="modal-window skills-window" role="document">
+          <header class="modal-header skills-header">
+            <div class="skills-title-group">
+              <h2 id="skills-title">Древо навыков</h2>
+              <div class="skills-summary" aria-live="polite">
+                <span>Очков доступно: <strong id="skill-points-available">0</strong></span>
+                <span>Потрачено: <strong id="skill-points-spent">0</strong></span>
+              </div>
+            </div>
+            <button type="button" class="modal-close" id="skills-close" aria-label="Закрыть древо навыков">✕</button>
+          </header>
+          <div class="skills-body">
+            <section class="skills-tree" id="skills-tree" role="listbox" aria-label="Навыки героя"></section>
+            <aside class="skills-details" aria-live="polite">
+              <header class="skills-details__header">
+                <h3 id="skill-detail-name">Выберите навык</h3>
+                <span id="skill-detail-cost" class="skills-cost-badge">—</span>
+              </header>
+              <p id="skill-detail-description" class="skills-detail-description">Кликните на ячейку в древе, чтобы узнать подробности и изучить навык.</p>
+              <dl id="skill-detail-effects" class="skills-effects"></dl>
+              <div id="skill-detail-requirements" class="skills-requirements"></div>
+              <div class="skills-actions">
+                <button type="button" class="skills-action" data-skill-action="learn">Изучить</button>
+                <button type="button" class="skills-action skills-action--ghost" data-skill-action="reset">Сбросить</button>
+              </div>
+            </aside>
           </div>
         </div>
       </div>

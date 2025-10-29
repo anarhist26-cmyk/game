@@ -54,6 +54,18 @@ const questsObjectivesList = document.getElementById('quests-objectives');
 const questsRewardsList = document.getElementById('quests-rewards');
 const questTrackButton = document.getElementById('quest-track-button');
 
+const skillsModal = document.getElementById('skills-modal');
+const skillsCloseButton = document.getElementById('skills-close');
+const skillsTreeElement = document.getElementById('skills-tree');
+const skillPointsAvailableElement = document.getElementById('skill-points-available');
+const skillPointsSpentElement = document.getElementById('skill-points-spent');
+const skillDetailName = document.getElementById('skill-detail-name');
+const skillDetailCost = document.getElementById('skill-detail-cost');
+const skillDetailDescription = document.getElementById('skill-detail-description');
+const skillDetailEffects = document.getElementById('skill-detail-effects');
+const skillDetailRequirements = document.getElementById('skill-detail-requirements');
+const skillActionButtons = document.querySelectorAll('[data-skill-action]');
+
 const gameData = {
   loot: new Map(),
   monsters: [],
@@ -61,7 +73,9 @@ const gameData = {
   locations: [],
   locationIndex: new Map(),
   quests: [],
-  questIndex: new Map()
+  questIndex: new Map(),
+  skills: [],
+  skillIndex: new Map()
 };
 
 const codexState = {
@@ -75,6 +89,12 @@ const questBoardState = {
   trackedId: null
 };
 
+const skillsState = {
+  totalPoints: 8,
+  selectionId: null,
+  learned: new Set()
+};
+
 const questStatusLabels = {
   active: 'Активно',
   available: 'Доступно',
@@ -86,7 +106,8 @@ const dataSources = {
   loot: 'data/loot.json',
   monsters: 'data/monsters.json',
   locations: 'data/locations.json',
-  quests: 'data/quests.json'
+  quests: 'data/quests.json',
+  skills: 'data/skills.json'
 };
 
 const fallbackCatalogs = {
@@ -444,6 +465,196 @@ const fallbackCatalogs = {
       tags: ['легендарный', 'история'],
       urgency: 'низкая'
     }
+  ],
+  skills: [
+    {
+      id: 'shadow_step',
+      name: 'Шаг тени',
+      tier: 1,
+      column: 1,
+      cost: 1,
+      icon: '🦊',
+      category: 'Тактика',
+      description: 'Вы учитесь растворяться в сумерках и проскальзывать мимо засады.',
+      effects: {
+        'Шанс уклонения': '+5%',
+        'Скорость перемещения': '+10%'
+      },
+      bonuses: {
+        agility: 4
+      }
+    },
+    {
+      id: 'blood_edge',
+      name: 'Клинок крови',
+      tier: 1,
+      column: 2,
+      cost: 1,
+      icon: '🗡️',
+      category: 'Атака',
+      description: 'Концентрируете ярость, пропитывая клинок кровавой энергией.',
+      effects: {
+        'Физический урон': '+6%',
+        'Критический шанс': '+3%'
+      },
+      bonuses: {
+        strength: 3
+      }
+    },
+    {
+      id: 'scarlet_resolve',
+      name: 'Алое стояние',
+      tier: 1,
+      column: 3,
+      cost: 1,
+      icon: '🛡️',
+      category: 'Защита',
+      description: 'Закаляет вашу плоть и волю, усиливая кровавые барьеры.',
+      effects: {
+        'Броня': '+8',
+        'Сопротивление кровотечению': '+12%'
+      },
+      bonuses: {
+        defense: 4,
+        maxHp: 40
+      }
+    },
+    {
+      id: 'veil_of_ashes',
+      name: 'Пепельный покров',
+      tier: 2,
+      column: 1,
+      cost: 2,
+      icon: '🜂',
+      category: 'Тактика',
+      description: 'Пепельные вихри окутывают след героя, скрывая его от врагов.',
+      prerequisites: ['shadow_step'],
+      effects: {
+        'Видимость на карте': '-1 сектор врагам',
+        'Шанс засад': '-20%'
+      },
+      bonuses: {
+        agility: 2,
+        defense: 2
+      }
+    },
+    {
+      id: 'siphon_strike',
+      name: 'Кровавый сифон',
+      tier: 2,
+      column: 2,
+      cost: 2,
+      icon: '🩸',
+      category: 'Атака',
+      description: 'Каждый удар вытягивает жизненную силу противника и укрепляет вас.',
+      prerequisites: ['blood_edge'],
+      effects: {
+        'Кража здоровья': '4% от нанесённого урона',
+        'Шанс ослабления врага': '15%'
+      },
+      bonuses: {
+        strength: 2,
+        maxHp: 30
+      }
+    },
+    {
+      id: 'blood_barrier',
+      name: 'Багровый бастион',
+      tier: 2,
+      column: 3,
+      cost: 2,
+      icon: '🛞',
+      category: 'Защита',
+      description: 'Создаёт пульсирующий щит, впитывающий кровавые удары.',
+      prerequisites: ['scarlet_resolve'],
+      effects: {
+        'Поглощение урона': '+12%',
+        'Щит в начале боя': '+60'
+      },
+      bonuses: {
+        defense: 5,
+        maxHp: 50
+      }
+    },
+    {
+      id: 'nightmare_blade',
+      name: 'Клинок кошмаров',
+      tier: 3,
+      column: 2,
+      cost: 3,
+      icon: '⚔️',
+      category: 'Атака',
+      description: 'Вы высвобождаете призрачные клинки, рвущие разум врагов.',
+      prerequisites: ['siphon_strike'],
+      effects: {
+        'Пробивание брони': '+18%',
+        'Шанс страха': '10% на 1 ход'
+      },
+      bonuses: {
+        strength: 4,
+        agility: 2
+      }
+    },
+    {
+      id: 'crimson_vanguard',
+      name: 'Алый авангард',
+      tier: 3,
+      column: 3,
+      cost: 3,
+      icon: '🛡️',
+      category: 'Защита',
+      description: 'Легендарная стойка легиона, усиливающая весь отряд.',
+      prerequisites: ['blood_barrier'],
+      effects: {
+        'Броня союзников': '+12%',
+        'Сопротивление магии': '+10%'
+      },
+      bonuses: {
+        defense: 6,
+        maxHp: 60
+      }
+    },
+    {
+      id: 'spectral_command',
+      name: 'Призрачный приказ',
+      tier: 3,
+      column: 1,
+      cost: 3,
+      icon: '👁️',
+      category: 'Тактика',
+      description: 'Связывает вас с призрачным авангардом, открывая разведданные.',
+      prerequisites: ['veil_of_ashes'],
+      effects: {
+        'Разведка на карте': '+1 сектор',
+        'Вероятность засады': '-30%'
+      },
+      bonuses: {
+        agility: 2,
+        defense: 3
+      }
+    },
+    {
+      id: 'avatar_of_legends',
+      name: 'Аватар легенд',
+      tier: 4,
+      column: 2,
+      cost: 3,
+      icon: '✦',
+      category: 'Парный',
+      description: 'Сливает опыт боя и тактики, открывая истинный потенциал Blood Legends.',
+      prerequisites: ['nightmare_blade', 'crimson_vanguard'],
+      effects: {
+        'Все характеристики': '+8',
+        'Шанс легендарной добычи': '+4%'
+      },
+      bonuses: {
+        strength: 4,
+        agility: 4,
+        defense: 4,
+        maxHp: 80,
+        maxMp: 40
+      }
+    }
   ]
 };
 
@@ -758,6 +969,17 @@ function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+function slugify(text, fallback = 'entry') {
+  if (!text) return fallback;
+  return text
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\u0400-\u04FF]+/gi, '_')
+    .replace(/_{2,}/g, '_')
+    .replace(/^_|_$/g, '') || fallback;
+}
+
 async function fetchJson(path) {
   const response = await fetch(path);
   if (!response.ok) {
@@ -837,6 +1059,31 @@ function transformMonster(rawMonster) {
     abilities: rawMonster.abilities ?? [],
     rank: rawMonster.rank ?? 'противник',
     base: rawMonster
+  };
+}
+
+function transformSkill(rawSkill) {
+  const id = rawSkill.id ?? slugify(rawSkill.name ?? 'skill', `skill_${Math.random().toString(36).slice(2, 8)}`);
+  const tier = Number.parseInt(rawSkill.tier ?? 1, 10);
+  const column = Number.parseInt(rawSkill.column ?? 1, 10);
+  const cost = Math.max(1, Number.parseInt(rawSkill.cost ?? 1, 10));
+  const prerequisites = Array.isArray(rawSkill.prerequisites) ? rawSkill.prerequisites.filter(Boolean) : [];
+  const effects = rawSkill.effects && typeof rawSkill.effects === 'object' ? rawSkill.effects : {};
+  const bonuses = rawSkill.bonuses && typeof rawSkill.bonuses === 'object' ? rawSkill.bonuses : {};
+
+  return {
+    id,
+    name: rawSkill.name ?? 'Неизвестный навык',
+    tier: Number.isFinite(tier) ? tier : 1,
+    column: Number.isFinite(column) ? column : 1,
+    cost,
+    icon: rawSkill.icon ?? '✦',
+    category: rawSkill.category ?? 'Навык',
+    description: rawSkill.description ?? 'Описание навыка пока не добавлено.',
+    prerequisites,
+    effects,
+    bonuses,
+    tags: Array.isArray(rawSkill.tags) ? rawSkill.tags : []
   };
 }
 
@@ -969,7 +1216,7 @@ function registerQuests(quests = []) {
   }
 }
 
-function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [] }) {
+function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [], skills = [] }) {
   gameData.loot.clear();
   loot.forEach((entry) => {
     const enriched = enrichLootEntry(entry);
@@ -977,6 +1224,8 @@ function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [] 
   });
 
   registerLocations(locations);
+
+  registerSkills(skills);
 
   gameData.monsterIndex.clear();
   gameData.monsters = monsters.map((monster) => {
@@ -988,6 +1237,7 @@ function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [] 
   registerQuests(quests);
   syncCodexAfterDataUpdate();
   syncQuestBoardAfterDataUpdate();
+  syncSkillsAfterDataUpdate();
 }
 
 function registerLocations(locations) {
@@ -998,14 +1248,50 @@ function registerLocations(locations) {
   });
 }
 
+function registerSkills(skills) {
+  gameData.skills = skills.map((skill) => transformSkill(skill));
+  gameData.skills.sort((a, b) => {
+    if (a.tier === b.tier) {
+      return a.column - b.column;
+    }
+    return a.tier - b.tier;
+  });
+
+  gameData.skillIndex.clear();
+  gameData.skills.forEach((skill) => {
+    gameData.skillIndex.set(skill.id, skill);
+  });
+
+  [...skillsState.learned].forEach((id) => {
+    if (!gameData.skillIndex.has(id)) {
+      skillsState.learned.delete(id);
+    }
+  });
+
+  if (skillsState.selectionId && !gameData.skillIndex.has(skillsState.selectionId)) {
+    skillsState.selectionId = null;
+  }
+
+  if (!skillsState.selectionId && gameData.skills.length) {
+    skillsState.selectionId = gameData.skills[0].id;
+  }
+}
+
 async function loadGameData() {
-  const [lootData, monsterData, locationData, questData] = await Promise.all([
+  const [lootData, monsterData, locationData, questData, skillData] = await Promise.all([
     fetchJson(dataSources.loot),
     fetchJson(dataSources.monsters),
     fetchJson(dataSources.locations),
-    fetchJson(dataSources.quests)
+    fetchJson(dataSources.quests),
+    fetchJson(dataSources.skills)
   ]);
-  ingestCatalogs({ loot: lootData, monsters: monsterData, locations: locationData, quests: questData });
+  ingestCatalogs({
+    loot: lootData,
+    monsters: monsterData,
+    locations: locationData,
+    quests: questData,
+    skills: skillData
+  });
 }
 
 function loadFallbackData() {
@@ -1655,6 +1941,302 @@ function closeCodex() {
   codexModal.setAttribute('aria-hidden', 'true');
 }
 
+function calculateSkillPointsSpent() {
+  let total = 0;
+  skillsState.learned.forEach((id) => {
+    const skill = gameData.skillIndex.get(id);
+    if (skill) {
+      total += skill.cost;
+    }
+  });
+  return total;
+}
+
+function getAvailableSkillPoints() {
+  return Math.max(0, skillsState.totalPoints - calculateSkillPointsSpent());
+}
+
+function arePrerequisitesMet(skill) {
+  if (!skill?.prerequisites?.length) return true;
+  return skill.prerequisites.every((id) => skillsState.learned.has(id));
+}
+
+function getSkillDependants(skillId) {
+  const dependants = new Set();
+  if (!skillId) return dependants;
+  const stack = [skillId];
+  while (stack.length) {
+    const current = stack.pop();
+    gameData.skills.forEach((skill) => {
+      if (skill.prerequisites?.includes(current) && !dependants.has(skill.id)) {
+        dependants.add(skill.id);
+        stack.push(skill.id);
+      }
+    });
+  }
+  dependants.delete(skillId);
+  return dependants;
+}
+
+function canLearnSkill(skill) {
+  if (!skill) return false;
+  if (skillsState.learned.has(skill.id)) return false;
+  if (!arePrerequisitesMet(skill)) return false;
+  return getAvailableSkillPoints() >= skill.cost;
+}
+
+function aggregateSkillBonuses() {
+  const totals = {};
+  skillsState.learned.forEach((id) => {
+    const skill = gameData.skillIndex.get(id);
+    if (!skill?.bonuses) return;
+    Object.entries(skill.bonuses).forEach(([key, value]) => {
+      if (typeof value !== 'number' || Number.isNaN(value)) return;
+      if (!totals[key]) {
+        totals[key] = 0;
+      }
+      totals[key] += value;
+    });
+  });
+  return totals;
+}
+
+function applySkillBonuses() {
+  const totals = aggregateSkillBonuses();
+  const keys = ['strength', 'agility', 'defense'];
+  keys.forEach((key) => {
+    if (playerBaseAttributes[key] !== undefined) {
+      playerState[key] = playerBaseAttributes[key] + (totals[key] ?? 0);
+    }
+  });
+
+  if (playerBaseAttributes.maxHp !== undefined) {
+    const prevRatio = playerState.maxHp > 0 ? playerState.hp / playerState.maxHp : 1;
+    playerState.maxHp = playerBaseAttributes.maxHp + (totals.maxHp ?? 0);
+    playerState.hp = clamp(Math.round(playerState.maxHp * prevRatio), 0, playerState.maxHp);
+  }
+
+  if (playerBaseAttributes.maxMp !== undefined) {
+    const prevRatio = playerState.maxMp > 0 ? playerState.mp / playerState.maxMp : 1;
+    playerState.maxMp = playerBaseAttributes.maxMp + (totals.maxMp ?? 0);
+    playerState.mp = clamp(Math.round(playerState.maxMp * prevRatio), 0, playerState.maxMp);
+  }
+
+  updatePlayerUI();
+}
+
+function updateSkillSummary() {
+  if (skillPointsAvailableElement) {
+    skillPointsAvailableElement.textContent = String(getAvailableSkillPoints());
+  }
+  if (skillPointsSpentElement) {
+    skillPointsSpentElement.textContent = String(calculateSkillPointsSpent());
+  }
+}
+
+function renderSkillDetails(skill) {
+  if (!skillDetailName || !skillDetailDescription || !skillDetailEffects || !skillDetailRequirements || !skillDetailCost) return;
+
+  if (!skill) {
+    skillDetailName.textContent = 'Выберите навык';
+    skillDetailCost.textContent = '—';
+    skillDetailDescription.textContent = 'Кликните на ячейку в древе, чтобы узнать подробности и изучить навык.';
+    skillDetailEffects.replaceChildren();
+    skillDetailRequirements.replaceChildren();
+    skillActionButtons.forEach((button) => {
+      button.disabled = true;
+    });
+    return;
+  }
+
+  skillDetailName.textContent = skill.name;
+  skillDetailCost.textContent = `Стоимость: ${skill.cost}`;
+  skillDetailDescription.textContent = skill.description;
+
+  skillDetailEffects.replaceChildren();
+  const entries = Object.entries(skill.effects ?? {});
+  if (entries.length) {
+    entries.forEach(([label, value]) => {
+      const term = document.createElement('dt');
+      term.textContent = label;
+      const def = document.createElement('dd');
+      def.textContent = String(value);
+      skillDetailEffects.append(term, def);
+    });
+  }
+
+  skillDetailRequirements.replaceChildren();
+  const requirements = [];
+  if (skill.prerequisites?.length) {
+    const names = skill.prerequisites
+      .map((id) => gameData.skillIndex.get(id)?.name ?? id)
+      .join(', ');
+    requirements.push(`Требует: ${names}`);
+  }
+  requirements.push(`Тип: ${skill.category ?? 'Навык'}`);
+  requirements.push(`Уровень: ${skill.tier}`);
+
+  requirements.forEach((text) => {
+    const line = document.createElement('p');
+    line.textContent = text;
+    skillDetailRequirements.append(line);
+  });
+
+  const learned = skillsState.learned.has(skill.id);
+  const available = canLearnSkill(skill);
+  skillActionButtons.forEach((button) => {
+    const action = button.dataset.skillAction;
+    if (action === 'learn') {
+      button.disabled = !available;
+    } else if (action === 'reset') {
+      button.disabled = !learned;
+    }
+  });
+}
+
+function renderSkillsTree() {
+  if (!skillsTreeElement) return;
+
+  skillsTreeElement.replaceChildren();
+  const skills = [...gameData.skills];
+
+  if (!skills.length) {
+    const placeholder = document.createElement('p');
+    placeholder.className = 'skills-placeholder';
+    placeholder.textContent = 'Каталог навыков не загружен.';
+    skillsTreeElement.append(placeholder);
+    renderSkillDetails(null);
+    updateSkillSummary();
+    return;
+  }
+
+  if (!skillsState.selectionId || !gameData.skillIndex.has(skillsState.selectionId)) {
+    skillsState.selectionId = skills[0].id;
+  }
+
+  const maxColumn = Math.max(3, ...skills.map((skill) => skill.column ?? 1));
+  skillsTreeElement.style.setProperty('--skill-columns', String(maxColumn));
+
+  skills.forEach((skill) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'skill-node';
+    button.dataset.skillId = skill.id;
+    button.style.gridColumn = String(skill.column ?? 1);
+    button.style.gridRow = String(skill.tier ?? 1);
+    button.title = skill.description;
+
+    const icon = document.createElement('span');
+    icon.className = 'skill-node__icon';
+    icon.textContent = skill.icon ?? '✦';
+
+    const name = document.createElement('span');
+    name.className = 'skill-node__name';
+    name.textContent = skill.name;
+
+    button.append(icon, name);
+
+    const learned = skillsState.learned.has(skill.id);
+    const available = canLearnSkill(skill);
+    if (learned) {
+      button.classList.add('is-learned');
+    } else if (available) {
+      button.classList.add('is-available');
+    } else {
+      button.classList.add('is-locked');
+    }
+
+    if (skill.id === skillsState.selectionId) {
+      button.classList.add('is-active');
+      button.setAttribute('aria-selected', 'true');
+    } else {
+      button.setAttribute('aria-selected', 'false');
+    }
+
+    button.addEventListener('click', () => {
+      skillsState.selectionId = skill.id;
+      renderSkillsTree();
+    });
+
+    skillsTreeElement.append(button);
+  });
+
+  const activeSkill = gameData.skillIndex.get(skillsState.selectionId) ?? null;
+  renderSkillDetails(activeSkill);
+  updateSkillSummary();
+}
+
+function learnSkill(skill) {
+  if (!canLearnSkill(skill)) {
+    appendChatLog('<strong>Система</strong>: Недостаточно очков навыков или не выполнены требования.');
+    return;
+  }
+  skillsState.learned.add(skill.id);
+  appendChatLog(`<strong>Система</strong>: Навык «${skill.name}» изучен.`);
+  applySkillBonuses();
+  renderSkillsTree();
+}
+
+function resetSkill(skill) {
+  if (!skillsState.learned.has(skill.id)) {
+    appendChatLog('<strong>Система</strong>: Навык ещё не изучен.');
+    return;
+  }
+  const toForget = new Set([skill.id]);
+  const dependants = getSkillDependants(skill.id);
+  dependants.forEach((id) => {
+    if (skillsState.learned.has(id)) {
+      toForget.add(id);
+    }
+  });
+
+  const forgottenNames = [];
+  toForget.forEach((id) => {
+    if (skillsState.learned.delete(id)) {
+      const entry = gameData.skillIndex.get(id);
+      forgottenNames.push(entry?.name ?? id);
+    }
+  });
+
+  appendChatLog(`<strong>Система</strong>: Сброшены навыки: ${forgottenNames.join(', ')}.`);
+  applySkillBonuses();
+  if (skillsState.selectionId && !skillsState.learned.has(skillsState.selectionId) && !gameData.skillIndex.has(skillsState.selectionId)) {
+    skillsState.selectionId = gameData.skills[0]?.id ?? null;
+  }
+  renderSkillsTree();
+}
+
+function handleSkillAction(action) {
+  const skill = skillsState.selectionId ? gameData.skillIndex.get(skillsState.selectionId) : null;
+  if (!skill) return;
+  if (action === 'learn') {
+    learnSkill(skill);
+  } else if (action === 'reset') {
+    resetSkill(skill);
+  }
+}
+
+function openSkills() {
+  if (!skillsModal) return;
+  skillsModal.classList.remove('is-hidden');
+  skillsModal.setAttribute('aria-hidden', 'false');
+  renderSkillsTree();
+}
+
+function closeSkills() {
+  if (!skillsModal) return;
+  skillsModal.classList.add('is-hidden');
+  skillsModal.setAttribute('aria-hidden', 'true');
+}
+
+function syncSkillsAfterDataUpdate() {
+  if (skillsState.selectionId && !gameData.skillIndex.has(skillsState.selectionId)) {
+    skillsState.selectionId = gameData.skills[0]?.id ?? null;
+  }
+  applySkillBonuses();
+  renderSkillsTree();
+}
+
 function buildQuestDataset(filter = questBoardState.filter) {
   const quests = [...gameData.quests];
   if (filter === 'all') return quests;
@@ -1948,8 +2530,19 @@ const playerState = {
   gold: 1250,
   shield: 0,
   skillBonus: 0,
-  skillRounds: 0
+  skillRounds: 0,
+  skillPoints: 12
 };
+
+const playerBaseAttributes = {
+  strength: playerState.strength,
+  agility: playerState.agility,
+  defense: playerState.defense,
+  maxHp: playerState.maxHp,
+  maxMp: playerState.maxMp
+};
+
+skillsState.totalPoints = playerState.skillPoints ?? skillsState.totalPoints;
 
 
 const combatPhrases = {
@@ -2705,6 +3298,9 @@ if (commandButtons.length) {
         case 'codex':
           openCodex();
           break;
+        case 'skills':
+          openSkills();
+          break;
         case 'map':
           appendChatLog('<strong>Система</strong>: Центр карты уже активен.');
           break;
@@ -2749,6 +3345,15 @@ if (questsModal) {
   });
 }
 
+if (skillsModal) {
+  skillsModal.addEventListener('click', (event) => {
+    if (!(event.target instanceof HTMLElement)) return;
+    if (event.target === skillsModal || event.target.matches('[data-dismiss="skills"]')) {
+      closeSkills();
+    }
+  });
+}
+
 if (inventoryCloseButton) {
   inventoryCloseButton.addEventListener('click', () => closeInventory());
 }
@@ -2759,6 +3364,18 @@ if (codexCloseButton) {
 
 if (questsCloseButton) {
   questsCloseButton.addEventListener('click', () => closeQuestBoard());
+}
+
+if (skillsCloseButton) {
+  skillsCloseButton.addEventListener('click', () => closeSkills());
+}
+
+if (skillActionButtons.length) {
+  skillActionButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      handleSkillAction(button.dataset.skillAction);
+    });
+  });
 }
 
 if (codexTabs.length) {
