@@ -43,6 +43,7 @@
       "Алтарь затмения"
     ],
     "encounters": [
+      "skeleton_warrior",
       "gloom_stalker",
       "blood_sentinel"
     ],

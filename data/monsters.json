@@ -44,6 +44,28 @@
     ]
   },
   {
+    "id": "skeleton_warrior",
+    "name": "Скелет-воин",
+    "rank": "нежить",
+    "level": 13,
+    "habitat": "Катакомбы Бездны",
+    "alignment": "проклятый легион",
+    "stats": {
+      "hp": 360,
+      "attack": 48,
+      "defense": 32,
+      "speed": 14
+    },
+    "abilities": [
+      "Костяной размах",
+      "Стена щитов"
+    ],
+    "loot": [
+      { "itemId": "bone_talisman", "chance": 0.32 },
+      { "itemId": "rusted_gladius", "chance": 0.18, "quantityRange": [1, 1] }
+    ]
+  },
+  {
     "id": "ember_colossus",
     "name": "Угольный колосс",
     "rank": "босс",
