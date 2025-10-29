@@ -129,52 +129,42 @@
       <section class="panel world-map">
         <header class="panel__header">
           <h2>Карта мира</h2>
-          <p class="panel__subtitle">Империя Кровавого Полумесяца</p>
+          <p class="panel__subtitle">Катакомбы Империи Кровавого Полумесяца</p>
         </header>
         <div class="map-viewport">
-          <canvas id="world-map-canvas" width="560" height="360" role="img" aria-label="Художественная карта Империи Кровавого Полумесяца"></canvas>
-          <ul class="map-nodes">
-            <li style="--x:54%; --y:36%;">
-              <button class="map-node is-active" type="button" data-region="castle" data-intel="Совет Крови держит ворота в полной боевой готовности. Укрепите отряды, чтобы открыть новые крылья замка.">
-                <span class="map-node__label">Кровавый Замок</span>
-                <span class="map-node__meta">Текущая · Уровень 1</span>
-              </button>
-            </li>
-            <li style="--x:32%; --y:54%;">
-              <button class="map-node" type="button" data-region="forest" data-intел="Тёмные друиды устраивают ритуалы под алыми фонарями. Магический щит усиливает прирост эссенции.">
-                <span class="map-node__label">Лес Мрака</span>
-                <span class="map-node__meta">Уровень 5</span>
-              </button>
-            </li>
-            <li style="--x:70%; --y:62%;">
-              <button class="map-node" type="button" data-region="catacombs" data-intел="Эхо старых войн всё ещё слышно. Принесите 5 эссенций, чтобы войти без боя.">
-                <span class="map-node__label">Катакомбы Забвения</span>
-                <span class="map-node__meta">Уровень 8</span>
-              </button>
-            </li>
-            <li style="--x:44%; --y:18%;">
-              <button class="map-node" type="button" data-region="market" data-intel="Торговцы ценят редкие души героев. Можно обменять рейтинг арены на легендарные руны.">
-                <span class="map-node__label">Рынок Теней</span>
-                <span class="map-node__meta">Уровень 12</span>
-              </button>
-            </li>
-            <li style="--x:82%; --y:28%;">
-              <button class="map-node map-node--locked" type="button" data-region="lair" data-intел="Дракон спит поверх озера жидкой крови. Не входите без защиты от огня.">
-                <span class="map-node__label">Логово Дракона</span>
-                <span class="map-node__meta">Закрыто · Уровень 20</span>
-              </button>
-            </li>
-          </ul>
+          <canvas id="world-map-canvas" width="560" height="360" role="img" aria-label="Лабиринт Империи Кровавого Полумесяца"></canvas>
+          <ul class="map-nodes" id="map-node-layer" aria-label="Точки перемещения по карте"></ul>
+          <div class="map-avatar" id="map-avatar" aria-hidden="true">
+            <span class="map-avatar__pulse"></span>
+            <span class="map-avatar__icon">✢</span>
+          </div>
         </div>
         <div class="map-legend">
-          <div class="map-legend__item"><span class="map-legend__marker"></span> Форт</div>
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--ritual"></span> Ритуальная зона</div>
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--ruin"></span> Руины и подземелья</div>
-          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--trade"></span> Торговые узлы</div>
+          <div class="map-legend__item"><span class="map-legend__marker"></span> Цитадели и бастионы</div>
+          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--gate"></span> Врата и караулы</div>
+          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--portal"></span> Порталы и узлы телепортации</div>
+          <div class="map-legend__item"><span class="map-legend__marker map-legend__marker--treasure"></span> Святилища с добычей</div>
+          <div class="map-legend__item"><span class="map-legend__glyph" aria-hidden="true">⚔️</span> Испытания и артефактные комнаты</div>
         </div>
-        <div class="map-intel" id="map-intел" role="status">Совет Крови держит ворота Кровавого Замка под защитой ночных стражей.</div>
+        <div class="map-controls" aria-label="Управление перемещением по карте">
+          <div class="map-controls__status">
+            <span class="map-controls__label">Текущая точка</span>
+            <strong class="map-controls__value" id="map-location">Цитадель Алого Сумрака</strong>
+          </div>
+          <div class="map-controls__pad" role="group" aria-label="Стрелки перемещения">
+            <button type="button" class="map-control map-control--north" data-direction="north" aria-label="Шаг к северу"><span>⬆</span></button>
+            <button type="button" class="map-control map-control--west" data-direction="west" aria-label="Шаг к западу"><span>⬅</span></button>
+            <button type="button" class="map-control map-control--origin" data-direction="origin" aria-label="Вернуться в центр"><span>⦿</span></button>
+            <button type="button" class="map-control map-control--east" data-direction="east" aria-label="Шаг к востоку"><span>➡</span></button>
+            <button type="button" class="map-control map-control--south" data-direction="south" aria-label="Шаг к югу"><span>⬇</span></button>
+          </div>
+          <p class="map-controls__hint">Используйте стрелки, WASD или клики по точкам, чтобы передвигаться по лабиринту.</p>
+        </div>
+        <ol class="map-trail" id="map-trail" aria-live="polite">
+          <li class="map-trail__item">Цитадель Алого Сумрака</li>
+        </ol>
+        <div class="map-intел" id="map-intел" role="status">Вы стоите в центре Цитадели Алого Сумрака. Порталы мерцают в ожидании команды.</div>
       </section>
-
       <section class="panel combat">
         <header class="panel__header">
           <h2>Журнал боя</h2>
@@ -229,6 +219,16 @@
           </div>
           <div class="enemy-card__status" id="enemy-status">Скелет оценивает ваши манёвры.</div>
         </div>
+      </section>
+
+      <section class="panel loot">
+        <header class="panel__header">
+          <h2>Трофеи боя</h2>
+          <p class="panel__subtitle">Последняя добыча</p>
+        </header>
+        <ul class="loot-list" id="loot-list">
+          <li class="loot-list__empty">Побеждайте врагов, чтобы собирать трофеи и артефакты.</li>
+        </ul>
       </section>
 
       <section class="panel chat">

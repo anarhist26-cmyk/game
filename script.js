@@ -7,8 +7,14 @@ const questFilters = document.querySelectorAll('.quest-filter');
 const quests = document.querySelectorAll('.quest-list .quest');
 const mapCanvas = document.querySelector('#world-map-canvas');
 const mapContext = mapCanvas?.getContext('2d');
-const mapNodes = document.querySelectorAll('.map-node');
+const mapNodeLayer = document.querySelector('#map-node-layer');
+let mapNodes = [];
+const mapAvatar = document.querySelector('#map-avatar');
 const mapIntel = document.querySelector('#map-intel');
+const mapLocation = document.querySelector('#map-location');
+const mapTrailElement = document.querySelector('#map-trail');
+const mapControlButtons = document.querySelectorAll('.map-control');
+const lootList = document.querySelector('#loot-list');
 const serverTime = document.querySelector('#server-time');
 const essenceCounter = document.querySelector('#essence-counter');
 const crystalCounter = document.querySelector('#crystal-counter');
@@ -101,7 +107,46 @@ const enemyTemplates = [
     maxDamage: 36,
     xpReward: 160,
     goldReward: [85, 140],
-    intro: 'Скелет скрежещет клинками, выжидая момент для атаки.'
+    intro: 'Скелет скрежещет клинками, выжидая момент для атаки.',
+    lootTable: [
+      {
+        id: 'bone-shard',
+        name: 'Костяной осколок',
+        rarity: 'common',
+        quantity: [2, 4],
+        chance: 0.95,
+        guaranteed: true,
+        icon: '🦴',
+        description: 'Материал для кузницы костей Совета.'
+      },
+      {
+        id: 'grave-dust',
+        name: 'Могильная пыль',
+        rarity: 'uncommon',
+        quantity: [1, 2],
+        chance: 0.55,
+        icon: '🕯️',
+        description: 'Используется для усиления защитных печатей.'
+      },
+      {
+        id: 'scarlet-signet',
+        name: 'Алый перстень дозорного',
+        rarity: 'rare',
+        quantity: [1, 1],
+        chance: 0.18,
+        icon: '💍',
+        description: 'Повышает шанс критического удара на арене.'
+      },
+      {
+        id: 'night-essence',
+        name: 'Эссенция ночных стражей',
+        rarity: 'epic',
+        quantity: [1, 1],
+        chance: 0.08,
+        icon: '✨',
+        description: 'Раскрывает скрытые тропы в катакомбах.'
+      }
+    ]
   },
   {
     id: 'inquisitor',
@@ -112,7 +157,46 @@ const enemyTemplates = [
     maxDamage: 44,
     xpReward: 210,
     goldReward: [120, 200],
-    intro: 'Инквизитор окутан чёрным плащом и нашёптывает клятвы крови.'
+    intro: 'Инквизитор окутан чёрным плащом и нашёптывает клятвы крови.',
+    lootTable: [
+      {
+        id: 'obsidian-sigil',
+        name: 'Обсидиановая печать',
+        rarity: 'uncommon',
+        quantity: [1, 2],
+        chance: 0.75,
+        guaranteed: true,
+        icon: '🛡️',
+        description: 'Укрепляет щиты крови перед рейдами.'
+      },
+      {
+        id: 'blood-script',
+        name: 'Писания кровавого дозора',
+        rarity: 'rare',
+        quantity: [1, 1],
+        chance: 0.32,
+        icon: '📜',
+        description: 'Раскрывает скрытые задачи ордена.'
+      },
+      {
+        id: 'hex-ember',
+        name: 'Уголь проклятия',
+        rarity: 'epic',
+        quantity: [1, 1],
+        chance: 0.14,
+        icon: '🔥',
+        description: 'Ослабляет магический урон врагов на 12%.'
+      },
+      {
+        id: 'dawn-mantle',
+        name: 'Накидка Рассвета',
+        rarity: 'legendary',
+        quantity: [1, 1],
+        chance: 0.06,
+        icon: '🧥',
+        description: 'Увеличивает мощь умений на 18%.'
+      }
+    ]
   },
   {
     id: 'harpy',
@@ -123,7 +207,46 @@ const enemyTemplates = [
     maxDamage: 38,
     xpReward: 195,
     goldReward: [100, 170],
-    intro: 'Гарпия кружит над ареной, рассыпая перья с огненной кромкой.'
+    intro: 'Гарпия кружит над ареной, рассыпая перья с огненной кромкой.',
+    lootTable: [
+      {
+        id: 'razor-plume',
+        name: 'Лезвийное перо',
+        rarity: 'common',
+        quantity: [3, 5],
+        chance: 0.88,
+        guaranteed: true,
+        icon: '🪶',
+        description: 'Оружейники любят их за режущую кромку.'
+      },
+      {
+        id: 'sky-glass',
+        name: 'Осколок небесного стекла',
+        rarity: 'uncommon',
+        quantity: [1, 2],
+        chance: 0.48,
+        icon: '🔮',
+        description: 'Служит катализатором для воздушных чар.'
+      },
+      {
+        id: 'storm-rune',
+        name: 'Руна штормового визга',
+        rarity: 'rare',
+        quantity: [1, 1],
+        chance: 0.2,
+        icon: '🌀',
+        description: 'Призывает вихрь, что разоружает противника.'
+      },
+      {
+        id: 'crescent-lyre',
+        name: 'Лира Полуночного ветра',
+        rarity: 'epic',
+        quantity: [1, 1],
+        chance: 0.08,
+        icon: '🎼',
+        description: 'Усиливает боевой дух союзников гильдии.'
+      }
+    ]
   },
   {
     id: 'warlord',
@@ -134,7 +257,46 @@ const enemyTemplates = [
     maxDamage: 52,
     xpReward: 280,
     goldReward: [180, 260],
-    intro: 'Полководец поднимает клинок, призывая вас к решающей дуэли.'
+    intro: 'Полководец поднимает клинок, призывая вас к решающей дуэли.',
+    lootTable: [
+      {
+        id: 'blood-signet',
+        name: 'Печать багрового командора',
+        rarity: 'uncommon',
+        quantity: [1, 2],
+        chance: 0.8,
+        guaranteed: true,
+        icon: '🗡️',
+        description: 'Позволяет призвать элитную стражу на поле боя.'
+      },
+      {
+        id: 'legion-banner',
+        name: 'Знамя Алой Стражи',
+        rarity: 'rare',
+        quantity: [1, 1],
+        chance: 0.28,
+        icon: '🚩',
+        description: 'Повышает репутацию гильдии среди торговцев.'
+      },
+      {
+        id: 'moonsteel-ingot',
+        name: 'Слиток лунной стали',
+        rarity: 'epic',
+        quantity: [1, 2],
+        chance: 0.18,
+        icon: '⚒️',
+        description: 'Редкий материал для легендарных клинков.'
+      },
+      {
+        id: 'sovereign-crest',
+        name: 'Герб Верховного Архонта',
+        rarity: 'legendary',
+        quantity: [1, 1],
+        chance: 0.06,
+        icon: '👑',
+        description: 'Открывает доступ к рейду Высшей крови.'
+      }
+    ]
   }
 ];
 
@@ -236,6 +398,69 @@ function fillPhrase(template, value) {
   return template.replace('{value}', replacement);
 }
 
+function rollLoot(table = []) {
+  if (!Array.isArray(table) || !table.length) return [];
+  return table.reduce((drops, item) => {
+    const chance = typeof item.chance === 'number' ? Math.max(0, Math.min(1, item.chance)) : 0;
+    const quantityRange = Array.isArray(item.quantity) ? item.quantity : [item.quantity || 1, item.quantity || 1];
+    const min = Math.max(1, Number(quantityRange[0]) || 1);
+    const max = Math.max(min, Number(quantityRange[1]) || min);
+    if (item.guaranteed || Math.random() < chance) {
+      drops.push({
+        id: item.id,
+        name: item.name,
+        rarity: item.rarity || 'common',
+        quantity: randomInRange(min, max),
+        icon: item.icon || '',
+        description: item.description || ''
+      });
+    }
+    return drops;
+  }, []);
+}
+
+function updateLootUI(summary) {
+  if (!lootList) return;
+  const { enemyName, xp, gold, items } = summary;
+  lootList.innerHTML = '';
+
+  const header = document.createElement('li');
+  header.className = 'loot-list__summary';
+  header.innerHTML = `<strong>${enemyName}</strong>`;
+  const meta = document.createElement('div');
+  meta.className = 'loot-list__summary-meta';
+  meta.innerHTML = `<span>Опыт: ${formatNumber(xp)}</span><span>Золото: ${formatNumber(gold)}</span>`;
+  header.appendChild(meta);
+  lootList.appendChild(header);
+
+  if (!items.length) {
+    const empty = document.createElement('li');
+    empty.className = 'loot-list__empty';
+    empty.textContent = 'Ничего ценного не найдено — враг рассеялся в алом тумане.';
+    lootList.appendChild(empty);
+    return;
+  }
+
+  items.forEach((item) => {
+    const entry = document.createElement('li');
+    entry.className = `loot-item loot-item--${item.rarity}`;
+    const info = document.createElement('div');
+    info.className = 'loot-item__info';
+    const name = document.createElement('span');
+    name.className = 'loot-item__name';
+    name.innerHTML = `${item.icon ? `<span class="loot-item__icon">${item.icon}</span>` : ''}${item.name}`;
+    const metaLine = document.createElement('span');
+    metaLine.className = 'loot-item__meta';
+    metaLine.textContent = item.description || 'Стандартный трофей.';
+    info.append(name, metaLine);
+    const quantity = document.createElement('span');
+    quantity.className = 'loot-item__quantity';
+    quantity.textContent = `×${formatNumber(item.quantity)}`;
+    entry.append(info, quantity);
+    lootList.appendChild(entry);
+  });
+}
+
 function gainXp(amount) {
   playerState.xp += amount;
   const logs = [];
@@ -257,12 +482,22 @@ function gainXp(amount) {
   logs.forEach((entry) => appendLog(entry, 'heal'));
 }
 
-function rewardPlayer({ xpReward, goldReward }) {
+function rewardPlayer({ xpReward, goldReward, lootTable = [], name }) {
   gainXp(xpReward);
   const goldGain = randomInRange(goldReward[0], goldReward[1]);
   playerState.gold += goldGain;
   updateStats();
+  const drops = rollLoot(lootTable);
   appendLog(`Вы собираете <strong>${formatNumber(goldGain)}</strong> золота с поверженного врага.`, 'heal');
+  if (drops.length) {
+    const summary = drops
+      .map((item) => `${item.name} ×${formatNumber(item.quantity)}`)
+      .join(', ');
+    appendLog(`Трофеи боя: ${summary}.`, 'heal');
+  } else {
+    appendLog('Трофеи боя: лишь пепел и кровь остаются после врага.', 'heal');
+  }
+  updateLootUI({ enemyName: name || 'Неизвестный противник', xp: xpReward, gold: goldGain, items: drops });
 }
 
 function applyShield(amount) {
@@ -342,72 +577,803 @@ function spawnEnemy(template) {
 }
 
 
-const mapRegions = [
+const labyrinthNodes = [
   {
-    id: 'castle',
-    type: 'fort',
-    path: [
-      [0.55, 0.28],
-      [0.63, 0.35],
-      [0.6, 0.44],
-      [0.48, 0.46],
-      [0.46, 0.34]
-    ]
+    id: 'citadel',
+    label: 'Цитадель Алого Сумрака',
+    type: 'boss',
+    position: [0.5, 0.5],
+    intel: 'Сердце Империи пульсирует эссенцией и управляет портальными нитями лабиринта.',
+    connections: { north: 'inner-north', south: 'inner-south', east: 'inner-east', west: 'inner-west' }
   },
   {
-    id: 'forest',
-    type: 'ritual',
-    path: [
-      [0.27, 0.52],
-      [0.33, 0.62],
-      [0.41, 0.58],
-      [0.38, 0.48]
-    ]
+    id: 'inner-north',
+    label: 'Кольцо Воронов',
+    type: 'path',
+    position: [0.5, 0.42],
+    intel: 'Переход к северным воротам. Караул проверяет печати крови на каждой связке.',
+    connections: { south: 'citadel', north: 'north-gate', east: 'portal-north-east', west: 'portal-north-west' }
   },
   {
-    id: 'catacombs',
-    type: 'ruin',
-    path: [
-      [0.7, 0.58],
-      [0.78, 0.66],
-      [0.74, 0.72],
-      [0.64, 0.66]
-    ]
+    id: 'inner-south',
+    label: 'Галерея Огней',
+    type: 'path',
+    position: [0.5, 0.58],
+    intel: 'Коридор ведёт к нижним ярусам катакомб и мастерским алхимиков.',
+    connections: { north: 'citadel', south: 'south-gate', east: 'portal-south-east', west: 'portal-south-west' }
   },
   {
-    id: 'market',
-    type: 'trade',
-    path: [
-      [0.4, 0.18],
-      [0.48, 0.22],
-      [0.46, 0.3],
-      [0.36, 0.26]
-    ]
+    id: 'inner-east',
+    label: 'Артерия восточного крыла',
+    type: 'path',
+    position: [0.58, 0.5],
+    intel: 'Поток мерцающей эссенции ведёт к рынку рун и торговцам древними печатями.',
+    connections: { west: 'citadel', east: 'east-gate', north: 'portal-north-east', south: 'portal-south-east' }
   },
   {
-    id: 'lair',
-    type: 'fort',
-    path: [
-      [0.78, 0.22],
-      [0.86, 0.28],
-      [0.82, 0.36],
-      [0.72, 0.3]
-    ]
+    id: 'inner-west',
+    label: 'Тоннель теней',
+    type: 'path',
+    position: [0.42, 0.5],
+    intel: 'Спрятанный путь к мастерским гильдии и оружейным кузницам.',
+    connections: { east: 'citadel', west: 'west-gate', north: 'portal-north-west', south: 'portal-south-west' }
+  },
+  {
+    id: 'north-gate',
+    label: 'Северные ворота',
+    type: 'gate',
+    position: [0.5, 0.32],
+    intel: 'Караул следит за каждым путником, ведущим к ледяным покоям архонтов.',
+    connections: { south: 'inner-north', north: 'north-ward', east: 'portal-north-east', west: 'portal-north-west' }
+  },
+  {
+    id: 'south-gate',
+    label: 'Южные ворота',
+    type: 'gate',
+    position: [0.5, 0.68],
+    intel: 'Запечатанный вход в алтарные склепы и рынки алхимиков.',
+    connections: { north: 'inner-south', south: 'south-ward', east: 'portal-south-east', west: 'portal-south-west' }
+  },
+  {
+    id: 'east-gate',
+    label: 'Восточные ворота',
+    type: 'gate',
+    position: [0.68, 0.5],
+    intel: 'Патрули гильдий охраняют порталы к торговым кварталам.',
+    connections: { west: 'inner-east', east: 'east-ward', north: 'portal-north-east', south: 'portal-south-east' }
+  },
+  {
+    id: 'west-gate',
+    label: 'Западные ворота',
+    type: 'gate',
+    position: [0.32, 0.5],
+    intel: 'Ведут в кузницы и склады оружия.',
+    connections: { east: 'inner-west', west: 'west-ward', north: 'portal-north-west', south: 'portal-south-west' }
+  },
+  {
+    id: 'north-ward',
+    label: 'Ледяной карниз',
+    type: 'portal',
+    position: [0.5, 0.22],
+    intel: 'Ворота к обледеневшим террасам архонтов.',
+    connections: { south: 'north-gate', north: 'north-sanctum', east: 'north-east-ward', west: 'north-west-ward' }
+  },
+  {
+    id: 'north-sanctum',
+    label: 'Святилище Полуночного ветра',
+    type: 'sanctum',
+    position: [0.5, 0.12],
+    intel: 'Здесь звучит хорал, открывающий древние клятвы.',
+    connections: { south: 'north-ward' }
+  },
+  {
+    id: 'north-east-ward',
+    label: 'Казармы ледяных стражей',
+    type: 'treasure',
+    position: [0.62, 0.24],
+    intel: 'Командиры прячут здесь редкие руны и замороженные трофеи.',
+    connections: { west: 'north-ward', east: 'outer-north-east' }
+  },
+  {
+    id: 'north-west-ward',
+    label: 'Обитель вороних дозоров',
+    type: 'treasure',
+    position: [0.38, 0.24],
+    intel: 'Сюда свозят перья и маски ночного дозора.',
+    connections: { east: 'north-ward', west: 'outer-north-west' }
+  },
+  {
+    id: 'outer-north-east',
+    label: 'Рубеж Стылой Луны',
+    type: 'gate',
+    position: [0.72, 0.24],
+    intel: 'Открывает путь к ледяным бастионам спутников.',
+    connections: { west: 'north-east-ward' }
+  },
+  {
+    id: 'outer-north-west',
+    label: 'Застава Чернокрылых',
+    type: 'gate',
+    position: [0.28, 0.24],
+    intel: 'Пропускает только тех, кто принесёт кровь врагов.',
+    connections: { east: 'north-west-ward' }
+  },
+  {
+    id: 'south-ward',
+    label: 'Алый колодец',
+    type: 'portal',
+    position: [0.5, 0.78],
+    intel: 'Сердце ритуалов крови и доступа к нижним катакомбам.',
+    connections: { north: 'south-gate', south: 'south-sanctum', east: 'south-east-ward', west: 'south-west-ward' }
+  },
+  {
+    id: 'south-sanctum',
+    label: 'Святилище Жар-птицы',
+    type: 'sanctum',
+    position: [0.5, 0.88],
+    intel: 'Пламя восстанавливает павших героев.',
+    connections: { north: 'south-ward' }
+  },
+  {
+    id: 'south-east-ward',
+    label: 'Алхимическая пристань',
+    type: 'treasure',
+    position: [0.62, 0.76],
+    intel: 'Хранятся редкие эликсиры и реагенты.',
+    connections: { west: 'south-ward', east: 'outer-south-east' }
+  },
+  {
+    id: 'south-west-ward',
+    label: 'Гранитные склады',
+    type: 'treasure',
+    position: [0.38, 0.76],
+    intel: 'Запасы металла и эссенции для осад.',
+    connections: { east: 'south-ward', west: 'outer-south-west' }
+  },
+  {
+    id: 'outer-south-east',
+    label: 'Врата Горящего Полумесяца',
+    type: 'gate',
+    position: [0.72, 0.76],
+    intel: 'Выводят к пламенеющим аренам кланов.',
+    connections: { west: 'south-east-ward' }
+  },
+  {
+    id: 'outer-south-west',
+    label: 'Лазурный редут',
+    type: 'gate',
+    position: [0.28, 0.76],
+    intel: 'Отсюда открываются подземные ходы в ущелья.',
+    connections: { east: 'south-west-ward' }
+  },
+  {
+    id: 'east-ward',
+    label: 'Зеркало торговцев',
+    type: 'portal',
+    position: [0.78, 0.5],
+    intel: 'Мерцающий портал ведёт к рынку реликвий.',
+    connections: { west: 'east-gate', east: 'east-sanctum', north: 'east-north-ward', south: 'east-south-ward' }
+  },
+  {
+    id: 'east-sanctum',
+    label: 'Хранилище рун',
+    type: 'sanctum',
+    position: [0.88, 0.5],
+    intel: 'Место, где заключены договоры с духами торговли.',
+    connections: { west: 'east-ward' }
+  },
+  {
+    id: 'east-north-ward',
+    label: 'Терраса арбитров',
+    type: 'treasure',
+    position: [0.76, 0.38],
+    intel: 'Арбитры проводят сюда победителей арены.',
+    connections: { south: 'east-ward', north: 'outer-east-north' }
+  },
+  {
+    id: 'east-south-ward',
+    label: 'Лаборатория рунных мастеров',
+    type: 'treasure',
+    position: [0.76, 0.62],
+    intel: 'Тоннели наполнены руническими искрами.',
+    connections: { north: 'east-ward', south: 'outer-east-south' }
+  },
+  {
+    id: 'outer-east-north',
+    label: 'Портал к облачным мостам',
+    type: 'gate',
+    position: [0.76, 0.28],
+    intel: 'Ведёт к парящим укреплениям над бездной.',
+    connections: { south: 'east-north-ward' }
+  },
+  {
+    id: 'outer-east-south',
+    label: 'Терраса огненных клятв',
+    type: 'gate',
+    position: [0.76, 0.72],
+    intel: 'Пропускает только носителей священных печатей.',
+    connections: { north: 'east-south-ward' }
+  },
+  {
+    id: 'west-ward',
+    label: 'Туннель мастеров',
+    type: 'portal',
+    position: [0.22, 0.5],
+    intel: 'Связь между кузницами и центральными складами.',
+    connections: { east: 'west-gate', west: 'west-sanctum', north: 'west-north-ward', south: 'west-south-ward' }
+  },
+  {
+    id: 'west-sanctum',
+    label: 'Святилище Каменной клятвы',
+    type: 'sanctum',
+    position: [0.12, 0.5],
+    intel: 'Оплот кузнецов, создающих артефакты.',
+    connections: { east: 'west-ward' }
+  },
+  {
+    id: 'west-north-ward',
+    label: 'Гнездо рыцарей сумрака',
+    type: 'treasure',
+    position: [0.24, 0.38],
+    intel: 'Они накапливают редкие пластины брони.',
+    connections: { south: 'west-ward', north: 'outer-west-north' }
+  },
+  {
+    id: 'west-south-ward',
+    label: 'Склепы Алатара',
+    type: 'treasure',
+    position: [0.24, 0.62],
+    intel: 'Хранятся филактерии павших генералов.',
+    connections: { north: 'west-ward', south: 'outer-west-south' }
+  },
+  {
+    id: 'outer-west-north',
+    label: 'Башня дымных крыльев',
+    type: 'gate',
+    position: [0.24, 0.28],
+    intel: 'Скрытая обсерватория воздушной разведки.',
+    connections: { south: 'west-north-ward' }
+  },
+  {
+    id: 'outer-west-south',
+    label: 'Форт подземной реки',
+    type: 'gate',
+    position: [0.24, 0.72],
+    intel: 'Ведёт в подземные катакомбы реки крови.',
+    connections: { north: 'west-south-ward' }
+  },
+  {
+    id: 'portal-north-east',
+    label: 'Перекрёсток стихий',
+    type: 'portal',
+    position: [0.62, 0.38],
+    intel: 'Магические лучи соединяют ворота с рынками.',
+    connections: { west: 'inner-north', south: 'inner-east', north: 'north-gate', east: 'east-gate' }
+  },
+  {
+    id: 'portal-north-west',
+    label: 'Зеркало Чернокрыла',
+    type: 'portal',
+    position: [0.38, 0.38],
+    intel: 'Чернокрылая стража наблюдает за северо-западным крылом.',
+    connections: { east: 'inner-north', south: 'inner-west', north: 'north-gate', west: 'west-gate' }
+  },
+  {
+    id: 'portal-south-east',
+    label: 'Кристальный перекрёсток',
+    type: 'portal',
+    position: [0.62, 0.62],
+    intel: 'Своды мерцают алым стеклом и ведут в торжище алхимиков.',
+    connections: { north: 'inner-east', west: 'inner-south', east: 'east-gate', south: 'south-gate' }
+  },
+  {
+    id: 'portal-south-west',
+    label: 'Огненный дозор',
+    type: 'portal',
+    position: [0.38, 0.62],
+    intel: 'Гильдия следит за юго-западными тоннелями.',
+    connections: { north: 'inner-west', east: 'inner-south', south: 'south-gate', west: 'west-gate' }
   }
 ];
 
-const regionStyles = {
-  fort: { fill: '#b2243e', glow: '#f45a7a' },
-  ritual: { fill: '#472a8f', glow: '#8b63ff' },
-  ruin: { fill: '#144c61', glow: '#4ed4e0' },
-  trade: { fill: '#7a3d14', glow: '#ffb657' }
-};
+const originNodeId = 'citadel';
+const labyrinthNodeMap = new Map(labyrinthNodes.map((node) => [node.id, node]));
+
+const labyrinthChambers = [
+  { x: 0.42, y: 0.42, w: 0.16, h: 0.16 },
+  { x: 0.32, y: 0.32, w: 0.1, h: 0.1 },
+  { x: 0.58, y: 0.32, w: 0.1, h: 0.1 },
+  { x: 0.32, y: 0.58, w: 0.1, h: 0.1 },
+  { x: 0.58, y: 0.58, w: 0.1, h: 0.1 },
+  { x: 0.32, y: 0.44, w: 0.1, h: 0.08 },
+  { x: 0.58, y: 0.44, w: 0.1, h: 0.08 },
+  { x: 0.44, y: 0.32, w: 0.08, h: 0.1 },
+  { x: 0.44, y: 0.58, w: 0.08, h: 0.1 },
+  { x: 0.2, y: 0.2, w: 0.1, h: 0.1 },
+  { x: 0.7, y: 0.2, w: 0.1, h: 0.1 },
+  { x: 0.2, y: 0.7, w: 0.1, h: 0.1 },
+  { x: 0.7, y: 0.7, w: 0.1, h: 0.1 },
+  { x: 0.2, y: 0.44, w: 0.1, h: 0.12 },
+  { x: 0.7, y: 0.44, w: 0.1, h: 0.12 },
+  { x: 0.44, y: 0.2, w: 0.12, h: 0.1 },
+  { x: 0.44, y: 0.7, w: 0.12, h: 0.1 },
+  { x: 0.18, y: 0.18, w: 0.06, h: 0.06 },
+  { x: 0.76, y: 0.18, w: 0.06, h: 0.06 },
+  { x: 0.18, y: 0.76, w: 0.06, h: 0.06 },
+  { x: 0.76, y: 0.76, w: 0.06, h: 0.06 },
+  { x: 0.2, y: 0.32, w: 0.06, h: 0.06 },
+  { x: 0.74, y: 0.32, w: 0.06, h: 0.06 },
+  { x: 0.2, y: 0.62, w: 0.06, h: 0.06 },
+  { x: 0.74, y: 0.62, w: 0.06, h: 0.06 },
+  { x: 0.44, y: 0.1, w: 0.12, h: 0.06 },
+  { x: 0.44, y: 0.84, w: 0.12, h: 0.06 }
+];
+
+const labyrinthGlyphs = [
+  { position: [0.5, 0.36], icon: '⚔️', glow: 'rgba(242, 77, 109, 0.55)', core: 'rgba(39, 10, 21, 0.92)' },
+  { position: [0.5, 0.64], icon: '🛡️', glow: 'rgba(108, 196, 255, 0.5)', core: 'rgba(13, 22, 38, 0.92)' },
+  { position: [0.36, 0.5], icon: '🔮', glow: 'rgba(192, 149, 255, 0.6)', core: 'rgba(25, 16, 36, 0.9)' },
+  { position: [0.64, 0.5], icon: '🜂', glow: 'rgba(255, 150, 102, 0.55)', core: 'rgba(36, 20, 14, 0.92)' },
+  { position: [0.36, 0.36], icon: '☠️', glow: 'rgba(255, 255, 255, 0.28)', core: 'rgba(20, 20, 28, 0.92)' },
+  { position: [0.64, 0.36], icon: '🧪', glow: 'rgba(81, 224, 192, 0.55)', core: 'rgba(12, 31, 28, 0.9)' },
+  { position: [0.36, 0.64], icon: '🗝️', glow: 'rgba(255, 228, 118, 0.55)', core: 'rgba(34, 26, 14, 0.9)' },
+  { position: [0.64, 0.64], icon: '📜', glow: 'rgba(192, 149, 255, 0.5)', core: 'rgba(18, 16, 32, 0.92)' },
+  { position: [0.5, 0.5], icon: '⛬', glow: 'rgba(242, 77, 109, 0.7)', core: 'rgba(48, 12, 24, 0.95)', scale: 1.2 },
+  { position: [0.2, 0.5], icon: '⚙️', glow: 'rgba(148, 179, 255, 0.55)', core: 'rgba(16, 22, 38, 0.9)' },
+  { position: [0.8, 0.5], icon: '💰', glow: 'rgba(255, 208, 120, 0.6)', core: 'rgba(36, 24, 12, 0.9)' }
+];
+
+const labyrinthEdges = [];
+const edgeRegistry = new Set();
+labyrinthNodes.forEach((node) => {
+  const { connections = {} } = node;
+  Object.values(connections).forEach((targetId) => {
+    if (!targetId || !labyrinthNodeMap.has(targetId)) return;
+    const key = [node.id, targetId].sort().join('::');
+    if (edgeRegistry.has(key)) return;
+    edgeRegistry.add(key);
+    labyrinthEdges.push({ from: node.id, to: targetId });
+  });
+});
+
+let activeNodeId = labyrinthNodeMap.has(originNodeId) ? originNodeId : labyrinthNodes[0]?.id || null;
+let hoveredNodeId = null;
+let mapPulse = 0;
+const travelHistory = activeNodeId ? [activeNodeId] : [];
+const visitedNodeIds = new Set(travelHistory);
+
+function getNode(id) {
+  return labyrinthNodeMap.get(id);
+}
+
+function createMapNodes() {
+  if (!mapNodeLayer) return;
+  mapNodeLayer.innerHTML = '';
+  labyrinthNodes.forEach((node) => {
+    const item = document.createElement('li');
+    item.style.setProperty('--x', (node.position[0] * 100).toFixed(2));
+    item.style.setProperty('--y', (node.position[1] * 100).toFixed(2));
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `map-node map-node--${node.type}`;
+    button.dataset.node = node.id;
+    if (node.intel) button.dataset.intel = node.intel;
+    button.setAttribute('aria-label', `${node.label}. ${node.intel}`);
+    button.innerHTML = '<span class="map-node__pip"></span><span class="map-node__label">' + node.label + '</span>';
+    item.appendChild(button);
+    mapNodeLayer.appendChild(item);
+  });
+  mapNodes = Array.from(mapNodeLayer.querySelectorAll('.map-node'));
+}
+
+function syncMapNodeSelection() {
+  if (!mapNodes.length) return;
+  mapNodes.forEach((button) => {
+    button.classList.toggle('is-active', button.dataset.node === activeNodeId);
+    button.classList.toggle('is-visited', visitedNodeIds.has(button.dataset.node || ''));
+  });
+}
+
+function updateLocationLabel() {
+  if (!mapLocation) return;
+  const node = getNode(activeNodeId);
+  mapLocation.textContent = node ? node.label : 'Неизвестная точка';
+}
+
+function updateMapAvatarPosition() {
+  if (!mapAvatar) return;
+  const node = getNode(activeNodeId);
+  if (!node) return;
+  mapAvatar.style.left = `${(node.position[0] * 100).toFixed(2)}%`;
+  mapAvatar.style.top = `${(node.position[1] * 100).toFixed(2)}%`;
+}
+
+function updateTravelTrail() {
+  if (!mapTrailElement) return;
+  mapTrailElement.innerHTML = '';
+  const recent = travelHistory.slice(-6);
+  recent.forEach((id, index) => {
+    const entry = document.createElement('li');
+    entry.className = 'map-trail__item';
+    if (index === recent.length - 1) entry.classList.add('is-current');
+    const node = getNode(id);
+    entry.textContent = node ? node.label : id;
+    mapTrailElement.appendChild(entry);
+  });
+}
+
+function updateMovementControls() {
+  if (!mapControlButtons.length) return;
+  const current = getNode(activeNodeId);
+  mapControlButtons.forEach((button) => {
+    const direction = button.dataset.direction;
+    if (direction === 'origin') {
+      button.disabled = activeNodeId === originNodeId || !originNodeId;
+      return;
+    }
+    const hasRoute = Boolean(current?.connections?.[direction]);
+    button.disabled = !hasRoute;
+  });
+}
+
+function attemptMoveTo(targetId) {
+  if (!targetId || targetId === activeNodeId) return;
+  if (targetId === originNodeId) {
+    moveToNode(targetId);
+    return;
+  }
+  const current = getNode(activeNodeId);
+  if (!current) return;
+  const neighbors = new Set(Object.values(current.connections || {}));
+  if (neighbors.has(targetId)) {
+    moveToNode(targetId);
+  }
+}
+
+function attemptDirection(direction) {
+  if (!direction) return;
+  if (direction === 'origin') {
+    if (activeNodeId !== originNodeId) moveToNode(originNodeId);
+    return;
+  }
+  const current = getNode(activeNodeId);
+  const targetId = current?.connections?.[direction];
+  if (targetId) {
+    moveToNode(targetId);
+  }
+}
+
+function moveToNode(targetId) {
+  if (!targetId || !labyrinthNodeMap.has(targetId) || targetId === activeNodeId) return;
+  activeNodeId = targetId;
+  visitedNodeIds.add(targetId);
+  syncMapNodeSelection();
+  updateLocationLabel();
+  const node = getNode(targetId);
+  if (node?.intel) setIntel(node.intel);
+  if (!travelHistory.length || travelHistory[travelHistory.length - 1] !== targetId) {
+    travelHistory.push(targetId);
+    if (travelHistory.length > 12) {
+      travelHistory.splice(0, travelHistory.length - 12);
+    }
+  }
+  updateTravelTrail();
+  updateMovementControls();
+  updateMapAvatarPosition();
+  drawMap();
+}
+
+function bindMapNodeEvents() {
+  if (!mapNodes.length) return;
+  mapNodes.forEach((button) => {
+    const nodeId = button.dataset.node;
+    button.addEventListener('click', () => attemptMoveTo(nodeId));
+    button.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        attemptMoveTo(nodeId);
+      }
+    });
+    button.addEventListener('mouseenter', () => {
+      hoveredNodeId = nodeId;
+      const node = getNode(nodeId);
+      if (node?.intel) setIntel(node.intel);
+      drawMap();
+    });
+    button.addEventListener('mouseleave', () => {
+      hoveredNodeId = null;
+      restoreActiveIntel();
+      drawMap();
+    });
+    button.addEventListener('focus', () => {
+      hoveredNodeId = nodeId;
+      const node = getNode(nodeId);
+      if (node?.intel) setIntel(node.intel);
+      drawMap();
+    });
+    button.addEventListener('blur', () => {
+      hoveredNodeId = null;
+      restoreActiveIntel();
+      drawMap();
+    });
+  });
+}
+
+function updateCanvasDimensions() {
+  if (!mapCanvas || !mapContext) return;
+  const ratio = window.devicePixelRatio || 1;
+  const width = mapCanvas.clientWidth || mapCanvas.width;
+  const height = mapCanvas.clientHeight || mapCanvas.height;
+  if (!width || !height) return;
+  mapCanvas.width = width * ratio;
+  mapCanvas.height = height * ratio;
+  mapContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+  updateMapAvatarPosition();
+}
+
+function drawLabyrinthBase(ctx, width, height) {
+  ctx.fillStyle = '#080a17';
+  ctx.fillRect(0, 0, width, height);
+
+  const gradient = ctx.createRadialGradient(width * 0.5, height * 0.5, width * 0.1, width * 0.5, height * 0.5, Math.max(width, height) * 0.75);
+  gradient.addColorStop(0, 'rgba(42, 16, 36, 0.85)');
+  gradient.addColorStop(1, 'rgba(7, 9, 19, 0.95)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(28, 24, 44, 0.92)';
+  labyrinthChambers.forEach(({ x, y, w, h }) => {
+    ctx.fillRect(x * width, y * height, w * width, h * height);
+  });
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.09)';
+  ctx.lineWidth = Math.max(width, height) * 0.0035;
+  labyrinthChambers.forEach(({ x, y, w, h }) => {
+    ctx.strokeRect(x * width, y * height, w * width, h * height);
+  });
+  ctx.restore();
+}
+
+function drawLabyrinthGlyphs(ctx, width, height) {
+  labyrinthGlyphs.forEach((glyph) => {
+    const [gx, gy] = glyph.position;
+    const x = gx * width;
+    const y = gy * height;
+    const radius = Math.max(width, height) * 0.032 * (glyph.scale || 1);
+    ctx.save();
+    const glow = ctx.createRadialGradient(x, y, radius * 0.1, x, y, radius);
+    glow.addColorStop(0, glyph.core || 'rgba(18, 18, 28, 0.95)');
+    glow.addColorStop(1, 'rgba(8, 10, 21, 0.4)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = glyph.glow || 'rgba(242, 77, 109, 0.45)';
+    ctx.lineWidth = radius * 0.18;
+    ctx.globalAlpha = 0.6;
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `${radius * 0.9}px 'Raleway', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = glyph.glow || 'rgba(242, 77, 109, 0.45)';
+    ctx.shadowBlur = radius * 0.6;
+    ctx.fillText(glyph.icon, x, y + (glyph.offsetY || 0));
+    ctx.restore();
+  });
+}
+
+function drawLabyrinthEdges(ctx, width, height) {
+  const activeNeighbors = new Set(Object.values(getNode(activeNodeId)?.connections || {}));
+  labyrinthEdges.forEach((edge) => {
+    const from = getNode(edge.from);
+    const to = getNode(edge.to);
+    if (!from || !to) return;
+    const fx = from.position[0] * width;
+    const fy = from.position[1] * height;
+    const tx = to.position[0] * width;
+    const ty = to.position[1] * height;
+    const isActive = edge.from === activeNodeId || edge.to === activeNodeId;
+    const isReachable = activeNeighbors.has(edge.from) || activeNeighbors.has(edge.to);
+    const isHovered = hoveredNodeId && (edge.from === hoveredNodeId || edge.to === hoveredNodeId);
+    const isVisited = visitedNodeIds.has(edge.from) && visitedNodeIds.has(edge.to);
+    const baseWidth = Math.max(width, height) * 0.012;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(fx, fy);
+    ctx.lineTo(tx, ty);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (isActive) {
+      ctx.strokeStyle = `rgba(242, 77, 109, ${0.45 + Math.sin(mapPulse) * 0.2})`;
+      ctx.lineWidth = baseWidth * 1.25;
+      ctx.shadowColor = 'rgba(242, 77, 109, 0.45)';
+      ctx.shadowBlur = baseWidth * 1.5;
+    } else if (isHovered) {
+      ctx.strokeStyle = `rgba(108, 196, 255, ${0.4 + Math.sin(mapPulse * 1.1) * 0.2})`;
+      ctx.lineWidth = baseWidth * 1.1;
+      ctx.shadowColor = 'rgba(108, 196, 255, 0.4)';
+      ctx.shadowBlur = baseWidth * 1.4;
+    } else if (isVisited) {
+      ctx.strokeStyle = 'rgba(148, 179, 255, 0.32)';
+      ctx.lineWidth = baseWidth * 1.05;
+      ctx.setLineDash([baseWidth * 0.7, baseWidth * 1.1]);
+    } else if (isReachable) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.24)';
+      ctx.lineWidth = baseWidth;
+    } else {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = baseWidth * 0.9;
+    }
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  labyrinthNodes.forEach((node) => {
+    const nx = node.position[0] * width;
+    const ny = node.position[1] * height;
+    const radius = Math.max(width, height) * 0.018;
+    const glow = ctx.createRadialGradient(nx, ny, 0, nx, ny, radius);
+    if (node.id === activeNodeId) {
+      glow.addColorStop(0, 'rgba(242, 77, 109, 0.38)');
+      glow.addColorStop(1, 'rgba(242, 77, 109, 0)');
+    } else if (visitedNodeIds.has(node.id)) {
+      glow.addColorStop(0, 'rgba(148, 179, 255, 0.28)');
+      glow.addColorStop(1, 'rgba(148, 179, 255, 0)');
+    } else if (node.id === hoveredNodeId) {
+      glow.addColorStop(0, 'rgba(108, 196, 255, 0.35)');
+      glow.addColorStop(1, 'rgba(108, 196, 255, 0)');
+    } else {
+      glow.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+      glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    }
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(nx, ny, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawTravelPath(ctx, width, height) {
+  if (travelHistory.length < 2) return;
+  const recent = travelHistory.slice(-10).map((id) => getNode(id)).filter(Boolean);
+  if (recent.length < 2) return;
+  ctx.save();
+  ctx.beginPath();
+  recent.forEach((node, index) => {
+    const px = node.position[0] * width;
+    const py = node.position[1] * height;
+    if (index === 0) {
+      ctx.moveTo(px, py);
+    } else {
+      ctx.lineTo(px, py);
+    }
+  });
+  const startNode = recent[0];
+  const endNode = recent[recent.length - 1];
+  const gradient = ctx.createLinearGradient(
+    startNode.position[0] * width,
+    startNode.position[1] * height,
+    endNode.position[0] * width,
+    endNode.position[1] * height
+  );
+  gradient.addColorStop(0, 'rgba(86, 194, 255, 0.2)');
+  gradient.addColorStop(0.5, 'rgba(242, 77, 109, 0.55)');
+  gradient.addColorStop(1, 'rgba(255, 207, 120, 0.7)');
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = Math.max(width, height) * 0.02;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.shadowColor = 'rgba(242, 77, 109, 0.45)';
+  ctx.shadowBlur = Math.max(width, height) * 0.018;
+  ctx.globalAlpha = 0.85;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawMap() {
+  if (!mapCanvas || !mapContext) return;
+  const ctx = mapContext;
+  const width = mapCanvas.clientWidth || mapCanvas.width;
+  const height = mapCanvas.clientHeight || mapCanvas.height;
+
+  ctx.clearRect(0, 0, width, height);
+  drawLabyrinthBase(ctx, width, height);
+  drawLabyrinthGlyphs(ctx, width, height);
+  drawLabyrinthEdges(ctx, width, height);
+  drawTravelPath(ctx, width, height);
+}
+
+function animateMap() {
+  mapPulse += 0.015;
+  drawMap();
+  requestAnimationFrame(animateMap);
+}
+
+function initializeMapLayer() {
+  if (!mapNodeLayer) return;
+  createMapNodes();
+  bindMapNodeEvents();
+  if (!activeNodeId && labyrinthNodes.length) {
+    activeNodeId = labyrinthNodes[0].id;
+  }
+  visitedNodeIds.clear();
+  if (activeNodeId) {
+    visitedNodeIds.add(activeNodeId);
+  }
+  syncMapNodeSelection();
+  updateLocationLabel();
+  travelHistory.length = 0;
+  if (activeNodeId) travelHistory.push(activeNodeId);
+  updateTravelTrail();
+  updateMovementControls();
+  const node = getNode(activeNodeId);
+  if (node?.intel) setIntel(node.intel);
+  updateMapAvatarPosition();
+  if (mapCanvas && mapContext) {
+    drawMap();
+  }
+}
+
+function handleMapKeyboard(event) {
+  if (!mapNodeLayer) return;
+  const activeTag = document.activeElement?.tagName;
+  if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
+  const keyMap = {
+    ArrowUp: 'north',
+    ArrowDown: 'south',
+    ArrowLeft: 'west',
+    ArrowRight: 'east',
+    w: 'north',
+    W: 'north',
+    s: 'south',
+    S: 'south',
+    a: 'west',
+    A: 'west',
+    d: 'east',
+    D: 'east'
+  };
+  const direction = keyMap[event.key];
+  if (!direction) return;
+  event.preventDefault();
+  attemptDirection(direction);
+}
 
 const resources = {
   essence: 9870,
   crystals: 1240,
   renown: 42600
 };
+
+if (mapCanvas && mapContext) {
+  updateCanvasDimensions();
+}
+
+initializeMapLayer();
+
+if (mapCanvas && mapContext) {
+  drawMap();
+  requestAnimationFrame(animateMap);
+  window.addEventListener('resize', () => {
+    updateCanvasDimensions();
+    drawMap();
+  });
+}
+
+mapControlButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const { direction } = button.dataset;
+    attemptDirection(direction);
+  });
+});
+
+window.addEventListener('keydown', handleMapKeyboard);
 
 function appendLog(entry, type) {
   const item = document.createElement('li');
@@ -590,181 +1556,6 @@ if (loreText) {
   setInterval(rotateLore, 15000);
 }
 
-let activeRegion = mapNodes[0]?.dataset.region || 'castle';
-let hoveredRegion = null;
-let mapPulse = 0;
-
-function updateCanvasDimensions() {
-  if (!mapCanvas || !mapContext) return;
-  const ratio = window.devicePixelRatio || 1;
-  const width = mapCanvas.clientWidth || mapCanvas.width;
-  const height = mapCanvas.clientHeight || mapCanvas.height;
-  if (!width || !height) return;
-  mapCanvas.width = width * ratio;
-  mapCanvas.height = height * ratio;
-  mapContext.setTransform(ratio, 0, 0, ratio, 0, 0);
-}
-
-function getRegionStyle(region) {
-  return regionStyles[region.type] || regionStyles.fort;
-}
-
-function drawRegionShape(region, highlightId) {
-  if (!mapCanvas || !mapContext) return;
-  const ctx = mapContext;
-  const { width, height } = mapCanvas;
-  const points = region.path.map(([x, y]) => [x * width, y * height]);
-  const style = getRegionStyle(region);
-  const isHighlight = region.id === highlightId;
-
-  ctx.beginPath();
-  ctx.moveTo(points[0][0], points[0][1]);
-  for (let i = 1; i < points.length; i += 1) {
-    const [px, py] = points[i];
-    ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-
-  ctx.save();
-  ctx.fillStyle = isHighlight ? style.glow : style.fill;
-  ctx.globalAlpha = isHighlight ? 0.9 : 0.65;
-  ctx.fill();
-  ctx.restore();
-
-  ctx.save();
-  ctx.strokeStyle = isHighlight ? style.glow : 'rgba(255, 255, 255, 0.15)';
-  ctx.lineWidth = isHighlight ? 4 : 2;
-  ctx.stroke();
-  ctx.restore();
-
-  if (isHighlight) {
-    ctx.save();
-    ctx.shadowBlur = 25;
-    ctx.shadowColor = style.glow;
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = style.glow;
-    ctx.stroke();
-    ctx.restore();
-  }
-}
-
-function drawMap(explicitHighlight) {
-  if (!mapCanvas || !mapContext) return;
-  const ctx = mapContext;
-  const width = mapCanvas.clientWidth || mapCanvas.width;
-  const height = mapCanvas.clientHeight || mapCanvas.height;
-  const highlightId = explicitHighlight || hoveredRegion || activeRegion;
-
-  ctx.clearRect(0, 0, width, height);
-
-  const baseGradient = ctx.createLinearGradient(0, 0, 0, height);
-  baseGradient.addColorStop(0, '#06070f');
-  baseGradient.addColorStop(1, '#1c0a16');
-  ctx.fillStyle = baseGradient;
-  ctx.fillRect(0, 0, width, height);
-
-  const haze = ctx.createRadialGradient(width * 0.5, height * 0.35, width * 0.1, width * 0.5, height * 0.35, width * 0.75);
-  haze.addColorStop(0, 'rgba(92, 18, 46, 0.6)');
-  haze.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  ctx.fillStyle = haze;
-  ctx.fillRect(0, 0, width, height);
-
-  ctx.beginPath();
-  ctx.moveTo(width * 0.12, height * 0.72);
-  ctx.quadraticCurveTo(width * 0.05, height * 0.42, width * 0.28, height * 0.25);
-  ctx.quadraticCurveTo(width * 0.46, height * 0.06, width * 0.72, height * 0.18);
-  ctx.quadraticCurveTo(width * 0.93, height * 0.34, width * 0.86, height * 0.62);
-  ctx.quadraticCurveTo(width * 0.7, height * 0.93, width * 0.38, height * 0.86);
-  ctx.quadraticCurveTo(width * 0.18, height * 0.81, width * 0.12, height * 0.72);
-  ctx.closePath();
-
-  const landGradient = ctx.createLinearGradient(width * 0.4, height * 0.15, width * 0.6, height * 0.85);
-  landGradient.addColorStop(0, '#22122c');
-  landGradient.addColorStop(0.5, '#2e1b3a');
-  landGradient.addColorStop(1, '#15162a');
-  ctx.fillStyle = landGradient;
-  ctx.fill();
-
-  ctx.save();
-  ctx.strokeStyle = 'rgba(243, 67, 112, 0.25)';
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  ctx.restore();
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(width * 0.2, height * 0.32);
-  ctx.bezierCurveTo(width * 0.32, height * 0.38, width * 0.28, height * 0.55, width * 0.38, height * 0.68);
-  ctx.bezierCurveTo(width * 0.48, height * 0.8, width * 0.62, height * 0.76, width * 0.75, height * 0.82);
-  ctx.strokeStyle = 'rgba(116, 177, 255, 0.35)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([8, 12]);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(width * 0.58, height * 0.18);
-  ctx.bezierCurveTo(width * 0.66, height * 0.3, width * 0.58, height * 0.5, width * 0.68, height * 0.56);
-  ctx.strokeStyle = `rgba(233, 76, 111, ${0.2 + Math.sin(mapPulse) * 0.12})`;
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  ctx.restore();
-
-  mapRegions.forEach((region) => drawRegionShape(region, highlightId));
-
-  mapRegions.forEach((region) => {
-    const point = region.path[0];
-    const x = point[0] * width;
-    const y = point[1] * height;
-    const style = getRegionStyle(region);
-
-    ctx.save();
-    ctx.fillStyle = style.glow;
-    ctx.globalAlpha = 0.4 + Math.sin(mapPulse * 1.2 + region.path[0][0]) * 0.15;
-    ctx.beginPath();
-    ctx.arc(x, y, 12, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    ctx.save();
-    ctx.fillStyle = '#0c101f';
-    ctx.beginPath();
-    ctx.arc(x, y, 7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    ctx.save();
-    ctx.strokeStyle = style.glow;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(x, y, highlightId === region.id ? 9 : 7, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-  });
-}
-
-function animateMap() {
-  mapPulse += 0.02;
-  drawMap();
-  requestAnimationFrame(animateMap);
-}
-
-if (mapCanvas && mapContext) {
-  updateCanvasDimensions();
-  drawMap();
-  requestAnimationFrame(animateMap);
-  window.addEventListener('resize', () => {
-    updateCanvasDimensions();
-    drawMap();
-  });
-}
-
-if (mapNodes.length) {
-  activateRegion(mapNodes[0]);
-}
-
 function animateResources() {
   const essenceGain = Math.floor(Math.random() * 35) + 15;
   const crystalGain = Math.floor(Math.random() * 5) + 1;
@@ -837,52 +1628,12 @@ function setIntel(text) {
   mapIntel.classList.add('map-intel--pulse');
 }
 
-function activateRegion(node) {
-  if (!node) return;
-  mapNodes.forEach((button) => button.classList.remove('is-active'));
-  node.classList.add('is-active');
-  activeRegion = node.dataset.region || activeRegion;
-  hoveredRegion = null;
-  if (node.dataset.intel) {
-    setIntel(node.dataset.intel);
-  }
-  drawMap();
-}
-
 function restoreActiveIntel() {
-  const current = document.querySelector('.map-node.is-active');
-  if (current && current.dataset.intel) {
-    setIntel(current.dataset.intel);
+  const node = getNode(activeNodeId);
+  if (node?.intel) {
+    setIntel(node.intel);
   }
 }
-
-mapNodes.forEach((node) => {
-  node.addEventListener('click', () => activateRegion(node));
-  node.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      activateRegion(node);
-    }
-  });
-  node.addEventListener('mouseenter', () => {
-    hoveredRegion = node.dataset.region || null;
-    if (node.dataset.intel) setIntel(node.dataset.intel);
-    drawMap();
-  });
-  node.addEventListener('mouseleave', () => {
-    hoveredRegion = null;
-    restoreActiveIntel();
-  });
-  node.addEventListener('focus', () => {
-    hoveredRegion = node.dataset.region || null;
-    if (node.dataset.intel) setIntel(node.dataset.intel);
-    drawMap();
-  });
-  node.addEventListener('blur', () => {
-    hoveredRegion = null;
-    restoreActiveIntel();
-  });
-});
 
 function formatDuration(seconds) {
   const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
