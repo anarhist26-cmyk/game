@@ -17,7 +17,7 @@
           <div class="portrait-slot portrait-slot--hero">
             <div class="portrait-image" aria-hidden="true"></div>
             <div class="portrait-info">
-              <span class="portrait-name">Аэллард</span>
+              <span class="portrait-name" data-player-name>—</span>
               <div class="portrait-bars">
                 <div class="portrait-bar portrait-bar--hp"><span id="sidebar-hp" style="width: 78%"></span></div>
                 <div class="portrait-bar portrait-bar--mp"><span id="sidebar-mp" style="width: 64%"></span></div>
@@ -74,6 +74,7 @@
                 </div>
               </div>
               <dl class="statline">
+                <div><dt>Герой</dt><dd data-player-name>—</dd></div>
                 <div><dt>Сила</dt><dd id="player-strength">45</dd></div>
                 <div><dt>Ловкость</dt><dd id="player-agility">52</dd></div>
                 <div><dt>Защита</dt><dd id="player-defense">38</dd></div>
@@ -229,6 +230,7 @@
               <ul id="race-detail-traits" class="race-traits"></ul>
               <div id="race-detail-skills" class="race-skills"></div>
               <button type="button" class="race-confirm" id="race-confirm" disabled>Подтвердить расу</button>
+              <p id="race-lock-note" class="race-lock-note" hidden>Раса закрепится после регистрации героя.</p>
             </section>
           </div>
         </div>

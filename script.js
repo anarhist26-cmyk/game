@@ -75,6 +75,7 @@ const raceDetailDescription = document.getElementById('race-detail-description')
 const raceDetailTraits = document.getElementById('race-detail-traits');
 const raceDetailSkills = document.getElementById('race-detail-skills');
 const raceConfirmButton = document.getElementById('race-confirm');
+const raceLockNote = document.getElementById('race-lock-note');
 
 const gameData = {
   loot: new Map(),
@@ -112,8 +113,17 @@ const raceState = {
   highlightedId: null
 };
 
+const profileStorageKey = 'blood_legends_profile';
 const raceStorageKey = 'blood_legends_race';
-const storedRacePreference = safeGetStorageItem(raceStorageKey);
+
+const storedProfileRaw = safeGetStorageItem(profileStorageKey);
+const playerProfile = safeParseJson(storedProfileRaw);
+const storedRacePreferenceRaw = safeGetStorageItem(raceStorageKey);
+const storedRacePreference = playerProfile?.raceId ?? storedRacePreferenceRaw ?? null;
+
+if (!playerProfile && typeof window !== 'undefined' && window.location) {
+  window.location.replace('registration.html');
+}
 
 const questStatusLabels = {
   active: 'Активно',
@@ -134,51 +144,51 @@ const dataSources = {
 const fallbackCatalogs = {
   races: [
     {
-      id: 'bloodborn',
-      name: 'Алые наследники',
-      icon: '🩸',
-      description: 'Наследники алого легиона, укрепившие свою силу в ритуалах крови и защите цитаделей.',
-      origin: 'Цитадель Алого Сумрака',
+      id: 'human',
+      name: 'Человек',
+      icon: '🛡️',
+      description: 'Универсальные исследователи Blood Legends, сочетающие дисциплину и адаптивность.',
+      origin: 'Гарнизон Алого Предела',
       traits: [
-        'Прирост силы и максимального здоровья',
-        'Мастерство кровавых клинков и защитных барьеров',
-        'Лояльность ордену Багрового бастиона'
+        'Сбалансированные показатели характеристик',
+        'Повышенная стойкость к воздействию лабиринта',
+        'Ускоренный рост репутации у фракций'
       ]
     },
     {
-      id: 'veilborn',
-      name: 'Сумеречные лисы',
-      icon: '🌒',
-      description: 'Кланы ночных охотников, скользящих по теням и управляющих страхом своих врагов.',
-      origin: 'Гроты Ноктуса',
+      id: 'dwarf',
+      name: 'Гном',
+      icon: '⚒️',
+      description: 'Мастера кузни и осады, полагающиеся на крепкие доспехи и разрушительную тактику.',
+      origin: 'Оплот Каменных Песен',
       traits: [
-        'Повышенная ловкость и скорость',
-        'Снижение шанса засад и ловушек',
-        'Специализация на скрытности и проклятых клинках'
+        'Повышенная защита и запас здоровья',
+        'Сопротивление контролю и кровотечению',
+        'Бонус к созданию и усилению снаряжения'
       ]
     },
     {
-      id: 'emberforged',
-      name: 'Пепельно-кованые',
-      icon: '🔥',
-      description: 'Гильдии кузнецов из Угольных Кузниц, несущие пламя и тяжёлые доспехи на поле боя.',
-      origin: 'Гарнизон Угольной Кузницы',
+      id: 'elf',
+      name: 'Эльф',
+      icon: '🌙',
+      description: 'Странники сумрачных лесов, превосходные следопыты и мастера скрытности.',
+      origin: 'Святилище Лунных Троп',
       traits: [
-        'Повышенная защита и устойчивость',
-        'Усиленные кровавые бастионы и тяжелое оружие',
-        'Пламенные клятвы и дисциплина легионов'
+        'Высокая ловкость и точность',
+        'Снижение шанса попасть в засаду',
+        'Расширенная разведка карты'
       ]
     },
     {
-      id: 'stormbound',
-      name: 'Штормовые кочевники',
-      icon: '⚡',
-      description: 'Странники грозового плато, обученные маневренным боям и внезапным ударам.',
-      origin: 'Плато Грозового дозора',
+      id: 'orc',
+      name: 'Орк',
+      icon: '🗡️',
+      description: 'Грозовые воины, закалённые в нескончаемых битвах за власть над лабиринтами.',
+      origin: 'Чертоги Громового Вожака',
       traits: [
-        'Сбалансированные показатели силы и защиты',
-        'Устойчивость к кровотечению и оглушению',
-        'Комбинируют разведку с фронтальными атаками'
+        'Повышенный урон и критический шанс',
+        'Прирост ярости при получении урона',
+        'Бонус к добыче трофеев в бою'
       ]
     }
   ],
@@ -554,7 +564,7 @@ const fallbackCatalogs = {
       bonuses: {
         agility: 4
       },
-      races: ['veilborn', 'stormbound']
+      races: ['elf', 'human']
     },
     {
       id: 'blood_edge',
@@ -572,7 +582,7 @@ const fallbackCatalogs = {
       bonuses: {
         strength: 3
       },
-      races: ['bloodborn', 'veilborn', 'emberforged']
+      races: ['human', 'orc']
     },
     {
       id: 'scarlet_resolve',
@@ -591,7 +601,7 @@ const fallbackCatalogs = {
         defense: 4,
         maxHp: 40
       },
-      races: ['bloodborn', 'emberforged', 'stormbound']
+      races: ['human', 'dwarf']
     },
     {
       id: 'veil_of_ashes',
@@ -611,7 +621,7 @@ const fallbackCatalogs = {
         agility: 2,
         defense: 2
       },
-      races: ['veilborn', 'stormbound']
+      races: ['elf', 'human']
     },
     {
       id: 'siphon_strike',
@@ -631,7 +641,7 @@ const fallbackCatalogs = {
         strength: 2,
         maxHp: 30
       },
-      races: ['bloodborn', 'veilborn', 'emberforged']
+      races: ['human', 'orc']
     },
     {
       id: 'blood_barrier',
@@ -651,7 +661,7 @@ const fallbackCatalogs = {
         defense: 5,
         maxHp: 50
       },
-      races: ['bloodborn', 'emberforged', 'stormbound']
+      races: ['human', 'dwarf']
     },
     {
       id: 'nightmare_blade',
@@ -671,7 +681,7 @@ const fallbackCatalogs = {
         strength: 4,
         agility: 2
       },
-      races: ['bloodborn', 'veilborn', 'emberforged']
+      races: ['human', 'orc']
     },
     {
       id: 'crimson_vanguard',
@@ -691,7 +701,7 @@ const fallbackCatalogs = {
         defense: 6,
         maxHp: 60
       },
-      races: ['bloodborn', 'emberforged', 'stormbound']
+      races: ['human', 'dwarf']
     },
     {
       id: 'spectral_command',
@@ -711,7 +721,7 @@ const fallbackCatalogs = {
         agility: 2,
         defense: 3
       },
-      races: ['veilborn', 'stormbound']
+      races: ['elf', 'human']
     },
     {
       id: 'avatar_of_legends',
@@ -734,7 +744,7 @@ const fallbackCatalogs = {
         maxHp: 80,
         maxMp: 40
       },
-      races: ['bloodborn', 'emberforged']
+      races: ['human', 'dwarf', 'elf', 'orc']
     }
   ]
 };
@@ -1022,6 +1032,7 @@ const essenceCounter = document.getElementById('essence-counter');
 const crystalCounter = document.getElementById('crystal-counter');
 const renownCounter = document.getElementById('renown-counter');
 const playerRaceElement = document.getElementById('player-race');
+const playerNameElements = document.querySelectorAll('[data-player-name]');
 
 const sidebarHpBar = document.getElementById('sidebar-hp');
 const sidebarMpBar = document.getElementById('sidebar-mp');
@@ -1065,6 +1076,15 @@ function safeSetStorageItem(key, value) {
     }
   } catch (error) {
     // ignore storage errors
+  }
+}
+
+function safeParseJson(value, fallback = null) {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    return fallback;
   }
 }
 
@@ -1490,6 +1510,12 @@ function renderRaceSelection() {
       raceConfirmButton.disabled = true;
       raceConfirmButton.textContent = 'Подтвердить расу';
     }
+    if (raceLockNote) {
+      raceLockNote.removeAttribute('hidden');
+      raceLockNote.textContent = playerProfile?.raceId
+        ? 'Раса была выбрана при регистрации. Просмотрите её характеристики слева.'
+        : 'Раса будет выбрана на этапе регистрации героя.';
+    }
     return;
   }
 
@@ -1613,8 +1639,23 @@ function renderRaceDetails(race) {
 
   if (raceConfirmButton) {
     const isCurrent = race.id === playerState.raceId;
-    raceConfirmButton.disabled = isCurrent;
-    raceConfirmButton.textContent = isCurrent ? 'Уже выбрана' : 'Подтвердить расу';
+    const locked = Boolean(playerProfile?.raceId);
+    if (locked) {
+      raceConfirmButton.disabled = true;
+      raceConfirmButton.textContent = isCurrent ? 'Выбрана при регистрации' : 'Недоступно';
+    } else {
+      raceConfirmButton.disabled = isCurrent;
+      raceConfirmButton.textContent = isCurrent ? 'Уже выбрана' : 'Подтвердить расу';
+    }
+  }
+
+  if (raceLockNote) {
+    const raceName = playerState.raceName && playerState.raceName !== '—' ? playerState.raceName : 'эту культуру';
+    const locked = Boolean(playerProfile?.raceId);
+    raceLockNote.removeAttribute('hidden');
+    raceLockNote.textContent = locked
+      ? `Раса «${raceName}» была выбрана при регистрации. Изменить её невозможно.`
+      : 'Раса закрепится за героем после регистрации. Выберите внимательно.';
   }
 }
 
@@ -1642,15 +1683,26 @@ function closeRaceSelection() {
   raceModal.setAttribute('aria-hidden', 'true');
 }
 
-function setPlayerRace(raceId, { silent = false } = {}) {
+function setPlayerRace(raceId, { silent = false, allowOverride = false } = {}) {
   if (!raceId || !gameData.raceIndex.has(raceId)) {
     appendChatLog('<strong>Система</strong>: Невозможно выбрать неизвестную расу.');
     return false;
   }
 
+  if (!allowOverride && playerProfile?.raceId && raceId !== playerProfile.raceId) {
+    appendChatLog('<strong>Система</strong>: Расу можно изменить только при регистрации нового героя.');
+    closeRaceSelection();
+    return false;
+  }
+
   const previous = playerState.raceId;
   playerState.raceId = raceId;
-  safeSetStorageItem(raceStorageKey, raceId);
+  if (!playerProfile?.raceId || allowOverride || playerProfile.raceId === raceId) {
+    safeSetStorageItem(raceStorageKey, raceId);
+  }
+  if (playerProfile && !playerProfile.raceId) {
+    playerProfile.raceId = raceId;
+  }
   raceState.highlightedId = raceId;
 
   applyRaceSkillFilter();
@@ -1676,10 +1728,15 @@ function ensureRaceSelection() {
     return;
   }
 
+  if (playerProfile?.raceId && gameData.raceIndex.has(playerProfile.raceId)) {
+    setPlayerRace(playerProfile.raceId, { silent: true, allowOverride: true });
+    return;
+  }
+
   raceState.highlightedId = gameData.races[0]?.id ?? null;
   renderRaceSelection();
   openRaceSelection();
-  appendChatLog('<strong>Система</strong>: Выберите расу, чтобы разблокировать древо навыков.');
+  appendChatLog('<strong>Система</strong>: Раса будет закреплена после регистрации героя.');
 }
 
 async function loadGameData() {
@@ -2953,6 +3010,8 @@ function setProgress(key, current, max) {
 }
 
 const playerState = {
+  name: playerProfile?.nickname ?? 'Герой',
+  email: playerProfile?.email ?? '',
   level: 12,
   hp: 450,
   maxHp: 600,
@@ -2969,7 +3028,7 @@ const playerState = {
   skillRounds: 0,
   skillPoints: 12,
   raceId: storedRacePreference ?? null,
-  raceName: '—'
+  raceName: playerProfile?.raceName ?? '—'
 };
 
 const playerBaseAttributes = {
@@ -3529,6 +3588,12 @@ function updatePlayerUI() {
   if (playerRaceElement) {
     playerRaceElement.textContent = playerState.raceName ?? '—';
   }
+
+  if (playerNameElements.length) {
+    playerNameElements.forEach((element) => {
+      element.textContent = playerState.name ?? '—';
+    });
+  }
 }
 
 function grantLoot(template) {
@@ -4054,4 +4119,6 @@ async function initializeGame() {
   setPlayerTurn(true);
 }
 
-initializeGame();
+if (playerProfile) {
+  initializeGame();
+}

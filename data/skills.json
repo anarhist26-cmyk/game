@@ -16,7 +16,7 @@
       "agility": 4
     },
     "tags": ["уклонение", "скрытность"],
-    "races": ["veilborn", "stormbound"]
+    "races": ["elf", "human"]
   },
   {
     "id": "blood_edge",
@@ -35,7 +35,7 @@
       "strength": 3
     },
     "tags": ["урон", "крит"],
-    "races": ["bloodborn", "veilborn", "emberforged"]
+    "races": ["human", "orc"]
   },
   {
     "id": "scarlet_resolve",
@@ -55,7 +55,7 @@
       "maxHp": 40
     },
     "tags": ["выживание", "барьер"],
-    "races": ["bloodborn", "emberforged", "stormbound"]
+    "races": ["human", "dwarf"]
   },
   {
     "id": "veil_of_ashes",
@@ -76,7 +76,7 @@
       "defense": 2
     },
     "tags": ["скрытность", "разведка"],
-    "races": ["veilborn", "stormbound"]
+    "races": ["elf", "human"]
   },
   {
     "id": "siphon_strike",
@@ -97,7 +97,7 @@
       "maxHp": 30
     },
     "tags": ["урон", "самоисцеление"],
-    "races": ["bloodborn", "veilborn", "emberforged"]
+    "races": ["human", "orc"]
   },
   {
     "id": "blood_barrier",
@@ -118,7 +118,7 @@
       "maxHp": 50
     },
     "tags": ["щит", "барьер"],
-    "races": ["bloodborn", "emberforged", "stormbound"]
+    "races": ["human", "dwarf"]
   },
   {
     "id": "spectral_command",
@@ -139,7 +139,7 @@
       "defense": 3
     },
     "tags": ["разведка", "поддержка"],
-    "races": ["veilborn", "stormbound"]
+    "races": ["elf", "human"]
   },
   {
     "id": "nightmare_blade",
@@ -160,7 +160,7 @@
       "agility": 2
     },
     "tags": ["урон", "контроль"],
-    "races": ["bloodborn", "veilborn", "emberforged"]
+    "races": ["human", "orc"]
   },
   {
     "id": "crimson_vanguard",
@@ -181,7 +181,7 @@
       "maxHp": 60
     },
     "tags": ["поддержка", "выживание"],
-    "races": ["bloodborn", "emberforged", "stormbound"]
+    "races": ["human", "dwarf"]
   },
   {
     "id": "avatar_of_legends",
@@ -205,6 +205,6 @@
       "maxMp": 40
     },
     "tags": ["синергия", "легендарный"],
-    "races": ["bloodborn", "emberforged"]
+    "races": ["human", "dwarf", "elf", "orc"]
   }
 ]

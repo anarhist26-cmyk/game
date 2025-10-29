@@ -1338,6 +1338,14 @@ html, body {
   color: rgba(255, 234, 214, 0.6);
 }
 
+.race-lock-note {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: rgba(230, 210, 188, 0.75);
+  font-style: italic;
+  line-height: 1.35;
+}
+
 .race-placeholder {
   padding: 16px;
   border-radius: 12px;
@@ -2317,5 +2325,255 @@ html, body {
     text-align: center;
     padding: 8px 10px;
     font-size: 0.75rem;
+  }
+}
+
+/* Registration */
+
+body.registration-body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.registration-shell {
+  width: min(720px, 100%);
+}
+
+.registration-panel {
+  background: linear-gradient(160deg, rgba(18, 24, 32, 0.96), rgba(8, 10, 14, 0.98));
+  border: 1px solid rgba(206, 170, 118, 0.25);
+  border-radius: 18px;
+  box-shadow: var(--shadow-strong);
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.registration-header h1 {
+  margin: 0 0 6px;
+  font-family: 'Play', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.registration-header p {
+  margin: 0;
+  color: rgba(218, 226, 236, 0.78);
+  font-size: 0.95rem;
+}
+
+.registration-form {
+  display: grid;
+  gap: 18px;
+}
+
+.registration-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.registration-field label,
+.registration-fieldset legend {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(236, 220, 196, 0.95);
+}
+
+.registration-input {
+  border-radius: 10px;
+  border: 1px solid rgba(120, 140, 164, 0.4);
+  background: rgba(18, 24, 32, 0.85);
+  color: var(--text-bright);
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.registration-input:focus {
+  outline: none;
+  border-color: rgba(210, 170, 110, 0.85);
+  box-shadow: 0 0 0 2px rgba(210, 170, 110, 0.25);
+}
+
+.registration-fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.registration-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(224, 210, 194, 0.68);
+}
+
+.registration-race-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.registration-race-option {
+  position: relative;
+  display: block;
+}
+
+.registration-race-radio {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.registration-race-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(24, 30, 40, 0.92);
+  border: 1px solid rgba(118, 140, 168, 0.35);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 160px;
+  cursor: pointer;
+}
+
+.registration-race-option input:checked + .registration-race-card {
+  transform: translateY(-2px);
+  border-color: rgba(214, 166, 102, 0.85);
+  box-shadow: 0 12px 24px rgba(28, 18, 8, 0.45);
+}
+
+.registration-race-card:hover {
+  border-color: rgba(214, 166, 102, 0.45);
+}
+
+.registration-race-icon {
+  font-size: 1.5rem;
+}
+
+.registration-race-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.registration-race-origin {
+  font-size: 0.82rem;
+  color: rgba(206, 220, 238, 0.75);
+}
+
+.registration-race-traits {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.8rem;
+  color: rgba(210, 224, 240, 0.7);
+}
+
+.registration-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #f16b6b;
+  min-height: 1.2em;
+}
+
+.registration-submit {
+  justify-self: start;
+  padding: 12px 26px;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 174, 128, 0.5);
+  background: linear-gradient(135deg, rgba(214, 150, 94, 0.92), rgba(164, 82, 38, 0.92));
+  color: #fff5e6;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.registration-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(68, 32, 12, 0.45);
+}
+
+.registration-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(210, 220, 230, 0.55);
+}
+
+.registration-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.registration-summary[hidden] {
+  display: none;
+}
+
+.registration-summary h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.registration-summary-list {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.registration-summary-list div {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+  font-size: 0.95rem;
+}
+
+.registration-summary-list dt {
+  color: rgba(236, 220, 196, 0.75);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.registration-summary-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(220, 214, 208, 0.6);
+  line-height: 1.4;
+}
+
+@media (max-width: 720px) {
+  .registration-panel {
+    padding: 24px;
+  }
+
+  .registration-summary-list div {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 520px) {
+  .registration-race-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .registration-submit {
+    width: 100%;
+    justify-self: stretch;
+    text-align: center;
   }
 }

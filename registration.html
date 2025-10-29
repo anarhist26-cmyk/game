@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blood Legends — Регистрация</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="registration-body">
+  <main class="registration-shell" role="main">
+    <section class="registration-panel" aria-labelledby="registration-title">
+      <header class="registration-header">
+        <h1 id="registration-title">Регистрация героя</h1>
+        <p>Создайте профиль Blood Legends, выберите расу и отправляйтесь в лабиринты легенд.</p>
+      </header>
+      <form id="registration-form" class="registration-form" autocomplete="off" novalidate>
+        <div class="registration-field">
+          <label for="nickname">Ник в игре</label>
+          <input id="nickname" name="nickname" type="text" class="registration-input" minlength="3" maxlength="24" required placeholder="Например, Аэллард">
+        </div>
+        <div class="registration-field">
+          <label for="email">Электронная почта</label>
+          <input id="email" name="email" type="email" class="registration-input" required placeholder="hero@bloodlegends.ru">
+        </div>
+        <div class="registration-field">
+          <label for="password">Пароль</label>
+          <input id="password" name="password" type="password" class="registration-input" minlength="6" maxlength="48" required placeholder="Минимум 6 символов">
+        </div>
+        <fieldset class="registration-fieldset">
+          <legend>Выбор расы</legend>
+          <p class="registration-note">Раса выбирается один раз и закрепляется за героем.</p>
+          <div id="registration-race-list" class="registration-race-grid" role="radiogroup" aria-label="Выбор расы"></div>
+        </fieldset>
+        <p id="registration-error" class="registration-error" role="alert"></p>
+        <button type="submit" class="registration-submit">Создать героя</button>
+        <p class="registration-hint">Профиль сохраняется локально в браузере. Очистка хранилища удалит данные регистрации.</p>
+      </form>
+      <section id="registration-summary" class="registration-summary" hidden aria-live="polite">
+        <h2>Профиль уже создан</h2>
+        <dl class="registration-summary-list">
+          <div><dt>Герой</dt><dd id="summary-name">—</dd></div>
+          <div><dt>Эл. почта</dt><dd id="summary-email">—</dd></div>
+          <div><dt>Раса</dt><dd id="summary-race">—</dd></div>
+        </dl>
+        <p class="registration-summary-note">Чтобы выбрать другую расу, удалите сохранённый профиль или зарегистрируйте нового героя в другом браузере.</p>
+        <button type="button" id="registration-continue" class="registration-submit">Перейти в игру</button>
+      </section>
+    </section>
+  </main>
+  <script src="registration.js"></script>
+</body>
+</html>
