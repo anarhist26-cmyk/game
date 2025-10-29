@@ -986,15 +986,12 @@ body::before {
 }
 
 
+
 .combat-suite__body {
   display: grid;
   gap: 20px;
-}
-
-.combat-suite__col {
-  display: grid;
-  gap: 20px;
-  align-content: start;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: stretch;
 }
 
 .combat-suite__block {
@@ -1033,9 +1030,8 @@ body::before {
   text-transform: uppercase;
 }
 
-.combat-suite__block--log .log {
-  flex: 1;
-  min-height: 220px;
+.panel.combat-log .log {
+  max-height: 320px;
 }
 
 .combat-suite__block--loot .loot-list {
@@ -1044,16 +1040,7 @@ body::before {
 
 @media (min-width: 960px) {
   .combat-suite__body {
-    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
-    align-items: stretch;
-  }
-
-  .combat-suite__col--left {
-    grid-auto-rows: minmax(0, auto);
-  }
-
-  .combat-suite__col--right {
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
   }
 }
 
@@ -1063,18 +1050,6 @@ body::before {
 
 .combat-suite__block--state .combat-state {
   margin-top: 0;
-}
-
-@media (max-width: 959px) {
-  .combat-suite__col--right {
-    grid-template-rows: minmax(0, auto);
-  }
-}
-
-@media (max-width: 959px) {
-  .combat-suite__block--log .log {
-    max-height: 320px;
-  }
 }
 
 .log {
