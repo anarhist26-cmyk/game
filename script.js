@@ -32,12 +32,27 @@ const inventoryItemStats = document.getElementById('inventory-item-stats');
 const inventoryActions = document.querySelectorAll('[data-inventory-action]');
 const equipmentTableBody = document.getElementById('equipment-table-body');
 
+const codexModal = document.getElementById('codex-modal');
+const codexCloseButton = document.getElementById('codex-close');
+const codexTabs = document.querySelectorAll('.codex-tab');
+const codexListElement = document.getElementById('codex-list');
+const codexEntryName = document.getElementById('codex-entry-name');
+const codexEntryMeta = document.getElementById('codex-entry-meta');
+const codexEntryDescription = document.getElementById('codex-entry-description');
+const codexEntryStats = document.getElementById('codex-entry-stats');
+const codexEntryExtra = document.getElementById('codex-entry-extra');
+
 const gameData = {
   loot: new Map(),
   monsters: [],
   monsterIndex: new Map(),
   locations: [],
   locationIndex: new Map()
+};
+
+const codexState = {
+  category: 'monsters',
+  selectionId: null
 };
 
 const dataSources = {
@@ -733,6 +748,7 @@ function ingestCatalogs({ loot = [], monsters = [], locations = [] }) {
   });
 
   registerLocations(locations);
+  syncCodexAfterDataUpdate();
 }
 
 function registerLocations(locations) {
@@ -1049,6 +1065,354 @@ function closeInventory() {
   inventoryModal.setAttribute('aria-hidden', 'true');
   clearInventorySelection();
   renderInventoryDetails(null);
+}
+
+function setCodexActiveTab(category) {
+  if (!codexTabs.length) return;
+  codexTabs.forEach((tab) => {
+    const active = tab.dataset.codexTab === category;
+    tab.classList.toggle('is-active', active);
+    tab.setAttribute('aria-selected', String(active));
+  });
+}
+
+function formatLevelRange(range) {
+  if (Array.isArray(range) && range.length === 2) {
+    return `${range[0]} — ${range[1]}`;
+  }
+  if (typeof range === 'number') {
+    return String(range);
+  }
+  return '—';
+}
+
+function formatChance(value) {
+  if (value === null || value === undefined) {
+    return '—';
+  }
+  const normalized = value > 1 ? value : value * 100;
+  const rounded = Math.abs(normalized - Math.round(normalized)) < 0.05
+    ? Math.round(normalized)
+    : normalized.toFixed(1);
+  return `${String(rounded).replace('.', ',')}%`;
+}
+
+function buildCodexDataset(category) {
+  switch (category) {
+    case 'monsters':
+      return gameData.monsters.map((monster) => ({
+        id: monster.id,
+        title: monster.name,
+        meta: `Ур. ${monster.level}${monster.habitat ? ` · ${monster.habitat}` : ''}`,
+        data: monster
+      }));
+    case 'locations':
+      return gameData.locations.map((location) => ({
+        id: location.id,
+        title: location.name,
+        meta: `${location.sector ?? 'Неизвестный сектор'} · Угроза ${location.threatRating ?? '—'}`,
+        data: location
+      }));
+    case 'loot':
+      return Array.from(gameData.loot.values()).map((item) => ({
+        id: item.id,
+        title: item.name,
+        meta: `${item.type ?? 'Трофей'} · Шанс ${formatChance(item.dropChance ?? item.chance ?? null)}`,
+        data: item
+      }));
+    default:
+      return [];
+  }
+}
+
+function createCodexListSection(title, items) {
+  const section = document.createElement('div');
+  section.className = 'codex-extra-section';
+  const heading = document.createElement('h4');
+  heading.textContent = title;
+  const list = document.createElement('ul');
+  list.className = 'codex-extra-list';
+  if (!items.length) {
+    const placeholder = document.createElement('li');
+    placeholder.textContent = 'Нет данных.';
+    list.append(placeholder);
+  } else {
+    items.forEach((item) => {
+      const entry = document.createElement('li');
+      if (item instanceof HTMLElement) {
+        entry.append(item);
+      } else {
+        entry.textContent = item;
+      }
+      list.append(entry);
+    });
+  }
+  section.append(heading, list);
+  return section;
+}
+
+function createCodexLootSection(lootTable) {
+  const section = document.createElement('div');
+  section.className = 'codex-extra-section';
+  const heading = document.createElement('h4');
+  heading.textContent = 'Трофеи';
+  const list = document.createElement('ul');
+  list.className = 'codex-extra-list';
+
+  if (!lootTable.length) {
+    const placeholder = document.createElement('li');
+    placeholder.textContent = 'Трофеи не обнаружены.';
+    list.append(placeholder);
+  } else {
+    lootTable.forEach((entry) => {
+      const itemRow = document.createElement('li');
+      const container = document.createElement('div');
+      container.className = 'codex-loot-item';
+
+      const icon = document.createElement('span');
+      icon.className = 'codex-loot-item__icon';
+      icon.textContent = entry.icon ?? '♦';
+
+      const body = document.createElement('div');
+      body.className = 'codex-loot-item__body';
+
+      const name = document.createElement('span');
+      name.className = 'codex-loot-item__name';
+      name.textContent = entry.name;
+
+      const [minQty, maxQty] = entry.quantityRange ?? [1, 1];
+      const qtyText = minQty === maxQty ? `${minQty} шт.` : `${minQty}–${maxQty} шт.`;
+      const meta = document.createElement('span');
+      meta.className = 'codex-loot-item__meta';
+      meta.textContent = `Шанс ${formatChance(entry.chance ?? entry.dropChance ?? null)} · ${qtyText}`;
+
+      body.append(name, meta);
+      container.append(icon, body);
+      itemRow.append(container);
+      list.append(itemRow);
+    });
+  }
+
+  section.append(heading, list);
+  return section;
+}
+
+function renderCodexDetails(entry, category) {
+  if (!codexEntryName || !codexEntryMeta || !codexEntryDescription || !codexEntryStats || !codexEntryExtra) {
+    return;
+  }
+
+  codexEntryExtra.replaceChildren();
+  codexEntryStats.replaceChildren();
+
+  if (!entry) {
+    codexEntryName.textContent = 'Записей пока нет';
+    codexEntryMeta.textContent = '';
+    codexEntryDescription.textContent = 'Добавьте данные в каталоги JSON, чтобы увидеть записи кодекса.';
+    return;
+  }
+
+  if (category === 'monsters') {
+    codexEntryName.textContent = entry.name;
+    const rank = entry.rank ? capitalize(entry.rank) : 'Противник';
+    const locationText = entry.habitat ? ` · ${entry.habitat}` : '';
+    codexEntryMeta.textContent = `Ур. ${entry.level} · ${rank}${locationText}`;
+    codexEntryDescription.textContent = entry.intro;
+
+    const stats = [
+      ['Макс. НР', formatNumber(entry.maxHp)],
+      ['Урон', `${formatNumber(entry.minDamage)} – ${formatNumber(entry.maxDamage)}`],
+      ['Опыт', formatNumber(entry.xpReward)],
+      ['Золото', Array.isArray(entry.goldReward)
+        ? `${formatNumber(entry.goldReward[0])} – ${formatNumber(entry.goldReward[1])}`
+        : formatNumber(entry.goldReward ?? 0)
+      ],
+      ['Принадлежность', entry.alignment ? capitalize(entry.alignment) : 'Неизвестно']
+    ];
+
+    stats.forEach(([label, value]) => {
+      const term = document.createElement('dt');
+      term.textContent = label;
+      const def = document.createElement('dd');
+      def.textContent = value;
+      codexEntryStats.append(term, def);
+    });
+
+    if (entry.abilities?.length) {
+      codexEntryExtra.append(createCodexListSection('Способности', entry.abilities));
+    }
+
+    codexEntryExtra.append(createCodexLootSection(entry.lootTable ?? []));
+    return;
+  }
+
+  if (category === 'locations') {
+    codexEntryName.textContent = entry.name;
+    codexEntryMeta.textContent = `${entry.sector ?? 'Неизвестный сектор'} · Тип: ${entry.type ?? '—'}`;
+    codexEntryDescription.textContent = entry.description ?? 'Описание локации не задано.';
+
+    const stats = [
+      ['Уровни', formatLevelRange(entry.levelRange)],
+      ['Угроза', entry.threatRating ?? '—'],
+      ['Ключевых точек', entry.pointsOfInterest?.length ?? 0],
+      ['Событий в пути', entry.travelEvents?.length ?? 0]
+    ];
+
+    stats.forEach(([label, value]) => {
+      const term = document.createElement('dt');
+      term.textContent = label;
+      const def = document.createElement('dd');
+      def.textContent = String(value);
+      codexEntryStats.append(term, def);
+    });
+
+    if (entry.pointsOfInterest?.length) {
+      codexEntryExtra.append(createCodexListSection('Ключевые точки', entry.pointsOfInterest));
+    }
+
+    if (entry.encounters?.length) {
+      const encounters = entry.encounters.map((id) => {
+        const monster = gameData.monsterIndex.get(id);
+        if (monster) {
+          return `${monster.name} (ур. ${monster.level})`;
+        }
+        return id;
+      });
+      codexEntryExtra.append(createCodexListSection('Возможные враги', encounters));
+    }
+
+    if (entry.travelEvents?.length) {
+      const events = entry.travelEvents.map((event) => {
+        const type = event?.type ? capitalize(event.type) : 'Событие';
+        const description = event?.description ?? '';
+        const risk = event?.dangerLevel ? ` (опасность: ${event.dangerLevel})` : '';
+        const separator = description ? ' — ' : '';
+        return `${type}${separator}${description}${risk}`.trim();
+      });
+      codexEntryExtra.append(createCodexListSection('События на пути', events));
+    }
+    return;
+  }
+
+  if (category === 'loot') {
+    codexEntryName.textContent = entry.name;
+    codexEntryMeta.textContent = `${entry.type ?? 'Трофей'} · ${capitalize(entry.rarity ?? '')}`;
+    codexEntryDescription.textContent = entry.description ?? 'Описание отсутствует.';
+
+    const weight = typeof entry.weight === 'number'
+      ? (Number.isInteger(entry.weight) ? entry.weight : entry.weight.toFixed(1).replace('.', ','))
+      : '—';
+
+    const stats = [
+      ['Вес', typeof weight === 'string' ? weight : String(weight)],
+      ['Шанс выпадения', formatChance(entry.dropChance ?? entry.chance ?? null)],
+      ['Редкость', entry.rarity ? capitalize(entry.rarity) : '—']
+    ];
+
+    stats.forEach(([label, value]) => {
+      const term = document.createElement('dt');
+      term.textContent = label;
+      const def = document.createElement('dd');
+      def.textContent = String(value);
+      codexEntryStats.append(term, def);
+    });
+
+    if (entry.properties && Object.keys(entry.properties).length) {
+      const properties = Object.entries(entry.properties).map(([prop, value]) => `${prop}: ${value}`);
+      codexEntryExtra.append(createCodexListSection('Свойства', properties));
+    }
+
+    const sources = gameData.monsters
+      .filter((monster) => monster.lootTable?.some((loot) => loot.id === entry.id))
+      .map((monster) => `${monster.name} (ур. ${monster.level})`);
+    if (sources.length) {
+      codexEntryExtra.append(createCodexListSection('Источник', sources));
+    }
+    return;
+  }
+}
+
+function syncCodexAfterDataUpdate() {
+  const dataset = buildCodexDataset(codexState.category);
+  if (!dataset.some((entry) => entry.id === codexState.selectionId)) {
+    codexState.selectionId = dataset[0]?.id ?? null;
+  }
+  if (codexModal && !codexModal.classList.contains('is-hidden')) {
+    renderCodex(codexState.category);
+  }
+}
+
+function renderCodex(category = codexState.category) {
+  if (!codexListElement) return;
+  codexState.category = category;
+  setCodexActiveTab(category);
+
+  const dataset = buildCodexDataset(category);
+  codexListElement.replaceChildren();
+
+  if (!dataset.length) {
+    codexState.selectionId = null;
+    const placeholder = document.createElement('li');
+    placeholder.textContent = 'Нет записей для выбранной категории.';
+    codexListElement.append(placeholder);
+    renderCodexDetails(null, category);
+    return;
+  }
+
+  if (!dataset.some((entry) => entry.id === codexState.selectionId)) {
+    codexState.selectionId = dataset[0].id;
+  }
+
+  dataset.forEach((entry) => {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'codex-entry';
+    button.setAttribute('role', 'option');
+    if (entry.id === codexState.selectionId) {
+      button.classList.add('is-active');
+      button.setAttribute('aria-selected', 'true');
+    } else {
+      button.setAttribute('aria-selected', 'false');
+    }
+    button.dataset.entryId = entry.id;
+
+    const titleLine = document.createElement('div');
+    titleLine.className = 'codex-entry__title';
+    const title = document.createElement('span');
+    title.textContent = entry.title;
+    titleLine.append(title);
+
+    const metaLine = document.createElement('div');
+    metaLine.className = 'codex-entry__meta';
+    metaLine.textContent = entry.meta;
+
+    button.append(titleLine, metaLine);
+
+    button.addEventListener('click', () => {
+      codexState.selectionId = entry.id;
+      renderCodex(category);
+    });
+
+    item.append(button);
+    codexListElement.append(item);
+  });
+
+  const active = dataset.find((entry) => entry.id === codexState.selectionId) ?? dataset[0];
+  renderCodexDetails(active?.data ?? null, category);
+}
+
+function openCodex(category = codexState.category) {
+  if (!codexModal) return;
+  codexModal.classList.remove('is-hidden');
+  codexModal.setAttribute('aria-hidden', 'false');
+  renderCodex(category);
+}
+
+function closeCodex() {
+  if (!codexModal) return;
+  codexModal.classList.add('is-hidden');
+  codexModal.setAttribute('aria-hidden', 'true');
 }
 
 function appendCombatLog(message) {
@@ -1807,6 +2171,9 @@ if (commandButtons.length) {
         case 'inventory':
           openInventory();
           break;
+        case 'codex':
+          openCodex();
+          break;
         case 'map':
           appendChatLog('<strong>Система</strong>: Центр карты уже активен.');
           break;
@@ -1833,8 +2200,31 @@ if (inventoryModal) {
   });
 }
 
+if (codexModal) {
+  codexModal.addEventListener('click', (event) => {
+    if (!(event.target instanceof HTMLElement)) return;
+    if (event.target === codexModal || event.target.matches('[data-dismiss="codex"]')) {
+      closeCodex();
+    }
+  });
+}
+
 if (inventoryCloseButton) {
   inventoryCloseButton.addEventListener('click', () => closeInventory());
+}
+
+if (codexCloseButton) {
+  codexCloseButton.addEventListener('click', () => closeCodex());
+}
+
+if (codexTabs.length) {
+  codexTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const category = tab.dataset.codexTab ?? 'monsters';
+      codexState.selectionId = null;
+      renderCodex(category);
+    });
+  });
 }
 
 if (inventoryActions.length) {
@@ -1873,8 +2263,12 @@ if (inventoryActions.length) {
 }
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && inventoryModal && !inventoryModal.classList.contains('is-hidden')) {
-    closeInventory();
+  if (event.key === 'Escape') {
+    if (inventoryModal && !inventoryModal.classList.contains('is-hidden')) {
+      closeInventory();
+    } else if (codexModal && !codexModal.classList.contains('is-hidden')) {
+      closeCodex();
+    }
   }
 });
 

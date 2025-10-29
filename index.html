@@ -193,6 +193,7 @@
               </form>
               <div class="command-row">
                 <button type="button" class="command-button" data-command="inventory">Инвентарь</button>
+                <button type="button" class="command-button" data-command="codex">Кодекс</button>
                 <button type="button" class="command-button" data-command="quests">Квесты</button>
                 <button type="button" class="command-button" data-command="map">Карта</button>
                 <button type="button" class="command-button" data-command="help">Помощь</button>
@@ -246,6 +247,34 @@
       <div class="client-footer">
         <span class="footer-badge">v 4.0.1</span>
         <span class="footer-text">Blood Legends · Окно клиента</span>
+      </div>
+    </div>
+  </div>
+  <div class="modal-layer is-hidden" id="codex-modal" role="dialog" aria-modal="true" aria-labelledby="codex-title" aria-hidden="true">
+    <div class="modal-backdrop" data-dismiss="codex"></div>
+    <div class="modal-window codex-window" role="document">
+      <header class="modal-header codex-header">
+        <h2 id="codex-title">Кодекс</h2>
+        <div class="codex-tabs" role="tablist">
+          <button type="button" class="codex-tab is-active" role="tab" aria-selected="true" data-codex-tab="monsters">Бестиарий</button>
+          <button type="button" class="codex-tab" role="tab" aria-selected="false" data-codex-tab="locations">Локации</button>
+          <button type="button" class="codex-tab" role="tab" aria-selected="false" data-codex-tab="loot">Трофеи</button>
+        </div>
+        <button type="button" class="modal-close" id="codex-close" aria-label="Закрыть кодекс">✕</button>
+      </header>
+      <div class="codex-body">
+        <aside class="codex-list" aria-label="Записи кодекса">
+          <ul id="codex-list" class="codex-entries" role="listbox" aria-labelledby="codex-title"></ul>
+        </aside>
+        <section class="codex-details" id="codex-details" aria-live="polite">
+          <header class="codex-details__header">
+            <h3 id="codex-entry-name">Выберите запись</h3>
+            <p id="codex-entry-meta" class="codex-entry-meta"></p>
+          </header>
+          <p id="codex-entry-description" class="codex-entry-description">Откройте запись из списка слева, чтобы узнать подробности.</p>
+          <dl id="codex-entry-stats" class="codex-entry-stats"></dl>
+          <div id="codex-entry-extra" class="codex-entry-extra"></div>
+        </section>
       </div>
     </div>
   </div>
