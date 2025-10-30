@@ -935,6 +935,8 @@ html, body {
   align-items: stretch;
   gap: 24px;
   padding: 26px;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .quests-window {
@@ -1769,6 +1771,7 @@ html, body {
   background: linear-gradient(180deg, rgba(26, 32, 46, 0.78), rgba(12, 16, 26, 0.92));
   border: 1px solid rgba(110, 140, 200, 0.28);
   box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.45);
+  min-height: 0;
 }
 
 .codex-entries {
@@ -1778,7 +1781,8 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 430px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
 }
@@ -1839,6 +1843,8 @@ html, body {
   background: linear-gradient(180deg, rgba(18, 26, 40, 0.82), rgba(10, 16, 24, 0.92));
   border: 1px solid rgba(112, 146, 212, 0.28);
   box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.46);
+  min-height: 0;
+  overflow: auto;
 }
 
 .codex-details__header {
