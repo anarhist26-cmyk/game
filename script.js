@@ -314,10 +314,6 @@ if (!newRacePreferenceRaw && legacyRacePreferenceRaw) {
 }
 const storedRacePreference = playerProfile?.raceId ?? storedRacePreferenceRaw ?? null;
 
-if (!playerProfile && typeof window !== 'undefined' && window.location) {
-  window.location.replace('registration.html');
-}
-
 const questStatusLabels = {
   active: 'Активно',
   available: 'Доступно',
@@ -2092,6 +2088,15 @@ function ensureRaceSelection() {
 
   if (playerProfile?.raceId && gameData.raceIndex.has(playerProfile.raceId)) {
     setPlayerRace(playerProfile.raceId, { silent: true, allowOverride: true });
+    return;
+  }
+
+  if (!playerProfile) {
+    playerState.raceId = null;
+    playerState.raceName = '—';
+    raceState.highlightedId = null;
+    applyRaceSkillFilter({ preserveSelection: true });
+    appendChatLog('<strong>Система</strong>: Зарегистрируйтесь, чтобы выбрать расу и открыть древо навыков.');
     return;
   }
 
@@ -4783,6 +4788,4 @@ async function initializeGame() {
   setPlayerTurn(true);
 }
 
-if (playerProfile) {
-  initializeGame();
-}
+initializeGame();
