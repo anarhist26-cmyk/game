@@ -565,7 +565,9 @@ html, body {
   padding-bottom: 6px;
 }
 
+
 .enemy-card {
+  --enemy-card-width: 240px;
   background: rgba(0, 0, 0, 0.35);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -573,21 +575,28 @@ html, body {
   display: grid;
   gap: 12px;
   align-content: start;
+  justify-items: center;
+  width: min(100%, var(--enemy-card-width));
+  margin: 0 auto;
+  text-align: center;
 }
 
 .enemy-card__header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   font-family: 'Play', sans-serif;
   font-size: 0.95rem;
+  width: 100%;
 }
 
 .enemy-card__portrait {
   position: relative;
-  width: 78%;
-  max-width: 220px;
+  width: 100%;
+  max-width: var(--enemy-card-width);
   aspect-ratio: 3 / 4;
-  margin: 0 auto;
+  margin: 0;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -623,24 +632,29 @@ html, body {
 .enemy-card__actions {
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
 .enemy-card__actions .action-buttons {
-  width: 78%;
-  max-width: 220px;
+  width: 100%;
+  max-width: var(--enemy-card-width);
 }
 
 .enemy-card__intel {
   display: none;
 }
 
+
 .enemy-card__bars {
   display: grid;
   gap: 4px;
+  width: 100%;
+  max-width: var(--enemy-card-width);
 }
 
 .enemy-card__bars .resource-bar {
   margin: 0;
+  text-align: left;
 }
 
 .enemy-card__bars .resource-bar__label {
