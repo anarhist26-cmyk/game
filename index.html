@@ -41,7 +41,7 @@
         </aside>
 
         <div class="client-main">
-          <section class="main-top" aria-label="Карта и разведданные">
+          <section class="main-top" aria-label="Разведданные и карта">
             <aside class="intel-panel">
               <div class="intel-section">
                 <h3>Противник</h3>
@@ -110,6 +110,42 @@
                 <button type="button" class="map-control" data-direction="south">▼</button>
               </div>
             </div>
+            <section class="main-log" aria-label="Журнал и чат">
+              <header class="log-header">
+                <div class="log-tabs" role="tablist">
+                  <button type="button" class="log-tab is-active" data-log="combat" role="tab" aria-selected="true">Журнал боя</button>
+                  <button type="button" class="log-tab" data-log="chat" role="tab" aria-selected="false">Чат</button>
+                </div>
+                <div class="log-status">
+                  <span id="turn-indicator" class="status-tag">Ваш ход</span>
+                  <span id="stance-indicator" class="status-tag status-tag--passive">Стойка: Бастион</span>
+                </div>
+              </header>
+              <div class="log-viewport">
+                <div class="log-panel is-active" data-log="combat" role="tabpanel" aria-hidden="false">
+                  <ol id="combat-log" class="log-list"></ol>
+                </div>
+                <div class="log-panel" data-log="chat" role="tabpanel" aria-hidden="true">
+                  <ol id="chat-log" class="log-list log-list--chat"></ol>
+                </div>
+              </div>
+              <footer class="log-footer">
+                <form id="chat-form" class="chat-form" autocomplete="off">
+                  <label class="chat-form__label" for="chat-input">Сказать:</label>
+                  <input id="chat-input" name="chat" type="text" maxlength="160" placeholder="Введите сообщение" required>
+                  <button type="submit" class="chat-send">Отправить</button>
+                </form>
+                <div class="command-row">
+                  <button type="button" class="command-button" data-command="inventory">Инвентарь</button>
+                  <button type="button" class="command-button" data-command="codex">Кодекс</button>
+                  <button type="button" class="command-button" data-command="skills">Навыки</button>
+                  <button type="button" class="command-button" data-command="attributes">Характеристики</button>
+                  <button type="button" class="command-button" data-command="quests">Квесты</button>
+                  <button type="button" class="command-button" data-command="map">Карта</button>
+                  <button type="button" class="command-button" data-command="help">Помощь</button>
+                </div>
+              </footer>
+            </section>
           </section>
 
           <header class="main-header" aria-label="Статус героя">
@@ -149,42 +185,6 @@
             </div>
           </header>
 
-          <section class="main-log" aria-label="Журнал и чат">
-            <header class="log-header">
-              <div class="log-tabs" role="tablist">
-                <button type="button" class="log-tab is-active" data-log="combat" role="tab" aria-selected="true">Журнал боя</button>
-                <button type="button" class="log-tab" data-log="chat" role="tab" aria-selected="false">Чат</button>
-              </div>
-              <div class="log-status">
-                <span id="turn-indicator" class="status-tag">Ваш ход</span>
-                <span id="stance-indicator" class="status-tag status-tag--passive">Стойка: Бастион</span>
-              </div>
-            </header>
-            <div class="log-viewport">
-              <div class="log-panel is-active" data-log="combat" role="tabpanel" aria-hidden="false">
-                <ol id="combat-log" class="log-list"></ol>
-              </div>
-              <div class="log-panel" data-log="chat" role="tabpanel" aria-hidden="true">
-                <ol id="chat-log" class="log-list log-list--chat"></ol>
-              </div>
-            </div>
-            <footer class="log-footer">
-              <form id="chat-form" class="chat-form" autocomplete="off">
-                <label class="chat-form__label" for="chat-input">Сказать:</label>
-                <input id="chat-input" name="chat" type="text" maxlength="160" placeholder="Введите сообщение" required>
-                <button type="submit" class="chat-send">Отправить</button>
-              </form>
-              <div class="command-row">
-                <button type="button" class="command-button" data-command="inventory">Инвентарь</button>
-                <button type="button" class="command-button" data-command="codex">Кодекс</button>
-                <button type="button" class="command-button" data-command="skills">Навыки</button>
-                <button type="button" class="command-button" data-command="attributes">Характеристики</button>
-                <button type="button" class="command-button" data-command="quests">Квесты</button>
-                <button type="button" class="command-button" data-command="map">Карта</button>
-                <button type="button" class="command-button" data-command="help">Помощь</button>
-              </div>
-            </footer>
-          </section>
         </div>
       </div>
 
