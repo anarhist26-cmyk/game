@@ -94,10 +94,12 @@
                 <p id="map-location">Сердце Серого Города</p>
                 <span class="panel-subtitle" id="map-coords">[07:07]</span>
               </header>
-              <div class="map-viewport">
-                <canvas id="labyrinth-canvas" width="520" height="320" aria-label="Лабиринт Империи"></canvas>
-                <div id="map-overlay" class="map-overlay" aria-hidden="true"></div>
-                <div class="map-avatar" id="map-avatar" aria-hidden="true">✢</div>
+              <div class="map-viewport" id="map-viewport">
+                <div class="map-stage" id="map-stage">
+                  <canvas id="labyrinth-canvas" width="520" height="320" aria-label="Лабиринт Империи"></canvas>
+                  <div id="map-overlay" class="map-overlay" aria-hidden="true"></div>
+                  <div class="map-avatar" id="map-avatar" aria-hidden="true">✢</div>
+                </div>
               </div>
               <div class="map-intel" id="map-intel">Главная площадь с обсидиановым монолитом. Угроза: 12.</div>
               <div class="map-controls" role="group" aria-label="Управление передвижением">

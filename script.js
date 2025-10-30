@@ -1,5 +1,7 @@
 const mapCanvas = document.getElementById('labyrinth-canvas');
 const mapContext = mapCanvas ? mapCanvas.getContext('2d') : null;
+const mapViewport = document.getElementById('map-viewport');
+const mapStage = document.getElementById('map-stage');
 const mapOverlay = document.getElementById('map-overlay');
 const mapAvatar = document.getElementById('map-avatar');
 const mapIntel = document.getElementById('map-intel');
@@ -3515,10 +3517,66 @@ const mapState = {
   current: null
 };
 
+const mapView = {
+  offsetX: 0,
+  offsetY: 0,
+  dragging: false,
+  pointerId: null,
+  startX: 0,
+  startY: 0,
+  startOffsetX: 0,
+  startOffsetY: 0
+};
+
 const mapConfig = {
   cols: 15,
   rows: 11
 };
+
+function applyMapTransform() {
+  if (!mapStage) return;
+  mapStage.style.transform = `translate3d(${mapView.offsetX}px, ${mapView.offsetY}px, 0)`;
+}
+
+function getMapScale() {
+  if (!mapStage || !mapCanvas) {
+    return { x: 1, y: 1 };
+  }
+  const baseWidth = mapCanvas.width || 1;
+  const baseHeight = mapCanvas.height || 1;
+  const stageWidth = mapStage.offsetWidth || baseWidth;
+  const stageHeight = mapStage.offsetHeight || baseHeight;
+  return {
+    x: stageWidth / baseWidth,
+    y: stageHeight / baseHeight
+  };
+}
+
+function centerMapOnNode(node) {
+  if (!node || !mapViewport) return;
+  const { x, y } = gridToPixel(node.x, node.y);
+  const scale = getMapScale();
+  const viewportWidth = mapViewport.clientWidth || 0;
+  const viewportHeight = mapViewport.clientHeight || 0;
+  const targetX = x * scale.x;
+  const targetY = y * scale.y;
+  mapView.offsetX = Math.round((viewportWidth / 2) - targetX);
+  mapView.offsetY = Math.round((viewportHeight / 2) - targetY);
+  applyMapTransform();
+}
+
+function centerMapOnCurrent() {
+  if (mapState.current) {
+    centerMapOnNode(mapState.current);
+  } else {
+    const origin = mapState.nodes.get('7,5');
+    if (origin) {
+      centerMapOnNode(origin);
+    }
+  }
+}
+
+applyMapTransform();
 
 function ensureNode(x, y) {
   const key = `${x},${y}`;
@@ -4713,16 +4771,65 @@ if (logTabs.length && logPanels.length) {
   });
 }
 
+if (mapViewport && mapStage) {
+  const endMapDrag = (event) => {
+    if (!mapView.dragging || (event && mapView.pointerId !== null && event.pointerId !== mapView.pointerId)) {
+      return;
+    }
+    mapView.dragging = false;
+    mapViewport.classList.remove('is-dragging');
+    if (mapView.pointerId !== null) {
+      try {
+        mapViewport.releasePointerCapture(mapView.pointerId);
+      } catch (error) {
+        // Ignore browsers that do not support releasePointerCapture on this element
+      }
+    }
+    mapView.pointerId = null;
+  };
+
+  mapViewport.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    if (event.target.closest('.map-node')) return;
+    mapView.dragging = true;
+    mapView.pointerId = event.pointerId;
+    mapView.startX = event.clientX;
+    mapView.startY = event.clientY;
+    mapView.startOffsetX = mapView.offsetX;
+    mapView.startOffsetY = mapView.offsetY;
+    mapViewport.classList.add('is-dragging');
+    try {
+      mapViewport.setPointerCapture(event.pointerId);
+    } catch (error) {
+      // Ignore browsers that do not support setPointerCapture on this element
+    }
+    event.preventDefault();
+  });
+
+  mapViewport.addEventListener('pointermove', (event) => {
+    if (!mapView.dragging || event.pointerId !== mapView.pointerId) return;
+    const deltaX = event.clientX - mapView.startX;
+    const deltaY = event.clientY - mapView.startY;
+    mapView.offsetX = mapView.startOffsetX + deltaX;
+    mapView.offsetY = mapView.startOffsetY + deltaY;
+    applyMapTransform();
+    event.preventDefault();
+  });
+
+  mapViewport.addEventListener('pointerup', endMapDrag);
+  mapViewport.addEventListener('pointercancel', endMapDrag);
+  mapViewport.addEventListener('pointerleave', endMapDrag);
+}
+
 if (mapControls.length) {
   mapControls.forEach((button) => {
     button.addEventListener('click', () => {
-      if (!mapState.current) return;
       const direction = button.dataset.direction;
       if (direction === 'origin') {
-        const origin = mapState.nodes.get('7,5');
-        if (origin) moveToNode(origin);
+        centerMapOnCurrent();
         return;
       }
+      if (!mapState.current) return;
       const delta = {
         north: [0, -1],
         south: [0, 1],
