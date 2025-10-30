@@ -79,28 +79,6 @@
           </header>
 
           <section class="main-top" aria-label="Карта и разведданные">
-            <div class="map-panel">
-              <header class="panel-title">
-                <h2>Лестница в Небеса</h2>
-                <p id="map-location">Цитадель Алого Сумрака</p>
-                <span class="panel-subtitle" id="map-coords">[07:07]</span>
-              </header>
-              <div class="map-viewport">
-                <canvas id="labyrinth-canvas" width="420" height="280" aria-label="Лабиринт Империи"></canvas>
-                <div id="map-overlay" class="map-overlay" aria-hidden="true"></div>
-                <div class="map-avatar" id="map-avatar" aria-hidden="true">✢</div>
-              </div>
-              <div class="map-intel" id="map-intel">Центральная цитадель. Угроза: 12.</div>
-              <div class="map-controls" role="group" aria-label="Управление передвижением">
-                <button type="button" class="map-control" data-direction="north">▲</button>
-                <div class="map-control__middle">
-                  <button type="button" class="map-control" data-direction="west">◀</button>
-                  <button type="button" class="map-control map-control--origin" data-direction="origin">⦿</button>
-                  <button type="button" class="map-control" data-direction="east">▶</button>
-                </div>
-                <button type="button" class="map-control" data-direction="south">▼</button>
-              </div>
-            </div>
             <aside class="intel-panel">
               <div class="intel-section">
                 <h3>Противник</h3>
@@ -140,6 +118,28 @@
                 </div>
               </div>
             </aside>
+            <div class="map-panel">
+              <header class="panel-title">
+                <h2>Лестница в Небеса</h2>
+                <p id="map-location">Цитадель Алого Сумрака</p>
+                <span class="panel-subtitle" id="map-coords">[07:07]</span>
+              </header>
+              <div class="map-viewport">
+                <canvas id="labyrinth-canvas" width="420" height="280" aria-label="Лабиринт Империи"></canvas>
+                <div id="map-overlay" class="map-overlay" aria-hidden="true"></div>
+                <div class="map-avatar" id="map-avatar" aria-hidden="true">✢</div>
+              </div>
+              <div class="map-intel" id="map-intel">Центральная цитадель. Угроза: 12.</div>
+              <div class="map-controls" role="group" aria-label="Управление передвижением">
+                <button type="button" class="map-control" data-direction="north">▲</button>
+                <div class="map-control__middle">
+                  <button type="button" class="map-control" data-direction="west">◀</button>
+                  <button type="button" class="map-control map-control--origin" data-direction="origin">⦿</button>
+                  <button type="button" class="map-control" data-direction="east">▶</button>
+                </div>
+                <button type="button" class="map-control" data-direction="south">▼</button>
+              </div>
+            </div>
           </section>
 
           <section class="main-log" aria-label="Журнал и чат">
