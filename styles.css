@@ -81,13 +81,14 @@ html, body {
 
 .portrait-slot {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
   background: rgba(12, 16, 22, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 9px;
-  padding: 8px;
-  min-height: 96px;
+  padding: 12px 14px 28px;
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -107,32 +108,34 @@ html, body {
 }
 
 .portrait-image {
-  width: 56px;
-  height: 72px;
+  width: 70px;
+  height: 88px;
   border-radius: 6px;
   background: radial-gradient(circle at 50% 20%, #f8e8b9 0%, #b9582a 45%, #26110a 100%);
   box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
   flex-shrink: 0;
 }
 
-.portrait-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  min-width: 0;
-}
-
 .portrait-name {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 10px;
   font-family: 'Play', sans-serif;
   font-size: 0.92rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
 }
 
 .portrait-bars {
   display: grid;
   gap: 4px;
+  width: 100%;
 }
 
 .portrait-bar {
@@ -155,6 +158,12 @@ html, body {
 
 .portrait-bar--mp span {
   background: linear-gradient(90deg, #3476d2 0%, #14335e 100%);
+}
+
+.portrait-slot:hover .portrait-name,
+.portrait-slot:focus-within .portrait-name {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .client-main {
