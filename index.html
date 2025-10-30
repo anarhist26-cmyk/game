@@ -50,25 +50,23 @@
                     <span class="enemy-card__name" id="enemy-name">—</span>
                     <span class="enemy-card__level">Ур. <span id="enemy-level">—</span></span>
                   </header>
-                  <div class="enemy-card__layout">
-                    <figure class="enemy-card__portrait">
-                      <img id="enemy-avatar" src="assets/monsters/default.svg" alt="Портрет противника" />
-                    </figure>
-                    <div class="enemy-card__details">
+                  <figure class="enemy-card__portrait" tabindex="0">
+                    <img id="enemy-avatar" src="assets/monsters/default.svg" alt="Портрет противника" />
+                    <div class="enemy-card__tooltip" role="presentation">
                       <p class="enemy-card__status" id="enemy-status">Разведданные обновляются…</p>
-                      <div class="enemy-bars">
-                        <div class="resource-bar">
-                          <label>НР</label>
-                          <div class="resource-bar__track">
-                            <div class="resource-bar__value resource-bar__value--enemy" data-bar="enemy-hp" data-current="0" data-max="0" style="--value:0"></div>
-                            <span class="resource-bar__text" data-bar-text="enemy-hp">0 / 0</span>
-                          </div>
-                        </div>
-                      </div>
                       <dl class="enemy-stats">
                         <div><dt>Урон</dt><dd id="enemy-damage">—</dd></div>
                         <div><dt>Награда</dt><dd id="enemy-reward">—</dd></div>
                       </dl>
+                    </div>
+                  </figure>
+                  <div class="enemy-card__bars">
+                    <div class="resource-bar">
+                      <label>НР</label>
+                      <div class="resource-bar__track">
+                        <div class="resource-bar__value resource-bar__value--enemy" data-bar="enemy-hp" data-current="0" data-max="0" style="--value:0"></div>
+                        <span class="resource-bar__text" data-bar-text="enemy-hp">0 / 0</span>
+                      </div>
                     </div>
                   </div>
                 </div>

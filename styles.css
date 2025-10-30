@@ -507,6 +507,7 @@ html, body {
   padding: 12px;
   display: grid;
   gap: 12px;
+  align-content: start;
 }
 
 .enemy-card__header {
@@ -516,25 +517,17 @@ html, body {
   font-size: 0.95rem;
 }
 
-.enemy-card__layout {
-  display: grid;
-  grid-template-columns: 96px 1fr;
-  gap: 14px;
-  align-items: center;
-}
-
 .enemy-card__portrait {
-  width: 96px;
-  height: 96px;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 3;
   margin: 0;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.45));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.55));
+  display: block;
+  cursor: pointer;
 }
 
 .enemy-card__portrait img {
@@ -544,15 +537,36 @@ html, body {
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55));
 }
 
-.enemy-card__details {
+.enemy-card__portrait:focus {
+  outline: 2px solid rgba(206, 162, 91, 0.85);
+  outline-offset: 2px;
+}
+
+.enemy-card__tooltip {
+  position: absolute;
+  inset: 0;
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(10, 11, 16, 0.92), rgba(20, 16, 24, 0.94));
   display: grid;
   gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.enemy-card__portrait:hover .enemy-card__tooltip,
+.enemy-card__portrait:focus .enemy-card__tooltip,
+.enemy-card__portrait:focus-within .enemy-card__tooltip {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .enemy-card__status {
   font-size: 0.8rem;
   color: var(--text-dim);
-  min-height: 32px;
+  min-height: 0;
 }
 
 .enemy-stats {
@@ -567,15 +581,21 @@ html, body {
   justify-content: space-between;
 }
 
-@media (max-width: 1024px) {
-  .enemy-card__layout {
-    grid-template-columns: 80px 1fr;
-    gap: 12px;
-  }
+.enemy-card__bars {
+  display: grid;
+  gap: 4px;
+}
 
+.enemy-card__bars .resource-bar {
+  margin: 0;
+}
+
+.enemy-card__bars label {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 1024px) {
   .enemy-card__portrait {
-    width: 80px;
-    height: 80px;
     border-radius: 12px;
   }
 }
