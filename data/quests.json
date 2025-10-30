@@ -1,133 +1,192 @@
 [
   {
-    "id": "shadow_watch",
-    "name": "Тени над дозором",
-    "type": "охота",
+    "id": "plaza_cordon",
+    "name": "Кордоны площади",
+    "type": "оборона",
     "status": "active",
-    "giver": "Капитан дозора Элиан",
-    "recommendedLevel": 7,
-    "locationId": "gloomwood",
-    "summary": "В дозорном посту Сумрачного леса пропали ночные патрули. Нужно разобраться, что скрывается в тумане.",
-    "description": "Капитан Элиан просит очистить лесные тропы от теневых волков и собрать образцы их шкур для алхимиков.",
+    "giver": "Архонт Иллирий",
+    "recommendedLevel": 11,
+    "locationId": "central_plaza",
+    "summary": "Усилите посты на Сердце Серого Города и раскройте заговорщиков среди толпы.",
+    "description": "Архонт подозревает, что в торжественную процессию проникли агенты легиона. Нужно укрепить кордоны и вычислить подрывников.",
     "objectives": [
       {
-        "id": "recon_post",
-        "type": "investigate",
-        "description": "Осмотреть разрушенный дозорный пост",
-        "locationId": "gloomwood",
-        "progress": 1,
-        "required": 1
-      },
-      {
-        "id": "wolf_pack",
-        "type": "hunt",
-        "targetId": "shadow_wolf",
-        "required": 6,
-        "progress": 3
-      },
-      {
-        "id": "wolf_samples",
-        "type": "collect",
-        "targetId": "wolf_pelt",
+        "id": "torchline",
+        "type": "defend",
+        "description": "Укрепить огненные кордоны вокруг монолита",
         "required": 3,
-        "progress": 1
+        "progress": 1,
+        "locationId": "central_plaza"
+      },
+      {
+        "id": "conclave",
+        "type": "investigate",
+        "description": "Проверить слухи о тайной встрече в Зале совета",
+        "required": 1,
+        "progress": 0,
+        "locationId": "central_plaza"
       }
     ],
     "rewards": {
-      "xp": 780,
-      "gold": 220,
-      "reputation": {
-        "faction": "Дозор Сумрака",
-        "amount": 45
-      },
+      "xp": 920,
+      "gold": 240,
       "loot": [
-        { "itemId": "moon_shard", "quantity": 1, "chance": 1.0 },
-        { "itemId": "blood_vial", "quantity": 1, "chance": 0.25 }
+        {
+          "itemId": "blood_vial",
+          "quantity": 1,
+          "chance": 0.55
+        },
+        {
+          "itemId": "moon_shard",
+          "quantity": 1,
+          "chance": 0.35
+        }
       ]
     },
-    "tags": ["сюжет", "патруль"],
+    "tags": ["город", "разведка"],
+    "urgency": "высокая"
+  },
+  {
+    "id": "arcade_cleanup",
+    "name": "Ночной дозор аркад",
+    "type": "патруль",
+    "status": "available",
+    "giver": "Капитан Нарас",
+    "recommendedLevel": 10,
+    "locationId": "market_arcade",
+    "summary": "Обезвредьте диверсантов и перехватите контрабанду в Торговых аркадах.",
+    "description": "Капитан Нарас просит очистить аркады от шпионов, которые подделывают гильдейские печати и скупают запрещённые кристаллы.",
+    "objectives": [
+      {
+        "id": "smugglers",
+        "type": "defeat",
+        "description": "Обезвредить агентов легиона",
+        "required": 5,
+        "progress": 0,
+        "locationId": "market_arcade"
+      },
+      {
+        "id": "cache",
+        "type": "gather",
+        "description": "Изъять ящики с поддельными печатями",
+        "required": 3,
+        "progress": 1,
+        "locationId": "market_arcade"
+      }
+    ],
+    "rewards": {
+      "xp": 760,
+      "gold": 210,
+      "loot": [
+        {
+          "itemId": "wolf_pelt",
+          "quantity": 1,
+          "chance": 0.65
+        },
+        {
+          "itemId": "withered_root",
+          "quantity": 1,
+          "chance": 0.28
+        }
+      ]
+    },
+    "tags": ["патруль", "контрабанда"],
     "urgency": "средняя"
   },
   {
-    "id": "catacomb_echoes",
-    "name": "Эхо катакомб",
-    "type": "разведка",
-    "status": "available",
-    "giver": "Архивариус Лисандр",
+    "id": "harbor_vigil",
+    "name": "Дозор у ворот Гавани",
+    "type": "сопровождение",
+    "status": "active",
+    "giver": "Магистр пристани Селест",
     "recommendedLevel": 12,
-    "locationId": "abyssal_catacombs",
-    "summary": "Соберите хроники из Зала забытых королей и нейтрализуйте стражей некрополя.",
-    "description": "Лисандр уверен, что в Катакомбах Бездны пробудились старые заклинания. Ему нужны записи и образцы костяных талисманов.",
-    "objectives": [
-      {
-        "id": "royal_hall",
-        "type": "explore",
-        "description": "Добраться до Зала забытых королей",
-        "locationId": "abyssal_catacombs",
-        "progress": 0,
-        "required": 1
-      },
-      {
-        "id": "legionnaires",
-        "type": "hunt",
-        "targetId": "skeleton_warrior",
-        "required": 4,
-        "progress": 0
-      },
-      {
-        "id": "talismans",
-        "type": "collect",
-        "targetId": "bone_talisman",
-        "required": 2,
-        "progress": 0
-      }
-    ],
-    "rewards": {
-      "xp": 1220,
-      "gold": 360,
-      "loot": [
-        { "itemId": "ashen_scroll", "quantity": 1, "chance": 0.18 },
-        { "itemId": "cursed_relic", "quantity": 1, "chance": 0.12 }
-      ]
-    },
-    "tags": ["подземелье", "архив"]
-  },
-  {
-    "id": "ember_heart",
-    "name": "Сердце кузницы",
-    "type": "подвиг",
-    "status": "completed",
-    "giver": "Лорд-командор Каэлин",
-    "recommendedLevel": 18,
-    "locationId": "ember_forge",
-    "summary": "Сопроводите караван через Огненную кузницу и уничтожьте Угольного колосса.",
-    "description": "Вы остановили поставку оружия Легиона, проведя караван сквозь лавовые туннели и низвергнув Колосса.",
+    "locationId": "harbor_gates",
+    "summary": "Сопроводите инспекторов через доки и отразите ночные налёты из каналов.",
+    "description": "Селест сообщает, что в доках появились теневые пловцы. Инспекторы должны переписать грузы, а вы — охранять их и зачистить каналы.",
     "objectives": [
       {
         "id": "escort",
         "type": "escort",
-        "description": "Сопроводить караван через зал угольных стражей",
-        "locationId": "ember_forge",
-        "progress": 1,
-        "required": 1
+        "description": "Провести инспекторов вдоль внутренней пристани",
+        "required": 1,
+        "progress": 0,
+        "locationId": "harbor_gates"
       },
       {
-        "id": "colossus",
+        "id": "lurkers",
         "type": "defeat",
-        "targetId": "ember_colossus",
-        "required": 1,
-        "progress": 1
+        "targetId": "gloom_stalker",
+        "description": "Уничтожить теневых пловцов в каналах",
+        "required": 4,
+        "progress": 1,
+        "locationId": "harbor_gates"
       }
     ],
     "rewards": {
-      "xp": 1840,
-      "gold": 540,
+      "xp": 1020,
+      "gold": 320,
       "loot": [
-        { "itemId": "ember_core", "quantity": 1, "chance": 1.0 },
-        { "itemId": "iron_fang", "quantity": 1, "chance": 0.5 }
+        {
+          "itemId": "iron_fang",
+          "quantity": 1,
+          "chance": 0.6
+        },
+        {
+          "itemId": "ember_core",
+          "quantity": 1,
+          "chance": 0.22
+        }
       ]
     },
-    "tags": ["легендарный", "история"],
+    "tags": ["сопровождение", "доки"],
+    "urgency": "средняя"
+  },
+  {
+    "id": "bastion_drills",
+    "name": "Учения бастиона",
+    "type": "операция",
+    "status": "completed",
+    "giver": "Лорд-командор Каэлин",
+    "recommendedLevel": 15,
+    "locationId": "wardens_bastion",
+    "summary": "Поддержите учения гарнизона и остановите испорченную осадную машину.",
+    "description": "На учениях одна из баллист вышла из-под контроля. Ваша задача — помочь гарнизону удержать стены и перехватить раскалённые заряды.",
+    "objectives": [
+      {
+        "id": "drill",
+        "type": "defend",
+        "description": "Удержать три сигнальных костра",
+        "required": 3,
+        "progress": 3,
+        "locationId": "wardens_bastion"
+      },
+      {
+        "id": "ballista",
+        "type": "defeat",
+        "targetId": "blood_sentinel",
+        "description": "Обезвредить одержимого стража у баллисты",
+        "required": 1,
+        "progress": 1,
+        "locationId": "wardens_bastion"
+      }
+    ],
+    "rewards": {
+      "xp": 1280,
+      "gold": 410,
+      "loot": [
+        {
+          "itemId": "cursed_relic",
+          "quantity": 1,
+          "chance": 0.6
+        },
+        {
+          "itemId": "blood_vial",
+          "quantity": 2,
+          "chance": 0.75
+        }
+      ]
+    },
+    "tags": ["гарнизон", "операция"],
     "urgency": "низкая"
   }
 ]

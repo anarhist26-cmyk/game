@@ -84,10 +84,185 @@ const gameData = {
   loot: new Map(),
   monsters: [],
   monsterIndex: new Map(),
-  locations: [],
-  locationIndex: new Map(),
-  quests: [],
-  questIndex: new Map(),
+  locations: [
+    {
+      id: 'central_plaza',
+      name: 'Сердце Серого Города',
+      sector: 'Центральная площадь',
+      levelRange: [10, 12],
+      type: 'город',
+      threatRating: 3,
+      description: 'Главная площадь города сияет обсидиановыми плитами и золотыми факелами, однако патрули сообщают о тенях в арках.',
+      pointsOfInterest: ['Обсидиановый монолит', 'Зал совета', 'Фонтан памяти'],
+      encounters: ['blood_sentinel', 'shadow_wolf'],
+      travelEvents: [
+        { type: 'парад', description: 'Стража устраивает строевой марш, временно усиливая защиту площади.', dangerLevel: 2 },
+        { type: 'тайная сделка', description: 'Контрабандисты предлагают сведения в обмен на редкие трофеи.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'market_arcade',
+      name: 'Торговые аркады',
+      sector: 'Западные ряды',
+      levelRange: [9, 11],
+      type: 'город',
+      threatRating: 3,
+      description: 'Закрытые лавки, шатры и гул толпы скрывают карманников и агентов легиона.',
+      pointsOfInterest: ['Базар зеркальных масок', 'Хранилище гильдии', 'Переход к подземному тракту'],
+      encounters: ['rootbound_hag', 'shadow_wolf'],
+      travelEvents: [
+        { type: 'схватка', description: 'Охранники ловят диверсанта, схватка грозит перерасти в уличный бой.', dangerLevel: 3 },
+        { type: 'распродажа', description: 'Купцы сбывают артефакты по бросовой цене, но покупка привлекает внимание шпионов.', dangerLevel: 2 }
+      ]
+    },
+    {
+      id: 'noble_heights',
+      name: 'Высоты Домов',
+      sector: 'Северные террасы',
+      levelRange: [12, 15],
+      type: 'город',
+      threatRating: 4,
+      description: 'Особняки возвышаются над городом, но каждый балкон скрывает наблюдателей и баллисты.',
+      pointsOfInterest: ['Академия тактики', 'Сад лунного камня', 'Наблюдательная башня'],
+      encounters: ['blood_sentinel', 'gloom_stalker'],
+      travelEvents: [
+        { type: 'бал', description: 'Приглашение на тайный приём сулит союзников или засаду дворянских стражей.', dangerLevel: 3 },
+        { type: 'возгорание', description: 'Пламя вспыхивает на балконе, и приходится спасать архивы тактики.', dangerLevel: 4 }
+      ]
+    },
+    {
+      id: 'wardens_bastion',
+      name: 'Бастион Стражей',
+      sector: 'Восточные стены',
+      levelRange: [13, 17],
+      type: 'город',
+      threatRating: 4,
+      description: 'Казармы и арсеналы подступают к стене, и каждую ночь слышны тревожные колокола.',
+      pointsOfInterest: ['Оружейный двор', 'Зал сигнальных костров', 'Острожная башня'],
+      encounters: ['blood_sentinel', 'ember_colossus'],
+      travelEvents: [
+        { type: 'учения', description: 'Гарнизон проводит боевые учения, требуя помощи в отражении внезапного прорыва.', dangerLevel: 3 },
+        { type: 'артиллерийский залп', description: 'Балиста выходит из строя и грозит обрушить стену, нужен быстрый ремонт.', dangerLevel: 4 }
+      ]
+    },
+    {
+      id: 'harbor_gates',
+      name: 'Врата Гавани',
+      sector: 'Южные доки',
+      levelRange: [11, 14],
+      type: 'город',
+      threatRating: 4,
+      description: 'Каналы и доки освещены фонарями, но в воде прячутся шпионы и контрабандисты.',
+      pointsOfInterest: ['Смотровой мол', 'Склад эфира', 'Внутренняя пристань'],
+      encounters: ['gloom_stalker', 'grave_titan'],
+      travelEvents: [
+        { type: 'контрабанда', description: 'Шлюпка без огней пытается прошмыгнуть через ворота, предлагая запрещённые артефакты.', dangerLevel: 3 },
+        { type: 'буря', description: 'Прибрежный шквал грозит затопить склады, нужна срочная эвакуация грузов.', dangerLevel: 4 }
+      ]
+    }
+  ],
+  quests: [
+    {
+      id: 'plaza_cordon',
+      name: 'Кордоны площади',
+      type: 'оборона',
+      status: 'active',
+      giver: 'Архонт Иллирий',
+      recommendedLevel: 11,
+      locationId: 'central_plaza',
+      summary: 'Усилите посты на Сердце Серого Города и раскройте заговорщиков среди толпы.',
+      description: 'Архонт подозревает, что в торжественную процессию проникли агенты легиона. Нужно укрепить кордоны и вычислить подрывников.',
+      objectives: [
+        { id: 'torchline', type: 'defend', description: 'Укрепить огненные кордоны вокруг монолита', required: 3, progress: 1, locationId: 'central_plaza' },
+        { id: 'conclave', type: 'investigate', description: 'Проверить слухи о тайной встрече в Зале совета', required: 1, progress: 0, locationId: 'central_plaza' }
+      ],
+      rewards: {
+        xp: 920,
+        gold: 240,
+        loot: [
+          { itemId: 'blood_vial', quantity: 1, chance: 0.55 },
+          { itemId: 'moon_shard', quantity: 1, chance: 0.35 }
+        ]
+      },
+      tags: ['город', 'разведка'],
+      urgency: 'высокая'
+    },
+    {
+      id: 'arcade_cleanup',
+      name: 'Ночной дозор аркад',
+      type: 'патруль',
+      status: 'available',
+      giver: 'Капитан Нарас',
+      recommendedLevel: 10,
+      locationId: 'market_arcade',
+      summary: 'Обезвредьте диверсантов и перехватите контрабанду в Торговых аркадах.',
+      description: 'Капитан Нарас просит очистить аркады от шпионов, которые подделывают гильдейские печати и скупают запрещённые кристаллы.',
+      objectives: [
+        { id: 'smugglers', type: 'defeat', description: 'Обезвредить агентов легиона', required: 5, progress: 0, locationId: 'market_arcade' },
+        { id: 'cache', type: 'gather', description: 'Изъять ящики с поддельными печатями', required: 3, progress: 1, locationId: 'market_arcade' }
+      ],
+      rewards: {
+        xp: 760,
+        gold: 210,
+        loot: [
+          { itemId: 'wolf_pelt', quantity: 1, chance: 0.65 },
+          { itemId: 'withered_root', quantity: 1, chance: 0.28 }
+        ]
+      },
+      tags: ['патруль', 'контрабанда'],
+      urgency: 'средняя'
+    },
+    {
+      id: 'harbor_vigil',
+      name: 'Дозор у ворот Гавани',
+      type: 'сопровождение',
+      status: 'active',
+      giver: 'Магистр пристани Селест',
+      recommendedLevel: 12,
+      locationId: 'harbor_gates',
+      summary: 'Сопроводите инспекторов через доки и отразите ночные налёты из каналов.',
+      description: 'Селест сообщает, что в доках появились теневые пловцы. Инспекторы должны переписать грузы, а вы — охранять их и зачистить каналы.',
+      objectives: [
+        { id: 'escort', type: 'escort', description: 'Провести инспекторов вдоль внутренней пристани', required: 1, progress: 0, locationId: 'harbor_gates' },
+        { id: 'lurkers', type: 'defeat', targetId: 'gloom_stalker', description: 'Уничтожить теневых пловцов в каналах', required: 4, progress: 1, locationId: 'harbor_gates' }
+      ],
+      rewards: {
+        xp: 1020,
+        gold: 320,
+        loot: [
+          { itemId: 'iron_fang', quantity: 1, chance: 0.6 },
+          { itemId: 'ember_core', quantity: 1, chance: 0.22 }
+        ]
+      },
+      tags: ['сопровождение', 'доки'],
+      urgency: 'средняя'
+    },
+    {
+      id: 'bastion_drills',
+      name: 'Учения бастиона',
+      type: 'операция',
+      status: 'completed',
+      giver: 'Лорд-командор Каэлин',
+      recommendedLevel: 15,
+      locationId: 'wardens_bastion',
+      summary: 'Поддержите учения гарнизона и остановите испорченную осадную машину.',
+      description: 'На учениях одна из баллист вышла из-под контроля. Ваша задача — помочь гарнизону удержать стены и перехватить раскалённые заряды.',
+      objectives: [
+        { id: 'drill', type: 'defend', description: 'Удержать три сигнальных костра', required: 3, progress: 3, locationId: 'wardens_bastion' },
+        { id: 'ballista', type: 'defeat', targetId: 'blood_sentinel', description: 'Обезвредить одержимого стража у баллисты', required: 1, progress: 1, locationId: 'wardens_bastion' }
+      ],
+      rewards: {
+        xp: 1280,
+        gold: 410,
+        loot: [
+          { itemId: 'cursed_relic', quantity: 1, chance: 0.6 },
+          { itemId: 'blood_vial', quantity: 2, chance: 0.75 }
+        ]
+      },
+      tags: ['гарнизон', 'операция'],
+      urgency: 'низкая'
+    }
+  ],
   skills: [],
   allSkills: [],
   skillIndex: new Map(),
@@ -478,142 +653,180 @@ const fallbackCatalogs = {
   ],
   locations: [
     {
-      id: 'gloomwood',
-      name: 'Сумрачный лес',
-      sector: 'Северные рубежи',
-      levelRange: [5, 8],
-      type: 'дикие земли',
-      threatRating: 2,
-      description: 'Туманные чащи и алтарь Лунного ветра скрывают следы волчьих стай.',
-      pointsOfInterest: ['Логово теневых волков', 'Разрушенный дозорный пост', 'Алтарь Лунного ветра'],
-      encounters: ['shadow_wolf', 'rootbound_hag'],
+      id: 'central_plaza',
+      name: 'Сердце Серого Города',
+      sector: 'Центральная площадь',
+      levelRange: [10, 12],
+      type: 'город',
+      threatRating: 3,
+      description: 'Главная площадь города сияет обсидиановыми плитами и золотыми факелами, однако патрули сообщают о тенях в арках.',
+      pointsOfInterest: ['Обсидиановый монолит', 'Зал совета', 'Фонтан памяти'],
+      encounters: ['blood_sentinel', 'shadow_wolf'],
       travelEvents: [
-        { type: 'засада', description: 'Стая волков пытается окружить отряд.', dangerLevel: 3 },
-        { type: 'обнаружение', description: 'Следы ведьминского ритуала ведут в чащу.', dangerLevel: 2 }
+        { type: 'парад', description: 'Стража устраивает строевой марш, временно усиливая защиту площади.', dangerLevel: 2 },
+        { type: 'тайная сделка', description: 'Контрабандисты предлагают сведения в обмен на редкие трофеи.', dangerLevel: 3 }
       ]
     },
     {
-      id: 'abyssal_catacombs',
-      name: 'Катакомбы Бездны',
-      sector: 'Подземный шов',
-      levelRange: [10, 14],
-      type: 'подземелье',
+      id: 'market_arcade',
+      name: 'Торговые аркады',
+      sector: 'Западные ряды',
+      levelRange: [9, 11],
+      type: 'город',
+      threatRating: 3,
+      description: 'Закрытые лавки, шатры и гул толпы скрывают карманников и агентов легиона.',
+      pointsOfInterest: ['Базар зеркальных масок', 'Хранилище гильдии', 'Переход к подземному тракту'],
+      encounters: ['rootbound_hag', 'shadow_wolf'],
+      travelEvents: [
+        { type: 'схватка', description: 'Охранники ловят диверсанта, схватка грозит перерасти в уличный бой.', dangerLevel: 3 },
+        { type: 'распродажа', description: 'Купцы сбывают артефакты по бросовой цене, но покупка привлекает внимание шпионов.', dangerLevel: 2 }
+      ]
+    },
+    {
+      id: 'noble_heights',
+      name: 'Высоты Домов',
+      sector: 'Северные террасы',
+      levelRange: [12, 15],
+      type: 'город',
       threatRating: 4,
-      description: 'Тесные коридоры с эхом забытых голосов и костяными караулами.',
-      pointsOfInterest: ['Зал забытых королей', 'Провал к бездне', 'Алтарь затмения'],
-      encounters: ['skeleton_warrior', 'blood_sentinel'],
+      description: 'Особняки возвышаются над городом, но каждый балкон скрывает наблюдателей и баллисты.',
+      pointsOfInterest: ['Академия тактики', 'Сад лунного камня', 'Наблюдательная башня'],
+      encounters: ['blood_sentinel', 'gloom_stalker'],
       travelEvents: [
-        { type: 'голос бездны', description: 'Шёпот обещает силу в обмен на кровь.', dangerLevel: 4 },
-        { type: 'коллапс', description: 'Потолок осыпается и перекрывает путь.', dangerLevel: 3 }
+        { type: 'бал', description: 'Приглашение на тайный приём сулит союзников или засаду дворянских стражей.', dangerLevel: 3 },
+        { type: 'возгорание', description: 'Пламя вспыхивает на балконе, и приходится спасать архивы тактики.', dangerLevel: 4 }
       ]
     },
     {
-      id: 'ember_forge',
-      name: 'Огненная кузница',
-      sector: 'Вулканический хребет',
-      levelRange: [16, 20],
-      type: 'цитадель',
-      threatRating: 5,
-      description: 'Гул горнов и лавовые реки питают оружейные цеха легиона.',
-      pointsOfInterest: ['Зал угольных стражей', 'Жертвенный горн', 'Хранилище жароперстов'],
-      encounters: ['ember_colossus', 'blood_sentinel'],
-      travelEvents: [
-        { type: 'жаркое дыхание', description: 'Поток раскалённого воздуха обжигает броню.', dangerLevel: 4 },
-        { type: 'лазутчик', description: 'Шпион предлагает обменять добычу на сведения.', dangerLevel: 2 }
-      ]
-    },
-    {
-      id: 'noctus_expanse',
-      name: 'Пределы Ноктуса',
-      sector: 'Пограничная пустошь',
-      levelRange: [20, 24],
-      type: 'пустошь',
-      threatRating: 5,
-      description: 'Багровые вихри и руины титанов скрывают патрули легиона.',
-      pointsOfInterest: ['Караульная башня', 'Ритуальный кратер', 'Колыбель титанов'],
+      id: 'wardens_bastion',
+      name: 'Бастион Стражей',
+      sector: 'Восточные стены',
+      levelRange: [13, 17],
+      type: 'город',
+      threatRating: 4,
+      description: 'Казармы и арсеналы подступают к стене, и каждую ночь слышны тревожные колокола.',
+      pointsOfInterest: ['Оружейный двор', 'Зал сигнальных костров', 'Острожная башня'],
       encounters: ['blood_sentinel', 'ember_colossus'],
       travelEvents: [
-    { type: 'кровавый шторм', description: 'Алые искры усиливают ярость монстров.', dangerLevel: 5 },
-    { type: 'призрачный караван', description: 'Торговцы призраки предлагают сделки.', dangerLevel: 3 }
+        { type: 'учения', description: 'Гарнизон проводит боевые учения, требуя помощи в отражении внезапного прорыва.', dangerLevel: 3 },
+        { type: 'артиллерийский залп', description: 'Балиста выходит из строя и грозит обрушить стену, нужен быстрый ремонт.', dangerLevel: 4 }
+      ]
+    },
+    {
+      id: 'harbor_gates',
+      name: 'Врата Гавани',
+      sector: 'Южные доки',
+      levelRange: [11, 14],
+      type: 'город',
+      threatRating: 4,
+      description: 'Каналы и доки освещены фонарями, но в воде прячутся шпионы и контрабандисты.',
+      pointsOfInterest: ['Смотровой мол', 'Склад эфира', 'Внутренняя пристань'],
+      encounters: ['gloom_stalker', 'grave_titan'],
+      travelEvents: [
+        { type: 'контрабанда', description: 'Шлюпка без огней пытается прошмыгнуть через ворота, предлагая запрещённые артефакты.', dangerLevel: 3 },
+        { type: 'буря', description: 'Прибрежный шквал грозит затопить склады, нужна срочная эвакуация грузов.', dangerLevel: 4 }
       ]
     }
   ],
   quests: [
     {
-      id: 'shadow_watch',
-      name: 'Тени над дозором',
-      type: 'охота',
+      id: 'plaza_cordon',
+      name: 'Кордоны площади',
+      type: 'оборона',
       status: 'active',
-      giver: 'Капитан дозора Элиан',
-      recommendedLevel: 7,
-      locationId: 'gloomwood',
-      summary: 'Расследуйте исчезновение патрулей в туманных тропах Сумрачного леса.',
-      description: 'Элиан просит зачистить тропы от теневых волков и собрать образцы шкур для алхимиков.',
+      giver: 'Архонт Иллирий',
+      recommendedLevel: 11,
+      locationId: 'central_plaza',
+      summary: 'Усилите посты на Сердце Серого Города и раскройте заговорщиков среди толпы.',
+      description: 'Архонт подозревает, что в торжественную процессию проникли агенты легиона. Нужно укрепить кордоны и вычислить подрывников.',
       objectives: [
-        { id: 'recon_post', type: 'investigate', description: 'Осмотреть разрушенный дозорный пост', locationId: 'gloomwood', required: 1, progress: 1 },
-        { id: 'wolf_pack', type: 'hunt', targetId: 'shadow_wolf', required: 6, progress: 3 },
-        { id: 'wolf_samples', type: 'collect', targetId: 'wolf_pelt', required: 3, progress: 1 }
+        { id: 'torchline', type: 'defend', description: 'Укрепить огненные кордоны вокруг монолита', required: 3, progress: 1, locationId: 'central_plaza' },
+        { id: 'conclave', type: 'investigate', description: 'Проверить слухи о тайной встрече в Зале совета', required: 1, progress: 0, locationId: 'central_plaza' }
       ],
       rewards: {
-        xp: 780,
-        gold: 220,
-        reputation: { faction: 'Дозор Сумрака', amount: 45 },
+        xp: 920,
+        gold: 240,
         loot: [
-          { itemId: 'moon_shard', quantity: 1, chance: 1 },
-          { itemId: 'blood_vial', quantity: 1, chance: 0.25 }
+          { itemId: 'blood_vial', quantity: 1, chance: 0.55 },
+          { itemId: 'moon_shard', quantity: 1, chance: 0.35 }
         ]
       },
-      tags: ['сюжет', 'патруль'],
+      tags: ['город', 'разведка'],
+      urgency: 'высокая'
+    },
+    {
+      id: 'arcade_cleanup',
+      name: 'Ночной дозор аркад',
+      type: 'патруль',
+      status: 'available',
+      giver: 'Капитан Нарас',
+      recommendedLevel: 10,
+      locationId: 'market_arcade',
+      summary: 'Обезвредьте диверсантов и перехватите контрабанду в Торговых аркадах.',
+      description: 'Капитан Нарас просит очистить аркады от шпионов, которые подделывают гильдейские печати и скупают запрещённые кристаллы.',
+      objectives: [
+        { id: 'smugglers', type: 'defeat', description: 'Обезвредить агентов легиона', required: 5, progress: 0, locationId: 'market_arcade' },
+        { id: 'cache', type: 'gather', description: 'Изъять ящики с поддельными печатями', required: 3, progress: 1, locationId: 'market_arcade' }
+      ],
+      rewards: {
+        xp: 760,
+        gold: 210,
+        loot: [
+          { itemId: 'wolf_pelt', quantity: 1, chance: 0.65 },
+          { itemId: 'withered_root', quantity: 1, chance: 0.28 }
+        ]
+      },
+      tags: ['патруль', 'контрабанда'],
       urgency: 'средняя'
     },
     {
-      id: 'catacomb_echoes',
-      name: 'Эхо катакомб',
-      type: 'разведка',
-      status: 'available',
-      giver: 'Архивариус Лисандр',
+      id: 'harbor_vigil',
+      name: 'Дозор у ворот Гавани',
+      type: 'сопровождение',
+      status: 'active',
+      giver: 'Магистр пристани Селест',
       recommendedLevel: 12,
-      locationId: 'abyssal_catacombs',
-      summary: 'Соберите хроники из зала забытых королей и подавите костяных стражей.',
-      description: 'Лисандру нужны записи и костяные талисманы, чтобы закрыть порталы некрополя.',
+      locationId: 'harbor_gates',
+      summary: 'Сопроводите инспекторов через доки и отразите ночные налёты из каналов.',
+      description: 'Селест сообщает, что в доках появились теневые пловцы. Инспекторы должны переписать грузы, а вы — охранять их и зачистить каналы.',
       objectives: [
-        { id: 'royal_hall', type: 'explore', description: 'Добраться до Зала забытых королей', locationId: 'abyssal_catacombs', required: 1, progress: 0 },
-        { id: 'legionnaires', type: 'hunt', targetId: 'skeleton_warrior', required: 4, progress: 0 },
-        { id: 'talismans', type: 'collect', targetId: 'bone_talisman', required: 2, progress: 0 }
+        { id: 'escort', type: 'escort', description: 'Провести инспекторов вдоль внутренней пристани', required: 1, progress: 0, locationId: 'harbor_gates' },
+        { id: 'lurkers', type: 'defeat', targetId: 'gloom_stalker', description: 'Уничтожить теневых пловцов в каналах', required: 4, progress: 1, locationId: 'harbor_gates' }
       ],
       rewards: {
-        xp: 1220,
-        gold: 360,
+        xp: 1020,
+        gold: 320,
         loot: [
-          { itemId: 'ashen_scroll', quantity: 1, chance: 0.18 },
-          { itemId: 'cursed_relic', quantity: 1, chance: 0.12 }
+          { itemId: 'iron_fang', quantity: 1, chance: 0.6 },
+          { itemId: 'ember_core', quantity: 1, chance: 0.22 }
         ]
       },
-      tags: ['подземелье', 'архив']
+      tags: ['сопровождение', 'доки'],
+      urgency: 'средняя'
     },
     {
-      id: 'ember_heart',
-      name: 'Сердце кузницы',
-      type: 'подвиг',
+      id: 'bastion_drills',
+      name: 'Учения бастиона',
+      type: 'операция',
       status: 'completed',
       giver: 'Лорд-командор Каэлин',
-      recommendedLevel: 18,
-      locationId: 'ember_forge',
-      summary: 'Сопроводите караван через Огненную кузницу и повергните угольного колосса.',
-      description: 'Караван доставил реликвии, а колосс был низвергнут в лаву — поставки легиона сорваны.',
+      recommendedLevel: 15,
+      locationId: 'wardens_bastion',
+      summary: 'Поддержите учения гарнизона и остановите испорченную осадную машину.',
+      description: 'На учениях одна из баллист вышла из-под контроля. Ваша задача — помочь гарнизону удержать стены и перехватить раскалённые заряды.',
       objectives: [
-        { id: 'escort', type: 'escort', description: 'Сопроводить караван через зал угольных стражей', locationId: 'ember_forge', required: 1, progress: 1 },
-        { id: 'colossus', type: 'defeat', targetId: 'ember_colossus', required: 1, progress: 1 }
+        { id: 'drill', type: 'defend', description: 'Удержать три сигнальных костра', required: 3, progress: 3, locationId: 'wardens_bastion' },
+        { id: 'ballista', type: 'defeat', targetId: 'blood_sentinel', description: 'Обезвредить одержимого стража у баллисты', required: 1, progress: 1, locationId: 'wardens_bastion' }
       ],
       rewards: {
-        xp: 1840,
-        gold: 540,
+        xp: 1280,
+        gold: 410,
         loot: [
-          { itemId: 'ember_core', quantity: 1, chance: 1 },
-          { itemId: 'iron_fang', quantity: 1, chance: 0.5 }
+          { itemId: 'cursed_relic', quantity: 1, chance: 0.6 },
+          { itemId: 'blood_vial', quantity: 2, chance: 0.75 }
         ]
       },
-      tags: ['легендарный', 'история'],
+      tags: ['гарнизон', 'операция'],
       urgency: 'низкая'
     }
   ],
@@ -3296,8 +3509,8 @@ const mapState = {
 };
 
 const mapConfig = {
-  cols: 13,
-  rows: 9
+  cols: 15,
+  rows: 11
 };
 
 function ensureNode(x, y) {
@@ -3324,76 +3537,187 @@ function ensureNode(x, y) {
 function buildLabyrinth() {
   mapState.nodes.clear();
 
-  const segments = [
-    [[6, 4], [6, 3], [6, 2], [6, 1]],
-    [[6, 4], [6, 5], [6, 6], [6, 7]],
-    [[6, 5], [5, 5], [4, 5], [3, 5], [2, 5]],
-    [[3, 6], [3, 7], [3, 8]],
-    [[6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4]],
-    [[9, 4], [9, 5], [9, 6], [9, 7]],
-    [[8, 4], [8, 3], [8, 2]],
-    [[6, 6], [7, 6], [8, 6], [8, 7], [8, 8]],
-    [[5, 6], [5, 7], [4, 7]],
-    [[7, 4], [7, 5], [7, 6]],
-    [[5, 5], [5, 4], [4, 4]]
+  const addPath = (path) => {
+    path.forEach(([x, y]) => ensureNode(x, y));
+  };
+
+  const streetPaths = [
+    [[7, 5], [7, 4], [7, 3], [7, 2], [7, 1], [7, 0]],
+    [[7, 5], [7, 6], [7, 7], [7, 8], [7, 9], [7, 10]],
+    [[7, 5], [6, 5], [5, 5], [4, 5], [3, 5], [2, 5], [1, 5], [0, 5]],
+    [[7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5]],
+    [[5, 4], [6, 4], [7, 4], [8, 4], [9, 4]],
+    [[5, 6], [6, 6], [7, 6], [8, 6], [9, 6]],
+    [[5, 4], [5, 5], [5, 6], [5, 7], [5, 8]],
+    [[9, 4], [9, 5], [9, 6], [9, 7], [9, 8]],
+    [[4, 5], [4, 4], [4, 3], [3, 3], [2, 3], [1, 3]],
+    [[3, 5], [3, 4], [3, 3], [3, 2]],
+    [[3, 5], [3, 6], [3, 7], [3, 8]],
+    [[2, 5], [2, 4], [2, 6], [2, 7], [2, 8]],
+    [[1, 5], [1, 6], [1, 7], [1, 8]],
+    [[5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2]],
+    [[6, 1], [7, 1], [8, 1], [9, 1]],
+    [[8, 2], [8, 1], [8, 0]],
+    [[6, 3], [6, 2], [6, 1]],
+    [[10, 2], [10, 3], [10, 4], [10, 5]],
+    [[11, 5], [11, 6], [11, 7], [11, 8], [11, 9], [11, 10]],
+    [[12, 5], [12, 6], [12, 7], [12, 8], [12, 9], [12, 10]],
+    [[13, 5], [13, 6], [13, 7], [13, 8], [13, 9]],
+    [[7, 7], [6, 7], [5, 7], [4, 7], [3, 7]],
+    [[7, 8], [6, 8], [5, 8], [4, 8], [3, 8]],
+    [[7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [14, 8]],
+    [[7, 9], [8, 9], [9, 9], [10, 9], [11, 9]],
+    [[7, 10], [8, 10], [9, 10], [10, 10]],
+    [[4, 8], [4, 9], [4, 10]],
+    [[0, 5], [0, 6], [0, 7], [0, 8]],
+    [[14, 5], [14, 6], [14, 7], [14, 8]],
+    [[9, 3], [8, 3], [7, 3], [6, 3], [5, 3]],
+    [[6, 6], [6, 7], [6, 8]],
+    [[8, 6], [8, 7], [8, 8], [8, 9], [8, 10]],
+    [[10, 6], [10, 7], [10, 8]],
+    [[9, 8], [9, 9], [9, 10]],
+    [[5, 9], [6, 9], [7, 9]],
+    [[2, 8], [1, 8], [0, 8]]
   ];
 
-  segments.forEach((path) => {
-    path.forEach(([x, y]) => ensureNode(x, y));
-  });
+  streetPaths.forEach(addPath);
 
   const locationBindings = [
     {
-      id: 'gloomwood',
+      id: 'central_plaza',
       nodes: [
-        [6, 1],
-        [6, 2],
+        [7, 5],
+        [6, 5],
+        [8, 5],
+        [7, 4],
+        [7, 6],
+        [6, 4],
+        [8, 4],
+        [6, 6],
+        [8, 6],
+        [5, 5],
+        [9, 5],
         [6, 3],
-        [5, 3],
-        [7, 3]
+        [7, 3],
+        [8, 3],
+        [5, 4],
+        [5, 6],
+        [9, 4],
+        [9, 6]
       ],
-      anchor: '6,1'
+      anchor: '7,5'
     },
     {
-      id: 'abyssal_catacombs',
+      id: 'market_arcade',
       nodes: [
-        [5, 5],
         [4, 5],
         [3, 5],
         [2, 5],
+        [1, 5],
+        [0, 5],
+        [3, 4],
+        [2, 4],
+        [1, 4],
         [3, 6],
+        [2, 6],
+        [1, 6],
+        [2, 3],
+        [1, 3],
         [3, 7],
-        [3, 8]
+        [3, 8],
+        [2, 7],
+        [2, 8],
+        [1, 7],
+        [1, 8],
+        [0, 7],
+        [0, 8]
       ],
-      anchor: '3,6'
+      anchor: '2,5'
     },
     {
-      id: 'ember_forge',
+      id: 'noble_heights',
       nodes: [
-        [8, 4],
-        [9, 4],
-        [10, 4],
-        [11, 4],
-        [9, 5],
-        [9, 6],
-        [9, 7],
-        [8, 6],
-        [8, 7],
-        [8, 8]
+        [6, 2],
+        [7, 2],
+        [8, 2],
+        [9, 2],
+        [10, 2],
+        [11, 2],
+        [6, 1],
+        [7, 1],
+        [8, 1],
+        [9, 1],
+        [7, 0],
+        [8, 0],
+        [6, 3],
+        [7, 3],
+        [8, 3],
+        [9, 3],
+        [5, 2],
+        [5, 3]
       ],
-      anchor: '9,5'
+      anchor: '7,2'
     },
     {
-      id: 'noctus_expanse',
+      id: 'wardens_bastion',
       nodes: [
-        [6, 6],
+        [10, 5],
+        [11, 5],
+        [12, 5],
+        [13, 5],
+        [14, 5],
+        [11, 6],
+        [12, 6],
+        [13, 6],
+        [14, 6],
+        [11, 7],
+        [12, 7],
+        [13, 7],
+        [14, 7],
+        [11, 8],
+        [12, 8],
+        [13, 8],
+        [14, 8],
+        [12, 9],
+        [12, 10],
+        [11, 9],
+        [11, 10],
+        [13, 9]
+      ],
+      anchor: '12,6'
+    },
+    {
+      id: 'harbor_gates',
+      nodes: [
+        [7, 7],
+        [7, 8],
+        [7, 9],
+        [7, 10],
         [6, 7],
-        [5, 6],
+        [6, 8],
+        [6, 9],
         [5, 7],
+        [5, 8],
+        [5, 9],
         [4, 7],
-        [8, 7]
+        [4, 8],
+        [4, 9],
+        [4, 10],
+        [8, 8],
+        [9, 8],
+        [10, 8],
+        [11, 8],
+        [12, 8],
+        [13, 8],
+        [8, 9],
+        [9, 9],
+        [10, 9],
+        [11, 9],
+        [8, 10],
+        [9, 10],
+        [10, 10]
       ],
-      anchor: '6,7'
+      anchor: '7,8'
     }
   ];
 
@@ -3403,7 +3727,7 @@ function buildLabyrinth() {
     const [minLevel, maxLevel] = location.levelRange ?? [1, 1];
     const baseThreat = Math.round((minLevel + maxLevel) / 2 + (location.threatRating ?? 0) * 2);
     const encounterChance = Math.min(0.9, 0.24 + (location.threatRating ?? 1) * 0.1);
-    binding.nodes.forEach(([x, y]) => {
+    binding.nodes.forEach(([x, y], index) => {
       const node = ensureNode(x, y);
       const key = `${x},${y}`;
       node.locationId = binding.id;
@@ -3411,7 +3735,6 @@ function buildLabyrinth() {
       node.levelRange = location.levelRange;
       node.threat = baseThreat;
       node.encounterChance = encounterChance;
-      const index = binding.nodes.findIndex(([nx, ny]) => nx === x && ny === y);
       const poi = location.pointsOfInterest?.[index % (location.pointsOfInterest.length || 1)] ?? null;
       const travelEvent = location.travelEvents?.[index % (location.travelEvents.length || 1)] ?? null;
       node.type = key === binding.anchor ? 'stronghold' : node.type === 'treasure' ? 'treasure' : 'encounter';
@@ -3419,48 +3742,70 @@ function buildLabyrinth() {
       if (poi) intelParts.push(`Точка интереса: ${poi}.`);
       if (travelEvent?.description) intelParts.push(`Событие: ${travelEvent.description}`);
       node.intel = intelParts.join(' ');
-      node.name = key === binding.anchor ? location.name : `${location.name} · ${poi ?? 'Коридор'}`;
+      node.name = key === binding.anchor ? location.name : `${location.name} · ${poi ?? 'Квартал'}`;
     });
   });
 
-  const citadel = ensureNode(6, 4);
-  citadel.type = 'stronghold';
-  citadel.name = 'Цитадель Алого Сумрака';
-  citadel.intel = 'Центральный командный пост. Здесь планируются рейды и собираются отчёты разведки.';
-  citadel.threat = 14;
-  citadel.levelRange = [12, 14];
-  citadel.encounterChance = 0.55;
+  const plaza = ensureNode(7, 5);
+  plaza.type = 'stronghold';
+  plaza.name = 'Сердце Серого Города';
+  plaza.intel = 'Главная площадь с обсидиановым монолитом и штабом городского гарнизона.';
+  plaza.threat = 12;
+  plaza.levelRange = [10, 12];
+  plaza.encounterChance = 0.42;
 
-  const forwardBase = ensureNode(6, 5);
-  if (!forwardBase.locationId) {
-    forwardBase.type = 'encounter';
-    forwardBase.name = 'Плац нижнего яруса';
-    forwardBase.intel = 'Соединительный плац между цитаделью и внешними секторами. Гарнизон предупреждает о частых засадах.';
-    forwardBase.threat = 13;
-    forwardBase.levelRange = [11, 13];
-    forwardBase.encounterChance = 0.48;
-  }
+  const councilHall = ensureNode(6, 4);
+  councilHall.name = 'Зал совета';
+  councilHall.intel = 'В зале собираются архонты, отчёты и миссии обновляются каждый час.';
+  councilHall.encounterChance = 0.33;
 
-  const treasure = mapState.nodes.get('3,8');
-  if (treasure) {
-    treasure.type = 'treasure';
-    treasure.name = treasure.name ?? 'Зал трофеев';
-    treasure.intel = 'Древние сундуки под охраной ловушек. Здесь можно найти редкие эссенции и чертежи.';
-    treasure.encounterChance = 0.35;
-  }
+  const marketHub = ensureNode(2, 6);
+  marketHub.name = 'Караванный перекрёсток';
+  marketHub.intel = 'Через перекрёсток проходят торговые караваны, здесь часты засады карманников.';
+  marketHub.encounterChance = 0.38;
+
+  const harborCache = ensureNode(12, 8);
+  harborCache.type = 'treasure';
+  harborCache.name = 'Склад эфира';
+  harborCache.intel = 'Охраняемый склад с запечатанными кристаллами. Высокий риск налёта контрабандистов.';
+  harborCache.encounterChance = 0.41;
+
+  const northGate = ensureNode(7, 0);
+  northGate.type = 'stronghold';
+  northGate.name = 'Северные ворота';
+  northGate.intel = 'Проход к террасам знати. Стража тщательно проверяет пропуска.';
+  northGate.encounterChance = 0.28;
+
+  const westGate = ensureNode(0, 6);
+  westGate.type = 'stronghold';
+  westGate.name = 'Западная арка';
+  westGate.intel = 'Контрольный пункт торговых аркад. Охрана ищет поддельные печати.';
+  westGate.encounterChance = 0.32;
+
+  const eastGate = ensureNode(14, 6);
+  eastGate.type = 'stronghold';
+  eastGate.name = 'Бастионы Стражей';
+  eastGate.intel = 'Тяжёлые ворота бастиона. Отсюда выдвигаются манипулы стражи.';
+  eastGate.encounterChance = 0.37;
+
+  const southGate = ensureNode(7, 10);
+  southGate.type = 'stronghold';
+  southGate.name = 'Южные доки';
+  southGate.intel = 'Спуск к пристаням и каналам. Ночные рейды происходят каждую смену.';
+  southGate.encounterChance = 0.4;
 
   mapState.nodes.forEach((node) => {
     if (!node.levelRange) {
-      node.levelRange = [10, 12];
+      node.levelRange = [10, 13];
     }
     if (!node.threat) {
       node.threat = Math.round((node.levelRange[0] + node.levelRange[1]) / 2);
     }
     if (!node.encounterChance) {
-      node.encounterChance = 0.28;
+      node.encounterChance = 0.3;
     }
     if (!node.name) {
-      node.name = `Переход лабиринта [${String(node.x + 1).padStart(2, '0')}:${String(node.y + 1).padStart(2, '0')}]`;
+      node.name = `Улица [${String(node.x + 1).padStart(2, '0')}:${String(node.y + 1).padStart(2, '0')}]`;
     }
     node.neighbors = [];
   });
@@ -3499,27 +3844,110 @@ function drawMap() {
   const { width, height } = mapCanvas;
   mapContext.clearRect(0, 0, width, height);
 
+  const baseGradient = mapContext.createLinearGradient(0, 0, width, height);
+  baseGradient.addColorStop(0, '#171c27');
+  baseGradient.addColorStop(1, '#2f3345');
+  mapContext.fillStyle = baseGradient;
+  mapContext.fillRect(0, 0, width, height);
+
   const spacingX = width / (mapConfig.cols - 1);
   const spacingY = height / (mapConfig.rows - 1);
 
-  const sectorRects = [
-    { x0: 4, y0: 3, x1: 8, y1: 5, color: 'rgba(179, 15, 42, 0.16)' },
-    { x0: 5, y0: 0, x1: 7, y1: 2, color: 'rgba(63, 121, 201, 0.14)' },
-    { x0: 8, y0: 3, x1: 12, y1: 7, color: 'rgba(118, 98, 198, 0.14)' },
-    { x0: 4, y0: 5, x1: 7, y1: 8, color: 'rgba(63, 161, 104, 0.14)' },
-    { x0: 1, y0: 4, x1: 4, y1: 7, color: 'rgba(194, 119, 54, 0.14)' }
-  ];
-
-  sectorRects.forEach((rect) => {
-    const x = (rect.x0 - 0.5) * spacingX;
-    const y = (rect.y0 - 0.5) * spacingY;
-    const w = (rect.x1 - rect.x0 + 1) * spacingX;
-    const h = (rect.y1 - rect.y0 + 1) * spacingY;
-    mapContext.fillStyle = rect.color;
+  const drawRect = (x0, y0, x1, y1, color) => {
+    const x = x0 * spacingX;
+    const y = y0 * spacingY;
+    const w = (x1 - x0) * spacingX;
+    const h = (y1 - y0) * spacingY;
+    mapContext.fillStyle = color;
     mapContext.fillRect(x, y, w, h);
+  };
+
+  const districtRects = [
+    { x0: 4.2, y0: 3.2, x1: 10.2, y1: 7.1, color: 'rgba(247, 209, 140, 0.16)' },
+    { x0: 0.05, y0: 2.1, x1: 4.6, y1: 8.4, color: 'rgba(88, 122, 173, 0.18)' },
+    { x0: 4.3, y0: 0.1, x1: 11.2, y1: 3.5, color: 'rgba(102, 134, 192, 0.16)' },
+    { x0: 9.6, y0: 3.2, x1: 14.5, y1: 8.6, color: 'rgba(140, 108, 186, 0.18)' },
+    { x0: 4.0, y0: 6.1, x1: 13.8, y1: 10.8, color: 'rgba(70, 124, 154, 0.18)' }
+  ];
+  districtRects.forEach((rect) => drawRect(rect.x0, rect.y0, rect.x1, rect.y1, rect.color));
+
+  const plazaCenter = gridToPixel(7, 5);
+  const plazaRadius = Math.max(spacingX, spacingY) * 2.05;
+  mapContext.beginPath();
+  mapContext.fillStyle = 'rgba(255, 214, 150, 0.28)';
+  mapContext.arc(plazaCenter.x, plazaCenter.y, plazaRadius, 0, Math.PI * 2);
+  mapContext.fill();
+  mapContext.lineWidth = Math.max(spacingX, spacingY) * 0.18;
+  mapContext.strokeStyle = 'rgba(255, 238, 190, 0.45)';
+  mapContext.stroke();
+
+  const harbor = { x0: 8.25, y0: 7.1, x1: 14.6, y1: 10.9 };
+  const hx = harbor.x0 * spacingX;
+  const hy = harbor.y0 * spacingY;
+  const hw = (harbor.x1 - harbor.x0) * spacingX;
+  const hh = (harbor.y1 - harbor.y0) * spacingY;
+  const waterGradient = mapContext.createLinearGradient(hx, hy, hx, hy + hh);
+  waterGradient.addColorStop(0, 'rgba(38, 92, 140, 0.72)');
+  waterGradient.addColorStop(1, 'rgba(18, 54, 88, 0.88)');
+  mapContext.fillStyle = waterGradient;
+  mapContext.fillRect(hx, hy, hw, hh);
+  mapContext.fillStyle = 'rgba(196, 168, 120, 0.56)';
+  for (let i = 0; i < 4; i += 1) {
+    const px = (9 + i * 1.05) * spacingX;
+    mapContext.fillRect(px, hy - spacingY * 0.2, spacingX * 0.38, hh + spacingY * 0.6);
+  }
+
+  const buildingBlocks = [
+    { x0: 0.4, y0: 2.5, x1: 1.6, y1: 3.6 },
+    { x0: 1.8, y0: 2.2, x1: 3.2, y1: 3.6 },
+    { x0: 0.6, y0: 4.2, x1: 2.2, y1: 5.5 },
+    { x0: 0.5, y0: 6.2, x1: 2.1, y1: 7.6 },
+    { x0: 4.6, y0: 0.4, x1: 5.9, y1: 1.5 },
+    { x0: 6.2, y0: 0.35, x1: 7.7, y1: 1.4 },
+    { x0: 8.0, y0: 0.45, x1: 9.6, y1: 1.6 },
+    { x0: 10.3, y0: 2.5, x1: 11.8, y1: 3.9 },
+    { x0: 10.7, y0: 5.6, x1: 11.8, y1: 6.8 },
+    { x0: 12.3, y0: 5.5, x1: 13.7, y1: 6.9 },
+    { x0: 5.2, y0: 7.3, x1: 6.4, y1: 8.4 },
+    { x0: 9.1, y0: 8.7, x1: 10.2, y1: 9.6 }
+  ];
+  buildingBlocks.forEach((block) => {
+    const x = block.x0 * spacingX;
+    const y = block.y0 * spacingY;
+    const w = (block.x1 - block.x0) * spacingX;
+    const h = (block.y1 - block.y0) * spacingY;
+    mapContext.fillStyle = 'rgba(18, 22, 32, 0.86)';
+    mapContext.fillRect(x, y, w, h);
+    mapContext.strokeStyle = 'rgba(230, 205, 156, 0.18)';
+    mapContext.lineWidth = Math.max(spacingX, spacingY) * 0.06;
+    mapContext.strokeRect(x, y, w, h);
   });
 
-  mapContext.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  const drawRoadNetwork = (lineWidth, color) => {
+    mapContext.strokeStyle = color;
+    mapContext.lineWidth = lineWidth;
+    mapContext.lineCap = 'round';
+    mapState.nodes.forEach((node) => {
+      const { x, y } = gridToPixel(node.x, node.y);
+      node.neighbors.forEach((neighborKey) => {
+        const neighbor = mapState.nodes.get(neighborKey);
+        if (!neighbor) return;
+        if (neighbor.x < node.x || neighbor.y < node.y) return;
+        const { x: nx, y: ny } = gridToPixel(neighbor.x, neighbor.y);
+        mapContext.beginPath();
+        mapContext.moveTo(x, y);
+        mapContext.lineTo(nx, ny);
+        mapContext.stroke();
+      });
+    });
+  };
+
+  const majorWidth = Math.max(spacingX, spacingY) * 0.42;
+  drawRoadNetwork(majorWidth, 'rgba(223, 198, 146, 0.68)');
+  drawRoadNetwork(Math.max(spacingX, spacingY) * 0.14, 'rgba(46, 42, 38, 0.82)');
+  drawRoadNetwork(Math.max(spacingX, spacingY) * 0.05, 'rgba(255, 255, 255, 0.08)');
+
+  mapContext.strokeStyle = 'rgba(255, 255, 255, 0.05)';
   mapContext.lineWidth = 1;
   mapContext.beginPath();
   for (let c = 0; c < mapConfig.cols; c += 1) {
@@ -3534,23 +3962,9 @@ function drawMap() {
   }
   mapContext.stroke();
 
-  mapContext.strokeStyle = 'rgba(210, 230, 255, 0.45)';
-  mapContext.lineWidth = 3;
-  mapContext.lineCap = 'round';
-
-  mapState.nodes.forEach((node) => {
-    const { x, y } = gridToPixel(node.x, node.y);
-    node.neighbors.forEach((neighborKey) => {
-      const neighbor = mapState.nodes.get(neighborKey);
-      if (!neighbor) return;
-      if (neighbor.x < node.x || neighbor.y < node.y) return;
-      const { x: nx, y: ny } = gridToPixel(neighbor.x, neighbor.y);
-      mapContext.beginPath();
-      mapContext.moveTo(x, y);
-      mapContext.lineTo(nx, ny);
-      mapContext.stroke();
-    });
-  });
+  mapContext.strokeStyle = 'rgba(245, 214, 162, 0.3)';
+  mapContext.lineWidth = Math.max(spacingX, spacingY) * 0.08;
+  mapContext.strokeRect(spacingX * 0.35, spacingY * 0.35, width - spacingX * 0.7, height - spacingY * 0.7);
 }
 
 function renderNodes() {
@@ -4298,7 +4712,7 @@ if (mapControls.length) {
       if (!mapState.current) return;
       const direction = button.dataset.direction;
       if (direction === 'origin') {
-        const origin = mapState.nodes.get('6,4');
+        const origin = mapState.nodes.get('7,5');
         if (origin) moveToNode(origin);
         return;
       }
@@ -4348,7 +4762,7 @@ async function initializeGame() {
   drawMap();
   renderNodes();
 
-  const originNode = mapState.nodes.get('6,4') || mapState.nodes.values().next().value;
+  const originNode = mapState.nodes.get('7,5') || mapState.nodes.values().next().value;
   if (originNode) {
     updateMapState(originNode);
     spawnEnemyForThreat(originNode.threat, originNode.name, originNode.locationId);
