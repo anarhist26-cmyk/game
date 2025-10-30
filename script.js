@@ -20,7 +20,6 @@ const chatScrollButton = document.getElementById('chat-scroll-bottom');
 let chatAutoScroll = true;
 const CHAT_SCROLL_EPSILON = 6;
 let chatProgrammaticScroll = false;
-let syncChatScrollState = null;
 
 const lootList = document.getElementById('loot-list');
 const actionButtons = document.querySelectorAll('.action-button');
@@ -2145,6 +2144,49 @@ function setChatScrollButtonState(isVisible) {
   chatScrollButton.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
 }
 
+function isChatAtBottom() {
+  if (!chatLog) return true;
+  const distance = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight;
+  return distance <= CHAT_SCROLL_EPSILON;
+}
+
+function updateChatAutoScrollState() {
+  if (!chatLog) return;
+  if (chatProgrammaticScroll) return;
+  if (isChatAtBottom()) {
+    chatAutoScroll = true;
+    setChatScrollButtonState(false);
+  } else {
+    chatAutoScroll = false;
+    setChatScrollButtonState(true);
+  }
+}
+
+function scrollChatToBottom(options = {}) {
+  if (!chatLog) return;
+  chatAutoScroll = true;
+  setChatScrollButtonState(false);
+  chatProgrammaticScroll = true;
+
+  const behavior = options.behavior ?? 'auto';
+  if (typeof chatLog.scrollTo === 'function') {
+    chatLog.scrollTo({ top: chatLog.scrollHeight, behavior });
+    if (behavior === 'auto') {
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+  } else {
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  requestAnimationFrame(() => {
+    if (!isChatAtBottom()) {
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+    chatProgrammaticScroll = false;
+    updateChatAutoScrollState();
+  });
+}
+
 function appendLog(target, text) {
   if (!target) return;
   const entry = document.createElement('li');
@@ -2170,24 +2212,11 @@ function appendLog(target, text) {
 
   if (shouldAutoScroll) {
     if (isChatTarget) {
-      chatAutoScroll = true;
-      chatProgrammaticScroll = true;
-    }
-
-    if (typeof target.scrollTo === 'function') {
+      scrollChatToBottom({ behavior: 'smooth' });
+    } else if (typeof target.scrollTo === 'function') {
       target.scrollTo({ top: target.scrollHeight, behavior: 'smooth' });
     } else {
       target.scrollTop = target.scrollHeight;
-    }
-
-    if (isChatTarget) {
-      setChatScrollButtonState(false);
-      window.setTimeout(() => {
-        chatProgrammaticScroll = false;
-        if (typeof syncChatScrollState === 'function') {
-          syncChatScrollState();
-        }
-      }, 150);
     }
   } else if (isChatTarget) {
     chatAutoScroll = false;
@@ -4555,59 +4584,27 @@ if (enemyPortraitButton) {
 }
 
 if (chatLog) {
-  const isChatAtBottom = () => {
-    if (!chatLog) return true;
-    const distance = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight;
-    return distance <= CHAT_SCROLL_EPSILON;
-  };
-
-  syncChatScrollState = () => {
+  const scheduleChatStateSync = () => {
     if (chatProgrammaticScroll) return;
-    if (isChatAtBottom()) {
-      chatAutoScroll = true;
-      setChatScrollButtonState(false);
-    } else {
-      chatAutoScroll = false;
-      setChatScrollButtonState(true);
-    }
+    requestAnimationFrame(() => {
+      updateChatAutoScrollState();
+    });
   };
 
   chatLog.addEventListener('scroll', () => {
-    syncChatScrollState();
+    if (chatProgrammaticScroll) return;
+    updateChatAutoScrollState();
   });
 
-  chatLog.addEventListener(
-    'wheel',
-    () => {
-      chatProgrammaticScroll = false;
-      chatAutoScroll = false;
-      setChatScrollButtonState(true);
-    },
-    { passive: true }
-  );
+  chatLog.addEventListener('wheel', scheduleChatStateSync, { passive: true });
+  chatLog.addEventListener('touchmove', scheduleChatStateSync, { passive: true });
 
-  chatLog.addEventListener(
-    'touchmove',
-    () => {
-      chatProgrammaticScroll = false;
-      chatAutoScroll = false;
-      setChatScrollButtonState(true);
-    },
-    { passive: true }
-  );
-
-  syncChatScrollState();
+  updateChatAutoScrollState();
 }
 
 if (chatScrollButton && chatLog) {
   chatScrollButton.addEventListener('click', () => {
-    chatAutoScroll = true;
-    if (typeof chatLog.scrollTo === 'function') {
-      chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: 'smooth' });
-    } else {
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
-    setChatScrollButtonState(false);
+    scrollChatToBottom({ behavior: 'smooth' });
   });
 }
 
