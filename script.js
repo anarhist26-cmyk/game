@@ -13,6 +13,7 @@ const logTabs = document.querySelectorAll('.log-tab');
 const logPanels = document.querySelectorAll('.log-panel');
 const combatLog = document.getElementById('combat-log');
 const chatLog = document.getElementById('chat-log');
+const chatPanel = chatLog ? chatLog.closest('.log-panel') : null;
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 const chatScrollButton = document.getElementById('chat-scroll-bottom');
@@ -2145,13 +2146,17 @@ function setChatScrollButtonState(isVisible) {
 }
 
 function isChatAtBottom() {
-  if (!chatLog) return true;
-  const distance = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight;
+  const container = chatPanel ?? chatLog;
+  if (!container) return true;
+  const distance = container.scrollHeight - container.scrollTop - container.clientHeight;
   return distance <= CHAT_SCROLL_EPSILON;
 }
 
 function updateChatAutoScrollState() {
-  if (!chatLog) return;
+  if (!chatPanel && !chatLog) {
+    setChatScrollButtonState(false);
+    return;
+  }
   if (chatProgrammaticScroll) return;
   if (isChatAtBottom()) {
     chatAutoScroll = true;
@@ -2163,24 +2168,25 @@ function updateChatAutoScrollState() {
 }
 
 function scrollChatToBottom(options = {}) {
-  if (!chatLog) return;
+  const container = chatPanel ?? chatLog;
+  if (!container) return;
   chatAutoScroll = true;
   setChatScrollButtonState(false);
   chatProgrammaticScroll = true;
 
   const behavior = options.behavior ?? 'auto';
-  if (typeof chatLog.scrollTo === 'function') {
-    chatLog.scrollTo({ top: chatLog.scrollHeight, behavior });
+  if (typeof container.scrollTo === 'function') {
+    container.scrollTo({ top: container.scrollHeight, behavior });
     if (behavior === 'auto') {
-      chatLog.scrollTop = chatLog.scrollHeight;
+      container.scrollTop = container.scrollHeight;
     }
   } else {
-    chatLog.scrollTop = chatLog.scrollHeight;
+    container.scrollTop = container.scrollHeight;
   }
 
   requestAnimationFrame(() => {
     if (!isChatAtBottom()) {
-      chatLog.scrollTop = chatLog.scrollHeight;
+      container.scrollTop = container.scrollHeight;
     }
     chatProgrammaticScroll = false;
     updateChatAutoScrollState();
@@ -2207,16 +2213,17 @@ function appendLog(target, text) {
     target.removeChild(target.firstChild);
   }
 
+  const scrollContainer = target.closest('.log-panel') ?? target;
   const isChatTarget = target === chatLog;
   const shouldAutoScroll = !isChatTarget || chatAutoScroll;
 
   if (shouldAutoScroll) {
     if (isChatTarget) {
       scrollChatToBottom({ behavior: 'smooth' });
-    } else if (typeof target.scrollTo === 'function') {
-      target.scrollTo({ top: target.scrollHeight, behavior: 'smooth' });
+    } else if (typeof scrollContainer.scrollTo === 'function') {
+      scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
     } else {
-      target.scrollTop = target.scrollHeight;
+      scrollContainer.scrollTop = scrollContainer.scrollHeight;
     }
   } else if (isChatTarget) {
     chatAutoScroll = false;
@@ -4583,7 +4590,7 @@ if (enemyPortraitButton) {
   });
 }
 
-if (chatLog) {
+if (chatPanel) {
   const scheduleChatStateSync = () => {
     if (chatProgrammaticScroll) return;
     requestAnimationFrame(() => {
@@ -4591,18 +4598,18 @@ if (chatLog) {
     });
   };
 
-  chatLog.addEventListener('scroll', () => {
+  chatPanel.addEventListener('scroll', () => {
     if (chatProgrammaticScroll) return;
     updateChatAutoScrollState();
   });
 
-  chatLog.addEventListener('wheel', scheduleChatStateSync, { passive: true });
-  chatLog.addEventListener('touchmove', scheduleChatStateSync, { passive: true });
+  chatPanel.addEventListener('wheel', scheduleChatStateSync, { passive: true });
+  chatPanel.addEventListener('touchmove', scheduleChatStateSync, { passive: true });
 
   updateChatAutoScrollState();
 }
 
-if (chatScrollButton && chatLog) {
+if (chatScrollButton && (chatPanel || chatLog)) {
   chatScrollButton.addEventListener('click', () => {
     scrollChatToBottom({ behavior: 'smooth' });
   });
