@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title>Могильный титан</title>
+  <defs>
+    <linearGradient id="gt-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1119" />
+      <stop offset="100%" stop-color="#1d2330" />
+    </linearGradient>
+    <radialGradient id="gt-core" cx="50%" cy="42%" r="50%">
+      <stop offset="0%" stop-color="#7a8fa6" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#0a0d13" stop-opacity="0.1" />
+    </radialGradient>
+    <linearGradient id="gt-stone" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6f7986" />
+      <stop offset="100%" stop-color="#3b414c" />
+    </linearGradient>
+    <linearGradient id="gt-runes" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9fe0ff" />
+      <stop offset="100%" stop-color="#5fbde0" />
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#gt-bg)" rx="18" />
+  <circle cx="60" cy="50" r="40" fill="url(#gt-core)" />
+  <path d="M30 90c6-22 16-60 44-70 14-5 28-4 38 6-8 18-12 44-10 62-16-12-30-12-46 0-12 8-20 10-26 2z" fill="url(#gt-stone)" />
+  <path d="M58 38c6-6 16-10 26-8 4 1 8 4 10 6-6-1-12 1-18 6-6 6-12 8-18 6-4-1-6-4-8-10z" fill="#0f1119" opacity="0.5" />
+  <path d="M48 64h24l8 28-20 10-20-10z" fill="#4c535e" />
+  <path d="M64 54c4 0 8 4 8 8s-4 8-8 8-8-4-8-8 4-8 8-8z" fill="#9fe0ff" opacity="0.75" />
+  <path d="M42 74h8l4 24-10 6z" fill="#6f7986" />
+  <path d="M78 74h-8l-4 24 10 6z" fill="#6f7986" />
+  <path d="M44 58h32" stroke="url(#gt-runes)" stroke-width="4" stroke-linecap="round" opacity="0.6" />
+  <path d="M54 98h12" stroke="url(#gt-runes)" stroke-width="3" stroke-linecap="round" opacity="0.6" />
+</svg>

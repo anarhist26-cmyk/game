@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title>Корневая ведьма</title>
+  <defs>
+    <linearGradient id="hag-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#102414" />
+      <stop offset="100%" stop-color="#1f3a21" />
+    </linearGradient>
+    <radialGradient id="hag-glow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#7ed957" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#0f2a16" stop-opacity="0.1" />
+    </radialGradient>
+    <linearGradient id="hag-robes" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4f7a3a" />
+      <stop offset="100%" stop-color="#2e5225" />
+    </linearGradient>
+    <linearGradient id="hag-mask" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d9ffbf" />
+      <stop offset="100%" stop-color="#8bb579" />
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#hag-bg)" rx="18" />
+  <circle cx="60" cy="50" r="40" fill="url(#hag-glow)" />
+  <path d="M32 88c4-16 10-42 26-56 12-10 26-12 40-6-8 14-10 32-8 48-14-10-26-8-38 4-8 8-14 10-20 10z" fill="url(#hag-robes)" />
+  <path d="M56 34c6-6 16-8 24-4 4 2 8 6 10 10-6-2-12 0-18 4-6 4-12 6-18 2-4-2-6-6-8-12z" fill="#0f2a16" opacity="0.6" />
+  <ellipse cx="66" cy="56" rx="12" ry="16" fill="url(#hag-mask)" />
+  <circle cx="62" cy="54" r="4" fill="#0b1d0f" />
+  <circle cx="70" cy="54" r="4" fill="#0b1d0f" />
+  <path d="M60 64c4 4 8 4 12 0" stroke="#0b1d0f" stroke-width="3" stroke-linecap="round" />
+  <path d="M42 64l-10 12 12 10 8-12z" fill="#4f7a3a" opacity="0.8" />
+</svg>

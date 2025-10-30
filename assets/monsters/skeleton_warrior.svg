@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title>Скелет-воин</title>
+  <defs>
+    <linearGradient id="sk-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c1c26" />
+      <stop offset="100%" stop-color="#2a3244" />
+    </linearGradient>
+    <linearGradient id="sk-bone" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f7f3da" />
+      <stop offset="100%" stop-color="#cabf9c" />
+    </linearGradient>
+    <linearGradient id="sk-cloak" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#b14444" />
+      <stop offset="100%" stop-color="#722121" />
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#sk-bg)" rx="18" />
+  <path d="M44 26h32l10 20-10 40H54L34 46z" fill="url(#sk-cloak)" opacity="0.8" />
+  <circle cx="60" cy="44" r="22" fill="url(#sk-bone)" />
+  <path d="M60 28c12 0 20 8 20 16s-8 14-20 14-20-6-20-14 8-16 20-16z" fill="#f7f3da" />
+  <path d="M50 44h20v6H50z" fill="#0f0f15" />
+  <path d="M54 56h12l4 26-10 10-10-10z" fill="#f7f3da" />
+  <path d="M36 70l10-6 10 12-6 10z" fill="#f7f3da" opacity="0.7" />
+  <path d="M84 70l-10-6-10 12 6 10z" fill="#f7f3da" opacity="0.7" />
+  <rect x="32" y="30" width="8" height="40" rx="3" fill="#b14444" opacity="0.9" />
+</svg>

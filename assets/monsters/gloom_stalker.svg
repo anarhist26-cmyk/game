@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title>Мракоступ</title>
+  <defs>
+    <linearGradient id="gloom-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c1024" />
+      <stop offset="100%" stop-color="#341c47" />
+    </linearGradient>
+    <radialGradient id="gloom-core" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#8f5bff" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#2b0f47" stop-opacity="0.1" />
+    </radialGradient>
+    <linearGradient id="gloom-cloak" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b99dff" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#5b41a1" stop-opacity="0.75" />
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#gloom-bg)" rx="18" />
+  <circle cx="60" cy="52" r="40" fill="url(#gloom-core)" />
+  <path d="M32 86c4-18 10-40 28-52 14-9 34-8 46 2-5 6-10 12-13 20-6 16-4 28-2 34-14-6-23-6-36 4-10 7-18 5-23-8z" fill="url(#gloom-cloak)" />
+  <path d="M50 40c8-8 20-12 32-8 4 1 8 4 11 7-6-1-12 1-18 6-6 5-12 7-18 4-3-1-5-4-7-9z" fill="#140825" opacity="0.6" />
+  <path d="M70 58c4 0 7 3 7 6s-3 6-7 6-7-3-7-6 3-6 7-6z" fill="#f4f0ff" />
+  <circle cx="88" cy="46" r="6" fill="#f4f0ff" opacity="0.4" />
+</svg>

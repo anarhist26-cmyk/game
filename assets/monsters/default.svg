@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title>Неизвестный противник</title>
+  <defs>
+    <linearGradient id="bg-default" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d2331" />
+      <stop offset="100%" stop-color="#3a455d" />
+    </linearGradient>
+    <linearGradient id="shape-default" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7685a6" />
+      <stop offset="100%" stop-color="#aeb7cd" />
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#bg-default)" rx="18" />
+  <path d="M60 20c-16 0-30 13.6-30 30.4 0 10.6 6 19.7 14.6 25.2l-6 16.4c-1.4 3.9 2.1 7.6 6 6.1l15.4-5.5 15.4 5.5c3.9 1.4 7.4-2.3 6-6.1l-6-16.4C84 70 90 60.9 90 50.4 90 33.6 76 20 60 20z" fill="url(#shape-default)" opacity="0.88" />
+  <circle cx="60" cy="52" r="12" fill="#10141f" opacity="0.5" />
+  <path d="M60 42a10 10 0 0 0-10 10v6h20v-6a10 10 0 0 0-10-10z" fill="#c6cee1" opacity="0.7" />
+</svg>

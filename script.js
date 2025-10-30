@@ -159,6 +159,8 @@ const dataSources = {
   skills: 'data/skills.json'
 };
 
+const defaultMonsterAvatar = 'assets/monsters/default.svg';
+
 const fallbackCatalogs = {
   races: [
     {
@@ -405,6 +407,7 @@ const fallbackCatalogs = {
       level: 6,
       habitat: 'Сумрачный лес',
       alignment: 'дикарь',
+      avatar: 'assets/monsters/shadow_wolf.svg',
       stats: { hp: 180, attack: 24, defense: 12, speed: 30 },
       abilities: ['Раздирающий укус', 'Затуманивание'],
       loot: [
@@ -419,6 +422,7 @@ const fallbackCatalogs = {
       level: 9,
       habitat: 'Болотные зеркала',
       alignment: 'колдунья',
+      avatar: 'assets/monsters/rootbound_hag.svg',
       stats: { hp: 240, attack: 28, defense: 18, speed: 22 },
       abilities: ['Гниющая хватка', 'Ядовитая тина'],
       loot: [
@@ -433,6 +437,7 @@ const fallbackCatalogs = {
       level: 13,
       habitat: 'Катакомбы Бездны',
       alignment: 'проклятый легион',
+      avatar: 'assets/monsters/skeleton_warrior.svg',
       stats: { hp: 360, attack: 48, defense: 32, speed: 14 },
       abilities: ['Костяной размах', 'Стена щитов'],
       loot: [
@@ -447,6 +452,7 @@ const fallbackCatalogs = {
       level: 15,
       habitat: 'Бастион Сангвинариев',
       alignment: 'легион',
+      avatar: 'assets/monsters/blood_sentinel.svg',
       stats: { hp: 560, attack: 46, defense: 40, speed: 16 },
       abilities: ['Кара клинком', 'Кровавый щит'],
       loot: [
@@ -461,6 +467,7 @@ const fallbackCatalogs = {
       level: 18,
       habitat: 'Огненная кузница',
       alignment: 'элементаль',
+      avatar: 'assets/monsters/ember_colossus.svg',
       stats: { hp: 780, attack: 68, defense: 44, speed: 10 },
       abilities: ['Всполох пламени', 'Обвал лавы'],
       loot: [
@@ -1166,6 +1173,7 @@ function cloneInventoryItem(itemId) {
 const turnIndicator = document.getElementById('turn-indicator');
 const stanceIndicator = document.getElementById('stance-indicator');
 
+const enemyAvatarElement = document.getElementById('enemy-avatar');
 const enemyNameElement = document.getElementById('enemy-name');
 const enemyLevelElement = document.getElementById('enemy-level');
 const enemyStatusElement = document.getElementById('enemy-status');
@@ -1336,6 +1344,7 @@ function transformMonster(rawMonster) {
     habitat: rawMonster.habitat,
     abilities: rawMonster.abilities ?? [],
     rank: rawMonster.rank ?? 'противник',
+    avatar: rawMonster.avatar ?? defaultMonsterAvatar,
     base: rawMonster
   };
 }
@@ -3722,6 +3731,16 @@ function selectTemplateForThreat(threat, locationId) {
   return selection[Math.floor(Math.random() * selection.length)] ?? candidates[0];
 }
 
+function updateEnemyAvatar(template) {
+  if (!enemyAvatarElement) return;
+  const source = template?.avatar || defaultMonsterAvatar;
+  if (enemyAvatarElement.getAttribute('src') !== source) {
+    enemyAvatarElement.src = source;
+  }
+  const altText = template?.name ? `Портрет: ${template.name}` : 'Портрет противника';
+  enemyAvatarElement.alt = altText;
+}
+
 function updateEnemyUI() {
   if (!currentEnemy.template) return;
   const template = currentEnemy.template;
@@ -3733,6 +3752,7 @@ function updateEnemyUI() {
     const [goldMin, goldMax] = template.goldReward;
     enemyRewardElement.textContent = `${template.xpReward} XP · ${goldMin}-${goldMax} золота`;
   }
+  updateEnemyAvatar(template);
   setProgress('enemy-hp', currentEnemy.hp, currentEnemy.maxHp);
 }
 
@@ -3740,6 +3760,7 @@ function spawnEnemyForThreat(threat, locationName, locationId) {
   const template = selectTemplateForThreat(threat, locationId);
   if (!template) {
     appendCombatLog('Данные о противниках отсутствуют. Разведка будет обновлена позже.');
+    updateEnemyAvatar(null);
     return;
   }
   currentEnemy.template = template;

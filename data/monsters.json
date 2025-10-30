@@ -6,6 +6,7 @@
     "level": 6,
     "habitat": "Сумрачный лес",
     "alignment": "дикарь",
+    "avatar": "assets/monsters/shadow_wolf.svg",
     "stats": {
       "hp": 180,
       "attack": 24,
@@ -28,6 +29,7 @@
     "level": 12,
     "habitat": "Катакомбы Бездны",
     "alignment": "порождение тьмы",
+    "avatar": "assets/monsters/gloom_stalker.svg",
     "stats": {
       "hp": 420,
       "attack": 52,
@@ -50,6 +52,7 @@
     "level": 13,
     "habitat": "Катакомбы Бездны",
     "alignment": "проклятый легион",
+    "avatar": "assets/monsters/skeleton_warrior.svg",
     "stats": {
       "hp": 360,
       "attack": 48,
@@ -72,6 +75,7 @@
     "level": 18,
     "habitat": "Печи Огненной кузницы",
     "alignment": "элементаль",
+    "avatar": "assets/monsters/ember_colossus.svg",
     "stats": {
       "hp": 780,
       "attack": 68,
@@ -94,6 +98,7 @@
     "level": 15,
     "habitat": "Бастион Сангвинариев",
     "alignment": "легион",
+    "avatar": "assets/monsters/blood_sentinel.svg",
     "stats": {
       "hp": 560,
       "attack": 46,
@@ -116,6 +121,7 @@
     "level": 9,
     "habitat": "Болотные зеркала",
     "alignment": "колдунья",
+    "avatar": "assets/monsters/rootbound_hag.svg",
     "stats": {
       "hp": 240,
       "attack": 28,
@@ -138,6 +144,7 @@
     "level": 24,
     "habitat": "Пределы Ноктуса",
     "alignment": "древний",
+    "avatar": "assets/monsters/grave_titan.svg",
     "stats": {
       "hp": 1200,
       "attack": 82,
