@@ -40,8 +40,8 @@ html, body {
 }
 
 .client-window {
-  width: 1024px;
-  height: 768px;
+  width: 1320px;
+  height: 900px;
   display: flex;
   flex-direction: column;
   background: linear-gradient(160deg, #10151c 0%, #07090d 70%, #030408 100%);
@@ -316,8 +316,8 @@ html, body {
 .main-top {
   display: grid;
   grid-template-columns: 0.9fr 1fr;
-  gap: 18px;
-  min-height: 280px;
+  gap: 20px;
+  min-height: 320px;
 }
 
 .map-panel,
@@ -352,8 +352,9 @@ html, body {
 
 .map-viewport {
   position: relative;
-  width: 420px;
-  height: 280px;
+  width: 100%;
+  max-width: 520px;
+  height: 320px;
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
