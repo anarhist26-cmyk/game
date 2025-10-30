@@ -585,7 +585,7 @@ html, body {
 .enemy-card__portrait {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
   margin: 0;
   border-radius: 14px;
   overflow: hidden;
