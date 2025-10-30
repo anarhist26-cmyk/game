@@ -19,6 +19,8 @@ const chatScrollButton = document.getElementById('chat-scroll-bottom');
 
 let chatAutoScroll = true;
 const CHAT_SCROLL_EPSILON = 6;
+let chatProgrammaticScroll = false;
+let syncChatScrollState = null;
 
 const lootList = document.getElementById('loot-list');
 const actionButtons = document.querySelectorAll('.action-button');
@@ -2167,15 +2169,28 @@ function appendLog(target, text) {
   const shouldAutoScroll = !isChatTarget || chatAutoScroll;
 
   if (shouldAutoScroll) {
+    if (isChatTarget) {
+      chatAutoScroll = true;
+      chatProgrammaticScroll = true;
+    }
+
     if (typeof target.scrollTo === 'function') {
       target.scrollTo({ top: target.scrollHeight, behavior: 'smooth' });
     } else {
       target.scrollTop = target.scrollHeight;
     }
+
     if (isChatTarget) {
       setChatScrollButtonState(false);
+      window.setTimeout(() => {
+        chatProgrammaticScroll = false;
+        if (typeof syncChatScrollState === 'function') {
+          syncChatScrollState();
+        }
+      }, 150);
     }
   } else if (isChatTarget) {
+    chatAutoScroll = false;
     setChatScrollButtonState(true);
   }
 }
@@ -4546,22 +4561,25 @@ if (chatLog) {
     return distance <= CHAT_SCROLL_EPSILON;
   };
 
-  const releaseAutoScrollIfAtBottom = () => {
+  syncChatScrollState = () => {
+    if (chatProgrammaticScroll) return;
     if (isChatAtBottom()) {
       chatAutoScroll = true;
       setChatScrollButtonState(false);
-    } else if (!chatAutoScroll) {
+    } else {
+      chatAutoScroll = false;
       setChatScrollButtonState(true);
     }
   };
 
   chatLog.addEventListener('scroll', () => {
-    releaseAutoScrollIfAtBottom();
+    syncChatScrollState();
   });
 
   chatLog.addEventListener(
     'wheel',
     () => {
+      chatProgrammaticScroll = false;
       chatAutoScroll = false;
       setChatScrollButtonState(true);
     },
@@ -4571,13 +4589,14 @@ if (chatLog) {
   chatLog.addEventListener(
     'touchmove',
     () => {
+      chatProgrammaticScroll = false;
       chatAutoScroll = false;
       setChatScrollButtonState(true);
     },
     { passive: true }
   );
 
-  releaseAutoScrollIfAtBottom();
+  syncChatScrollState();
 }
 
 if (chatScrollButton && chatLog) {
