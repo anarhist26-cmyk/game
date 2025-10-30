@@ -4143,6 +4143,7 @@ function updateMapState(node) {
   });
 
   updateQuestHighlights();
+  centerMapOnNode(node);
 }
 
 function attemptMove(target) {
@@ -4845,6 +4846,12 @@ if (mapControls.length) {
         appendCombatLog('Путь в эту сторону закрыт каменной стеной.');
       }
     });
+  });
+}
+
+if (typeof window !== 'undefined' && window.addEventListener) {
+  window.addEventListener('resize', () => {
+    centerMapOnCurrent();
   });
 }
 
