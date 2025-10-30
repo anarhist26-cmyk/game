@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bootBody" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#090b16"/>
+      <stop offset="50%" stop-color="#1d2236"/>
+      <stop offset="100%" stop-color="#06070d"/>
+    </linearGradient>
+    <linearGradient id="bootGlow" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#57a3ff"/>
+      <stop offset="100%" stop-color="#0b346b"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="#05060d"/>
+  <path d="M14 18h12l4 24h-16z" fill="url(#bootBody)" stroke="#34415e" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M34 14h12l4 28H34z" fill="url(#bootBody)" stroke="#34415e" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M14 42l-2 8h20l-2-8z" fill="#0d111d" stroke="#2b3852" stroke-width="2"/>
+  <path d="M34 46l-2 6h20l-2-6z" fill="#0d111d" stroke="#2b3852" stroke-width="2"/>
+  <path d="M20 26c2-2 8-2 10 0" fill="none" stroke="#57a3ff" stroke-width="2" opacity="0.7"/>
+  <path d="M38 22c2-2 8-2 10 0" fill="none" stroke="#57a3ff" stroke-width="2" opacity="0.7"/>
+  <path d="M18 34h12" stroke="url(#bootGlow)" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <path d="M36 32h12" stroke="url(#bootGlow)" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+</svg>

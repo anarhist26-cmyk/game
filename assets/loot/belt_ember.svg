@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="beltLeather" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#2d150b"/>
+      <stop offset="50%" stop-color="#521f10"/>
+      <stop offset="100%" stop-color="#2d150b"/>
+    </linearGradient>
+    <linearGradient id="beltCore" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#ffb347"/>
+      <stop offset="50%" stop-color="#ff712e"/>
+      <stop offset="100%" stop-color="#ffc977"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="#120703"/>
+  <rect x="10" y="26" width="44" height="12" rx="6" fill="url(#beltLeather)" stroke="#6e3218" stroke-width="2"/>
+  <rect x="24" y="23" width="16" height="18" rx="4" fill="#1d0b05" stroke="#6e3218" stroke-width="2"/>
+  <circle cx="32" cy="32" r="6" fill="url(#beltCore)" stroke="#ffd9a0" stroke-width="2"/>
+  <path d="M14 32h6" stroke="#ff9c4a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M44 32h6" stroke="#ff9c4a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M32 26v-6" stroke="#ffb347" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <path d="M32 38v6" stroke="#ffb347" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+</svg>

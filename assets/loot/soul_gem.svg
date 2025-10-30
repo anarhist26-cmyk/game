@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="gemCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b57bff"/>
+      <stop offset="50%" stop-color="#6f2fd8"/>
+      <stop offset="100%" stop-color="#2b0c63"/>
+    </linearGradient>
+    <radialGradient id="gemAura" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#e9d1ff" stop-opacity="0.9"/>
+      <stop offset="65%" stop-color="#7c45d8" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#1b0936" stop-opacity="0.6"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" fill="#0f071b"/>
+  <circle cx="32" cy="30" r="26" fill="url(#gemAura)"/>
+  <path d="M32 8l16 20-16 28-16-28z" fill="url(#gemCore)" stroke="#f5e8ff" stroke-width="1.5"/>
+  <path d="M32 16l10 12-10 18-10-18z" fill="#1f0b3f" opacity="0.45"/>
+  <path d="M26 34l6 10 6-10-6-10z" fill="#c19aff" opacity="0.5"/>
+  <circle cx="32" cy="18" r="4" fill="#f5e8ff" opacity="0.6"/>
+  <circle cx="26" cy="44" r="2" fill="#e3c6ff" opacity="0.7"/>
+</svg>

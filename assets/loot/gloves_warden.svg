@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="gloveLeather" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#352a1e"/>
+      <stop offset="50%" stop-color="#5d4a33"/>
+      <stop offset="100%" stop-color="#2a1f14"/>
+    </linearGradient>
+    <linearGradient id="gloveTrim" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#f0c96a"/>
+      <stop offset="100%" stop-color="#d18c28"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="#120c07"/>
+  <path d="M18 16c4 2 6 8 6 12l4 10-4 10-8-4-4-14c0-8 2-12 6-14z" fill="url(#gloveLeather)" stroke="#63472f" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M34 12c4 2 6 8 6 12l4 12-4 10-8-4-4-16c0-8 2-12 6-14z" fill="url(#gloveLeather)" stroke="#63472f" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M14 34l12 8" stroke="#f0c96a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <path d="M30 28l12 8" stroke="#f0c96a" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <path d="M18 16l6 4" stroke="#d18c28" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <path d="M34 12l6 4" stroke="#d18c28" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <rect x="20" y="38" width="12" height="8" rx="3" fill="url(#gloveTrim)" opacity="0.8"/>
+  <rect x="36" y="36" width="12" height="8" rx="3" fill="url(#gloveTrim)" opacity="0.8"/>
+</svg>

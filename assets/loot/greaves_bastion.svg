@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="greaveSteel" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#31384a"/>
+      <stop offset="50%" stop-color="#596479"/>
+      <stop offset="100%" stop-color="#2a3142"/>
+    </linearGradient>
+    <linearGradient id="greaveGlow" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#ffd27a"/>
+      <stop offset="100%" stop-color="#ff9348"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="#090b15"/>
+  <path d="M18 12h10l4 24-4 16H16z" fill="url(#greaveSteel)" stroke="#5b6476" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M36 12h10l4 24-4 16H34z" fill="url(#greaveSteel)" stroke="#5b6476" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M18 30h12" stroke="#8892a8" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <path d="M36 28h12" stroke="#8892a8" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <path d="M20 22h8" stroke="url(#greaveGlow)" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <path d="M38 20h8" stroke="url(#greaveGlow)" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <path d="M18 44h10" stroke="#2a3142" stroke-width="4" stroke-linecap="round"/>
+  <path d="M36 42h10" stroke="#2a3142" stroke-width="4" stroke-linecap="round"/>
+</svg>

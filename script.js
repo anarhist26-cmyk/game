@@ -958,7 +958,7 @@ const fallbackCatalogs = {
       tier: 3,
       column: 2,
       cost: 3,
-      icon: '⚔️',
+      icon: { id: 'crimson_fury_blade' },
       category: 'Атака',
       description: 'Вы высвобождаете призрачные клинки, рвущие разум врагов.',
       prerequisites: ['siphon_strike'],
@@ -978,7 +978,7 @@ const fallbackCatalogs = {
       tier: 3,
       column: 3,
       cost: 3,
-      icon: '🛡️',
+      icon: { id: 'shadow_guard_plate' },
       category: 'Защита',
       description: 'Легендарная стойка легиона, усиливающая весь отряд.',
       prerequisites: ['blood_barrier'],
@@ -1114,7 +1114,7 @@ const inventoryState = {
       short: 'Рассвет',
       type: 'Двуручный меч',
       rarity: 'legendary',
-      icon: '⚔️',
+      icon: { id: 'crimson_fury_blade' },
       quantity: 1,
       weight: 14,
       stats: {
@@ -1130,7 +1130,7 @@ const inventoryState = {
       short: 'Бастион',
       type: 'Щит',
       rarity: 'epic',
-      icon: '🛡️',
+      icon: { id: 'shadow_guard_plate' },
       quantity: 1,
       weight: 12,
       stats: {
@@ -1146,7 +1146,7 @@ const inventoryState = {
       short: 'Буря',
       type: 'Украшение',
       rarity: 'rare',
-      icon: '💍',
+      icon: { id: 'ring_storm' },
       quantity: 1,
       weight: 1,
       stats: {
@@ -1162,7 +1162,7 @@ const inventoryState = {
       short: 'Эликсир',
       type: 'Расходуемое',
       rarity: 'rare',
-      icon: '🧪',
+      icon: { id: 'blood_vial' },
       quantity: 3,
       weight: 1,
       stats: {
@@ -1177,7 +1177,7 @@ const inventoryState = {
       short: 'Свиток',
       type: 'Расходуемое',
       rarity: 'epic',
-      icon: '📜',
+      icon: { id: 'ashen_scroll' },
       quantity: 2,
       weight: 0.5,
       stats: {
@@ -1192,7 +1192,7 @@ const inventoryState = {
       short: 'Реликвия',
       type: 'Реликт',
       rarity: 'legendary',
-      icon: '🩸',
+      icon: { id: 'cursed_relic' },
       quantity: 1,
       weight: 6,
       stats: {
@@ -1208,7 +1208,7 @@ const inventoryState = {
       short: 'Рацион',
       type: 'Припасы',
       rarity: 'common',
-      icon: '🥡',
+      icon: { id: 'supply_rations' },
       quantity: 5,
       weight: 0.6,
       stats: {
@@ -1223,7 +1223,7 @@ const inventoryState = {
       short: 'Самоцвет',
       type: 'Катализатор',
       rarity: 'epic',
-      icon: '🔮',
+      icon: { id: 'soul_gem' },
       quantity: 1,
       weight: 2,
       stats: {
@@ -1238,7 +1238,7 @@ const inventoryState = {
       short: 'Шкура',
       type: 'Материал',
       rarity: 'common',
-      icon: '🐺',
+      icon: { id: 'wolf_pelt' },
       quantity: 4,
       weight: 2.5,
       stats: {
@@ -1254,7 +1254,7 @@ const inventoryState = {
       short: 'Клык',
       type: 'Компонент',
       rarity: 'uncommon',
-      icon: '🦷',
+      icon: { id: 'iron_fang' },
       quantity: 3,
       weight: 1.2,
       stats: {
@@ -1270,7 +1270,7 @@ const inventoryState = {
       short: 'Ядро',
       type: 'Сердце элементаля',
       rarity: 'rare',
-      icon: '🔥',
+      icon: { id: 'ember_core' },
       quantity: 2,
       weight: 3.4,
       stats: {
@@ -1286,7 +1286,7 @@ const inventoryState = {
       short: 'Осколок',
       type: 'Катализатор',
       rarity: 'rare',
-      icon: '🌙',
+      icon: { id: 'moon_shard' },
       quantity: 2,
       weight: 0.4,
       stats: {
@@ -1302,7 +1302,7 @@ const inventoryState = {
       short: 'Корень',
       type: 'Ингредиент',
       rarity: 'common',
-      icon: '🌿',
+      icon: { id: 'withered_root' },
       quantity: 5,
       weight: 0.3,
       stats: {
@@ -1336,7 +1336,7 @@ const equipmentState = {
   helmet: {
     id: 'helm-eclipse',
     name: 'Шлем Эйдолона',
-    icon: '🪖',
+    icon: { id: 'helm_eclipse' },
     rarity: 'epic',
     properties: {
       Защита: '+28',
@@ -1346,7 +1346,7 @@ const equipmentState = {
   amulet: {
     id: 'amulet-scarlet',
     name: 'Кулон Алого Сердца',
-    icon: '📿',
+    icon: { id: 'bone_talisman' },
     rarity: 'legendary',
     properties: {
       'Сила крови': '+20',
@@ -1356,7 +1356,7 @@ const equipmentState = {
   gloves: {
     id: 'gloves-warden',
     name: 'Перчатки Дозорного',
-    icon: '🧤',
+    icon: { id: 'gloves_warden' },
     rarity: 'rare',
     properties: {
       'Скорость атаки': '+8%',
@@ -1367,7 +1367,7 @@ const equipmentState = {
   ring2: {
     id: 'ring-warden',
     name: 'Кольцо Стража',
-    icon: '💍',
+    icon: { id: 'ring_storm' },
     rarity: 'rare',
     properties: {
       Защита: '+6',
@@ -1378,7 +1378,7 @@ const equipmentState = {
   belt: {
     id: 'belt-ember',
     name: 'Пояс Жаркого ядра',
-    icon: '🪢',
+    icon: { id: 'belt_ember' },
     rarity: 'epic',
     properties: {
       'Макс. выносливость': '+30',
@@ -1388,7 +1388,7 @@ const equipmentState = {
   boots: {
     id: 'boots-shadow',
     name: 'Сапоги Теневого шага',
-    icon: '🥾',
+    icon: { id: 'boots_shadow' },
     rarity: 'epic',
     properties: {
       'Скорость перемещения': '+12%',
@@ -1398,7 +1398,7 @@ const equipmentState = {
   greaves: {
     id: 'greaves-bastion',
     name: 'Поножи Бастиона',
-    icon: '🦿',
+    icon: { id: 'greaves_bastion' },
     rarity: 'rare',
     properties: {
       Броня: '+18',
@@ -1409,7 +1409,7 @@ const equipmentState = {
   armor: {
     id: 'armor-bloodguard',
     name: 'Кираса Кровавой Стражи',
-    icon: '🛡️',
+    icon: { id: 'shadow_guard_plate' },
     rarity: 'legendary',
     properties: {
       Броня: '+46',
@@ -1419,7 +1419,7 @@ const equipmentState = {
   cloak: {
     id: 'cloak-veil',
     name: 'Плащ Багрового Покрова',
-    icon: '🧥',
+    icon: { id: 'lunar_veil_cloak' },
     rarity: 'epic',
     properties: {
       Скрытность: '+15%',

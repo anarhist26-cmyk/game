@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="helmMetal" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#141a2e"/>
+      <stop offset="45%" stop-color="#1f2746"/>
+      <stop offset="100%" stop-color="#0a0f1d"/>
+    </linearGradient>
+    <linearGradient id="helmGlow" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#ff8a5c"/>
+      <stop offset="100%" stop-color="#ffc66d"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="#04060f"/>
+  <path d="M12 42c0-16 8-32 20-32s20 16 20 32" fill="url(#helmMetal)" stroke="#3f4c73" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M20 44h24l4 10H16z" fill="#121a2d" stroke="#3f4c73" stroke-width="2"/>
+  <path d="M20 34c4-4 20-4 24 0l2 10H18z" fill="#0b1020" stroke="#3f4c73" stroke-width="2"/>
+  <path d="M24 28c2-2 14-2 16 0" fill="none" stroke="#ff9a6d" stroke-width="2" opacity="0.7"/>
+  <path d="M26 32h12l2 8H24z" fill="#151b30" stroke="#3f4c73" stroke-width="2"/>
+  <path d="M24 32c0-4 4-8 8-8s8 4 8 8" fill="none" stroke="url(#helmGlow)" stroke-width="3"/>
+  <circle cx="32" cy="20" r="6" fill="#1d2238" stroke="#495a80" stroke-width="2"/>
+  <circle cx="32" cy="20" r="3" fill="#ffc66d" opacity="0.8"/>
+</svg>
