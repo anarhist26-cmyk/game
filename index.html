@@ -64,6 +64,14 @@
                       </div>
                     </div>
                   </div>
+                  <div class="enemy-card__actions">
+                    <div class="action-buttons">
+                      <button type="button" class="action-button" data-action="attack">Атака</button>
+                      <button type="button" class="action-button" data-action="defend">Блок</button>
+                      <button type="button" class="action-button" data-action="skill">Умение</button>
+                      <button type="button" class="action-button" data-action="heal">Лечение</button>
+                    </div>
+                  </div>
                   <div class="enemy-card__intel" id="enemy-intel" hidden aria-hidden="true">
                     <p class="enemy-card__status" id="enemy-status">Разведданные обновляются…</p>
                     <dl class="enemy-stats">
@@ -76,12 +84,6 @@
               <div class="intel-section">
                 <h3>Действия</h3>
                 <p id="action-readout" class="action-readout">Вы обнажаете клинок и готовитесь нанести удар.</p>
-                <div class="action-buttons">
-                  <button type="button" class="action-button" data-action="attack">Атака</button>
-                  <button type="button" class="action-button" data-action="defend">Блок</button>
-                  <button type="button" class="action-button" data-action="skill">Умение</button>
-                  <button type="button" class="action-button" data-action="heal">Эликсир</button>
-                </div>
                 <div class="loot-panel">
                   <h4>Трофеи</h4>
                   <ul id="loot-list" class="loot-list"></ul>

@@ -584,9 +584,10 @@ html, body {
 
 .enemy-card__portrait {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  margin: 0;
+  width: 78%;
+  max-width: 220px;
+  aspect-ratio: 3 / 4;
+  margin: 0 auto;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -619,6 +620,16 @@ html, body {
   background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.65));
 }
 
+.enemy-card__actions {
+  display: flex;
+  justify-content: center;
+}
+
+.enemy-card__actions .action-buttons {
+  width: 78%;
+  max-width: 220px;
+}
+
 .enemy-card__intel {
   display: none;
 }
@@ -649,8 +660,8 @@ html, body {
 }
 
 .action-buttons {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
