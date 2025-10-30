@@ -1173,6 +1173,7 @@ function cloneInventoryItem(itemId) {
 const turnIndicator = document.getElementById('turn-indicator');
 const stanceIndicator = document.getElementById('stance-indicator');
 
+const enemyPortraitButton = document.getElementById('enemy-portrait-button');
 const enemyAvatarElement = document.getElementById('enemy-avatar');
 const enemyNameElement = document.getElementById('enemy-name');
 const enemyLevelElement = document.getElementById('enemy-level');
@@ -3756,6 +3757,15 @@ function updateEnemyUI() {
   setProgress('enemy-hp', currentEnemy.hp, currentEnemy.maxHp);
 }
 
+function openEnemyInCodex() {
+  if (!currentEnemy.template) return;
+  const template = currentEnemy.template;
+  if (template.id) {
+    codexState.selectionId = template.id;
+  }
+  openCodex('monsters');
+}
+
 function spawnEnemyForThreat(threat, locationName, locationId) {
   const template = selectTemplateForThreat(threat, locationId);
   if (!template) {
@@ -4018,6 +4028,12 @@ function performAction(action) {
 actionButtons.forEach((button) => {
   button.addEventListener('click', () => performAction(button.dataset.action));
 });
+
+if (enemyPortraitButton) {
+  enemyPortraitButton.addEventListener('click', () => {
+    openEnemyInCodex();
+  });
+}
 
 if (chatForm) {
   chatForm.addEventListener('submit', (event) => {

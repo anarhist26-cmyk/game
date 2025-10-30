@@ -50,15 +50,10 @@
                     <span class="enemy-card__name" id="enemy-name">—</span>
                     <span class="enemy-card__level">Ур. <span id="enemy-level">—</span></span>
                   </header>
-                  <figure class="enemy-card__portrait" tabindex="0">
-                    <img id="enemy-avatar" src="assets/monsters/default.svg" alt="Портрет противника" />
-                    <div class="enemy-card__tooltip" role="presentation">
-                      <p class="enemy-card__status" id="enemy-status">Разведданные обновляются…</p>
-                      <dl class="enemy-stats">
-                        <div><dt>Урон</dt><dd id="enemy-damage">—</dd></div>
-                        <div><dt>Награда</dt><dd id="enemy-reward">—</dd></div>
-                      </dl>
-                    </div>
+                  <figure class="enemy-card__portrait">
+                    <button type="button" class="enemy-card__portrait-button" id="enemy-portrait-button" aria-label="Открыть запись противника в бестиарии">
+                      <img id="enemy-avatar" src="assets/monsters/default.svg" alt="Портрет противника" />
+                    </button>
                   </figure>
                   <div class="enemy-card__bars">
                     <div class="resource-bar">
@@ -68,6 +63,13 @@
                         <span class="resource-bar__text" data-bar-text="enemy-hp">0 / 0</span>
                       </div>
                     </div>
+                  </div>
+                  <div class="enemy-card__intel" id="enemy-intel" hidden aria-hidden="true">
+                    <p class="enemy-card__status" id="enemy-status">Разведданные обновляются…</p>
+                    <dl class="enemy-stats">
+                      <div><dt>Урон</dt><dd id="enemy-damage">—</dd></div>
+                      <div><dt>Награда</dt><dd id="enemy-reward">—</dd></div>
+                    </dl>
                   </div>
                 </div>
               </div>
