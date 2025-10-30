@@ -275,6 +275,44 @@ html, body {
   font-family: 'Play', sans-serif;
 }
 
+.statline__currency {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+}
+
+.statline__currency dt {
+  display: flex;
+  align-items: center;
+}
+
+.statline__currency dd {
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+.statline__icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff4b0 0%, #ffd75a 40%, #f3aa3d 70%, #ba6d1a 100%);
+  box-shadow: 0 0 6px rgba(255, 204, 85, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 196, 65, 0.5);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .main-top {
   display: grid;
   grid-template-columns: 0.9fr 1fr;
