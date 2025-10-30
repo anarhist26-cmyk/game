@@ -221,8 +221,8 @@ html, body {
 
 .command-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
-  gap: 10px 14px;
+  grid-template-columns: repeat(2, minmax(72px, 1fr));
+  gap: 14px;
   width: 100%;
 }
 
@@ -2395,14 +2395,49 @@ html, body {
 .command-button {
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 14px;
   color: var(--text-bright);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
   cursor: pointer;
   width: 100%;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.command-button:hover,
+.command-button:focus-visible {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 12px rgba(255, 170, 72, 0.25);
+  transform: translateY(-1px);
+}
+
+.command-button__icon {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.command-button__icon path,
+.command-button__icon circle {
+  transition: stroke 0.2s ease;
+}
+
+.command-button__icon .icon-dot {
+  transition: fill 0.2s ease;
+}
+
+.command-button:hover .command-button__icon path,
+.command-button:hover .command-button__icon circle,
+.command-button:focus-visible .command-button__icon path,
+.command-button:focus-visible .command-button__icon circle {
+  stroke: var(--accent-gold);
+}
+
+.command-button:hover .command-button__icon .icon-dot,
+.command-button:focus-visible .command-button__icon .icon-dot {
+  fill: var(--accent-gold);
 }
 
 .client-footer {
