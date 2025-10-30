@@ -399,7 +399,7 @@ const fallbackCatalogs = {
       name: 'Шкура теневого волка',
       rarity: 'обычный',
       type: 'Материал',
-      icon: '🐺',
+      icon: { id: 'wolf_pelt', glyph: '🐺' },
       description: 'Плотная шкура, пропитанная тенью. Используется для пошива скрытных плащей.',
       properties: {
         'Сопротивление тьме': '+6%',
@@ -413,7 +413,7 @@ const fallbackCatalogs = {
       name: 'Осколок лунного стекла',
       rarity: 'редкий',
       type: 'Катализатор',
-      icon: '🌙',
+      icon: { id: 'moon_shard', glyph: '🌙' },
       description: 'Сияющий осколок, усиливающий навыки ночного дозора.',
       properties: {
         'Сила заклинаний': '+12',
@@ -427,7 +427,7 @@ const fallbackCatalogs = {
       name: 'Пепельный свиток',
       rarity: 'эпический',
       type: 'Свиток',
-      icon: '📜',
+      icon: { id: 'ashen_scroll', glyph: '📜' },
       description: 'Содержит потускневшие руны. После активации пробуждает пепельного фамильяра.',
       properties: {
         'Призыв фамильяра': 'Пепельный дух',
@@ -441,7 +441,7 @@ const fallbackCatalogs = {
       name: 'Проклятый реликт',
       rarity: 'эпический',
       type: 'Артефакт',
-      icon: '🩸',
+      icon: { id: 'cursed_relic', glyph: '🩸' },
       description: 'Осколок древнего обелиска, пьющий кровь владельца, но дарующий силу.',
       properties: {
         'Кровавый урон': '+18%',
@@ -455,7 +455,7 @@ const fallbackCatalogs = {
       name: 'Талисман костяного легиона',
       rarity: 'необычный',
       type: 'Талисман',
-      icon: '☠️',
+      icon: { id: 'bone_talisman', glyph: '☠️' },
       description: 'Переплетённые кости легионеров защищают от некротической магии.',
       properties: {
         'Сопротивление некрозу': '+18%',
@@ -469,7 +469,7 @@ const fallbackCatalogs = {
       name: 'Ржавый гладиус легионера',
       rarity: 'обычный',
       type: 'Оружие',
-      icon: '🗡️',
+      icon: { id: 'rusted_gladius', glyph: '🗡️' },
       description: 'Изношенный, но всё ещё опасный клинок.',
       properties: {
         'Физический урон': '+14',
@@ -483,7 +483,7 @@ const fallbackCatalogs = {
       name: 'Угольно-пламенное ядро',
       rarity: 'редкий',
       type: 'Сфера',
-      icon: '🔥',
+      icon: { id: 'ember_core', glyph: '🔥' },
       description: 'Остывший осколок сердца элементаля.',
       properties: {
         'Огненный урон': '+22',
@@ -497,7 +497,7 @@ const fallbackCatalogs = {
       name: 'Железный клык',
       rarity: 'необычный',
       type: 'Материал',
-      icon: '🦴',
+      icon: { id: 'iron_fang', glyph: '🦴' },
       description: 'Зазубренный клык элементаля, подходящий для ковки шипованных лат.',
       properties: {
         'Прочность брони': '+12%',
@@ -511,7 +511,7 @@ const fallbackCatalogs = {
       name: 'Фиал закалённой крови',
       rarity: 'редкий',
       type: 'Расходуемое',
-      icon: '🧪',
+      icon: { id: 'blood_vial', glyph: '🧪' },
       description: 'Укрепляет плоть, если выпить с молитвой Сангвинариуса.',
       properties: {
         'Восстановление HP': '180',
@@ -525,7 +525,7 @@ const fallbackCatalogs = {
       name: 'Иссохший корень ведьмы',
       rarity: 'обычный',
       type: 'Компонент',
-      icon: '🌿',
+      icon: { id: 'withered_root', glyph: '🌿' },
       description: 'Зловонный корень, впитывающий энергию болота.',
       properties: {
         'Ядовитый урон': '+10',
@@ -539,7 +539,7 @@ const fallbackCatalogs = {
       name: 'Клинок багровой ярости',
       rarity: 'легендарный',
       type: 'Оружие',
-      icon: '⚔️',
+      icon: { id: 'crimson_fury_blade', glyph: '⚔️' },
       description: 'Легендарное лезвие, кованое в Алом Горне. Каждая успешная атака разогревает клинок.',
       properties: {
         'Физический урон': '+34',
@@ -554,7 +554,7 @@ const fallbackCatalogs = {
       name: 'Латы стража сумерек',
       rarity: 'эпический',
       type: 'Броня',
-      icon: '🛡️',
+      icon: { id: 'shadow_guard_plate', glyph: '🛡️' },
       description: 'Броня, впитавшая тень лабиринта и отражающая проклятия.',
       properties: {
         'Броня': '+46',
@@ -569,7 +569,7 @@ const fallbackCatalogs = {
       name: 'Плащ лунной дымки',
       rarity: 'редкий',
       type: 'Плащ',
-      icon: '🧥',
+      icon: { id: 'lunar_veil_cloak', glyph: '🧥' },
       description: 'Лёгкий плащ следопыта, скрывающий носителя в ночном тумане.',
       properties: {
         'Уклонение': '+10%',
@@ -1051,6 +1051,60 @@ const rarityGlyphs = {
   обычный: '⬖'
 };
 
+function normalizeIconDescriptor(iconData, { fallbackGlyph = '⬖', folder = 'loot' } = {}) {
+  if (!iconData) {
+    return { type: 'glyph', glyph: fallbackGlyph, folder };
+  }
+
+  if (typeof iconData === 'string') {
+    if (/^[a-z0-9_\-]+$/i.test(iconData)) {
+      return { type: 'asset', id: iconData, glyph: fallbackGlyph, folder };
+    }
+    return { type: 'glyph', glyph: iconData, folder };
+  }
+
+  if (typeof iconData === 'object') {
+    const id = iconData.id ?? iconData.slug ?? null;
+    const glyph = iconData.glyph ?? iconData.emoji ?? iconData.fallback ?? fallbackGlyph;
+    const customFolder = iconData.folder ?? folder;
+    if (id) {
+      return { type: 'asset', id, glyph, folder: customFolder };
+    }
+    if (glyph) {
+      return { type: 'glyph', glyph, folder: customFolder };
+    }
+  }
+
+  return { type: 'glyph', glyph: fallbackGlyph, folder };
+}
+
+function createLootIconNode(iconData, className, altText = '', fallbackGlyph = '⬖') {
+  const wrapper = document.createElement('span');
+  wrapper.className = className;
+  const descriptor = normalizeIconDescriptor(iconData, { fallbackGlyph, folder: 'loot' });
+
+  if (descriptor.type === 'asset' && descriptor.id) {
+    const img = document.createElement('img');
+    img.src = `assets/${descriptor.folder ?? 'loot'}/${descriptor.id}.svg`;
+    img.alt = altText || '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.draggable = false;
+    img.dataset.iconId = descriptor.id;
+    wrapper.dataset.iconId = descriptor.id;
+    wrapper.append(img);
+  } else {
+    const glyph = descriptor.glyph ?? fallbackGlyph;
+    wrapper.textContent = glyph;
+    if (altText) {
+      wrapper.setAttribute('role', 'img');
+      wrapper.setAttribute('aria-label', altText);
+    }
+  }
+
+  return wrapper;
+}
+
 const inventoryState = {
   capacity: 120,
   items: [
@@ -1481,10 +1535,13 @@ async function fetchJson(path) {
 
 function enrichLootEntry(raw) {
   const rarityKey = raw.rarity?.toLowerCase();
-  const icon = raw.icon || rarityGlyphs[rarityKey] || '♦';
+  const fallbackGlyph = rarityGlyphs[rarityKey] || '⬖';
+  const icon = normalizeIconDescriptor(raw.icon, { fallbackGlyph, folder: 'loot' });
   return {
     ...raw,
     icon,
+    iconId: icon.id ?? null,
+    iconGlyph: icon.glyph ?? fallbackGlyph,
     properties: raw.properties ?? {}
   };
 }
@@ -1543,7 +1600,7 @@ function transformMonster(rawMonster) {
       rarity: lootDef?.rarity ?? 'обычный',
       chance: entry.chance ?? lootDef?.dropChance ?? 0,
       quantityRange: mergeQuantityRange(entry),
-      icon: lootDef?.icon ?? rarityGlyphs[rarityKey] ?? '♦',
+      icon: lootDef?.icon ?? rarityGlyphs[rarityKey] ?? '⬖',
       properties: lootDef?.properties ?? null,
       description: lootDef?.description ?? ''
     };
@@ -1658,7 +1715,7 @@ function transformQuest(rawQuest) {
     return {
       id: itemId,
       name: item?.name ?? itemId ?? 'Неизвестный трофей',
-      icon: item?.icon ?? '♦',
+      icon: item?.icon ?? '⬖',
       quantity,
       chance,
       rarity: item?.rarity ?? null
@@ -2375,10 +2432,12 @@ function renderInventory(selectedItemId = activeInventorySlot?.dataset.itemId ??
     slot.dataset.rarity = item.rarity;
     slot.dataset.qty = item.quantity > 1 ? item.quantity : '';
     slot.dataset.itemId = item.id;
-    slot.innerHTML = `
-      <span class="inventory-slot__icon">${item.icon}</span>
-      <span class="inventory-slot__label">${item.short}</span>
-    `;
+    const fallbackGlyph = rarityGlyphs[(item.rarity ?? 'common').toLowerCase()] ?? '⬖';
+    const iconNode = createLootIconNode(item.icon, 'inventory-slot__icon', item.name, fallbackGlyph);
+    const label = document.createElement('span');
+    label.className = 'inventory-slot__label';
+    label.textContent = item.short ?? deriveShortLabel(item.name);
+    slot.append(iconNode, label);
     if (isItemEquipped(item.id)) {
       slot.classList.add('is-equipped');
     }
@@ -2471,9 +2530,13 @@ function renderEquipmentTable() {
       item.dataset.rarity = (descriptor.rarity ?? 'common').toLowerCase();
       item.title = formatPropertiesTooltip(descriptor);
 
-      const icon = document.createElement('span');
-      icon.className = 'equipment-item__icon';
-      icon.textContent = descriptor.icon ?? rarityGlyphs[(descriptor.rarity ?? 'common').toLowerCase()] ?? '⬖';
+      const fallbackGlyph = rarityGlyphs[(descriptor.rarity ?? 'common').toLowerCase()] ?? '⬖';
+      const icon = createLootIconNode(
+        descriptor.icon ?? null,
+        'equipment-item__icon',
+        descriptor.name,
+        fallbackGlyph
+      );
 
       const label = document.createElement('span');
       label.textContent = descriptor.name;
@@ -2681,9 +2744,8 @@ function createCodexLootSection(lootTable) {
       const container = document.createElement('div');
       container.className = 'codex-loot-item';
 
-      const icon = document.createElement('span');
-      icon.className = 'codex-loot-item__icon';
-      icon.textContent = entry.icon ?? '♦';
+      const fallbackGlyph = rarityGlyphs[(entry.rarity ?? 'common').toLowerCase()] ?? '⬖';
+      const icon = createLootIconNode(entry.icon ?? null, 'codex-loot-item__icon', entry.name, fallbackGlyph);
 
       const body = document.createElement('div');
       body.className = 'codex-loot-item__body';
@@ -3434,15 +3496,7 @@ function renderQuestDetails(quest) {
 
     if (Array.isArray(rewards.loot) && rewards.loot.length) {
       rewards.loot.forEach((entry) => {
-        const parts = [];
-        if (entry.icon) parts.push(entry.icon);
-        parts.push(entry.name);
-        const quantity = entry.quantity ?? 1;
-        if (quantity > 1) parts.push(`×${quantity}`);
-        if (entry.chance != null) {
-          parts.push(`(${formatChance(entry.chance)})`);
-        }
-        rewardItems.push({ text: parts.join(' '), className: 'quests-reward--loot' });
+        rewardItems.push({ type: 'loot', entry });
       });
     }
 
@@ -3455,8 +3509,25 @@ function renderQuestDetails(quest) {
       rewardItems.forEach((reward) => {
         const li = document.createElement('li');
         li.className = 'quests-reward';
-        if (reward.className) li.classList.add(reward.className);
-        li.textContent = reward.text;
+        if (reward.type === 'loot' && reward.entry) {
+          li.classList.add('quests-reward--loot');
+          const lootEntry = reward.entry;
+          const fallbackGlyph = rarityGlyphs[(lootEntry.rarity ?? 'common').toLowerCase()] ?? '⬖';
+          const iconNode = createLootIconNode(lootEntry.icon ?? null, 'quests-reward__icon', lootEntry.name, fallbackGlyph);
+          const label = document.createElement('span');
+          label.className = 'quests-reward__label';
+          const quantity = lootEntry.quantity ?? 1;
+          const parts = [lootEntry.name];
+          if (quantity > 1) parts.push(`×${quantity}`);
+          if (lootEntry.chance != null) {
+            parts.push(`(${formatChance(lootEntry.chance)})`);
+          }
+          label.textContent = parts.join(' ');
+          li.append(iconNode, label);
+        } else {
+          if (reward.className) li.classList.add(reward.className);
+          li.textContent = reward.text ?? '';
+        }
         questsRewardsList.append(li);
       });
     }
@@ -4412,7 +4483,7 @@ function grantLoot(template) {
       name: loot.name,
       rarity: loot.rarity,
       quantity: amount,
-      icon: loot.icon || rarityGlyphs[loot.rarity?.toLowerCase() ?? 'common'] || '♦',
+      icon: loot.icon ?? rarityGlyphs[loot.rarity?.toLowerCase() ?? 'common'] ?? '⬖',
       description: loot.description ?? '',
       properties: loot.properties ?? null
     });
@@ -4427,7 +4498,12 @@ function grantLoot(template) {
 
     const name = document.createElement('span');
     name.className = 'loot-item__name';
-    name.innerHTML = `${item.icon} ${item.name}`;
+    const fallbackGlyph = rarityGlyphs[(item.rarity ?? 'common').toLowerCase()] ?? '⬖';
+    const iconNode = createLootIconNode(item.icon ?? null, 'loot-item__icon', item.name, fallbackGlyph);
+    const label = document.createElement('span');
+    label.className = 'loot-item__label';
+    label.textContent = item.name;
+    name.append(iconNode, label);
 
     const quantity = document.createElement('span');
     quantity.textContent = `×${item.quantity}`;

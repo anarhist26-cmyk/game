@@ -1,0 +1,20 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="12" fill="url(#bg)"/>
+  <path d="M38 12H26V18L22.5 23.5C19.6 27.9 19 33.6 21.1 38.6C23.6 44.7 29 49 34.9 49C40.8 49 46.2 44.7 48.7 38.6C50.8 33.6 50.2 27.9 47.3 23.5L44 18V12H38Z" fill="url(#glass)" stroke="#FDE4E8" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M24.4 33.2C24 38.6 28.5 43 34.1 43C39.7 43 44.2 38.6 43.8 33.2C40.2 32 36.5 31.4 32.8 31.6C30 31.8 27.2 32.3 24.4 33.2Z" fill="url(#essence)"/>
+  <path d="M26 12H38" stroke="#FDE4E8" stroke-width="2" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="bg" x1="12" y1="10" x2="52" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#301018"/>
+      <stop offset="1" stop-color="#4C1521"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="24" y1="12" x2="44" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFBFE" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#FAD8E0" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="essence" x1="24" y1="30" x2="44" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C0102D"/>
+      <stop offset="1" stop-color="#F04A63"/>
+    </linearGradient>
+  </defs>
+</svg>

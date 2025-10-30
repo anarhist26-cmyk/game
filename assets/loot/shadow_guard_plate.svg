@@ -1,0 +1,16 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="12" fill="url(#bg)"/>
+  <path d="M18 18H46V32C46 41 41 47 32 50C23 47 18 41 18 32V18Z" fill="url(#armor)" stroke="#C6D3FF" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M26 26C28.4 28.2 30.7 29.3 33 29.3C35.3 29.3 37.6 28.2 40 26" stroke="#96A7D7" stroke-width="2" stroke-linecap="round"/>
+  <path d="M24 34C27 37 30.2 38.5 33.5 38.5C36.8 38.5 40 37 43 34" stroke="#96A7D7" stroke-width="2" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="bg" x1="12" y1="10" x2="52" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#121B2E"/>
+      <stop offset="1" stop-color="#1F2F4C"/>
+    </linearGradient>
+    <linearGradient id="armor" x1="18" y1="18" x2="46" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5262A8"/>
+      <stop offset="1" stop-color="#2D3B6A"/>
+    </linearGradient>
+  </defs>
+</svg>
