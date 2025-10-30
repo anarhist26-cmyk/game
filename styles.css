@@ -203,15 +203,20 @@ html, body {
   gap: 14px;
 }
 
+.resource-bars__currency {
+  margin-top: 6px;
+}
+
+.resource-bars__currency .statline {
+  margin: 0;
+  width: 100%;
+}
+
 .main-header__commands {
   display: flex;
   flex-direction: column;
   gap: 16px;
   align-items: flex-start;
-}
-
-.main-header__commands .statline {
-  max-width: 260px;
 }
 
 .command-grid {
@@ -222,14 +227,19 @@ html, body {
 }
 
 .resource-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
   font-size: 0.78rem;
 }
 
-.resource-bar label {
+.resource-bar__label {
   color: var(--text-dim);
+  font-family: 'Play', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .resource-bar__track {
@@ -605,7 +615,7 @@ html, body {
   margin: 0;
 }
 
-.enemy-card__bars label {
+.enemy-card__bars .resource-bar__label {
   font-size: 0.75rem;
 }
 

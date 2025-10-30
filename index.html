@@ -57,7 +57,7 @@
                   </figure>
                   <div class="enemy-card__bars">
                     <div class="resource-bar">
-                      <label>НР</label>
+                      <span class="resource-bar__label">НР</span>
                       <div class="resource-bar__track">
                         <div class="resource-bar__value resource-bar__value--enemy" data-bar="enemy-hp" data-current="0" data-max="0" style="--value:0"></div>
                         <span class="resource-bar__text" data-bar-text="enemy-hp">0 / 0</span>
@@ -143,25 +143,36 @@
             <div class="main-header__status">
               <div class="resource-bars resource-bars--column">
                 <div class="resource-bar">
-                  <label for="health-bar">HP</label>
+                  <span class="resource-bar__label">HP</span>
                   <div class="resource-bar__track">
                     <div id="health-bar" class="resource-bar__value resource-bar__value--hp" data-bar="player-hp" data-current="450" data-max="600" style="--value:0.75"></div>
                     <span class="resource-bar__text" data-bar-text="player-hp">450 / 600</span>
                   </div>
                 </div>
                 <div class="resource-bar">
-                  <label for="mana-bar">MP</label>
+                  <span class="resource-bar__label">MP</span>
                   <div class="resource-bar__track">
                     <div id="mana-bar" class="resource-bar__value resource-bar__value--mp" data-bar="player-mp" data-current="280" data-max="350" style="--value:0.8"></div>
                     <span class="resource-bar__text" data-bar-text="player-mp">280 / 350</span>
                   </div>
                 </div>
                 <div class="resource-bar">
-                  <label for="xp-bar">XP</label>
+                  <span class="resource-bar__label">XP</span>
                   <div class="resource-bar__track">
                     <div id="xp-bar" class="resource-bar__value resource-bar__value--xp" data-bar="player-xp" data-current="2400" data-max="3000" style="--value:0.8"></div>
                     <span class="resource-bar__text" data-bar-text="player-xp">2 400 / 3 000</span>
                   </div>
+                </div>
+                <div class="resource-bars__currency">
+                  <dl class="statline">
+                    <div class="statline__currency" title="Золото">
+                      <dt>
+                        <span class="statline__icon" aria-hidden="true"></span>
+                        <span class="sr-only">Золото</span>
+                      </dt>
+                      <dd id="player-gold">1 250</dd>
+                    </div>
+                  </dl>
                 </div>
               </div>
               <div class="main-header__commands" aria-label="Команды управления">
@@ -174,15 +185,6 @@
                   <button type="button" class="command-button" data-command="map">Карта</button>
                   <button type="button" class="command-button" data-command="help">Помощь</button>
                 </div>
-                <dl class="statline">
-                  <div class="statline__currency" title="Золото">
-                    <dt>
-                      <span class="statline__icon" aria-hidden="true"></span>
-                      <span class="sr-only">Золото</span>
-                    </dt>
-                    <dd id="player-gold">1 250</dd>
-                  </div>
-                </dl>
               </div>
             </div>
           </header>
