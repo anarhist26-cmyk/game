@@ -2141,8 +2141,8 @@ html, body {
 
 .inventory-body {
   display: grid;
-  grid-template-columns: 220px 1fr 260px;
-  gap: 22px;
+  grid-template-columns: 260px minmax(0, 1fr) 300px;
+  gap: 24px;
   align-items: start;
 }
 
@@ -2173,6 +2173,7 @@ html, body {
 .inventory-weight__value {
   font-size: 1rem;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .inventory-resources {
@@ -2189,6 +2190,16 @@ html, body {
   justify-content: space-between;
   gap: 8px;
   font-size: 0.85rem;
+}
+
+.inventory-resources li span:first-child {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.inventory-resources li span:last-child {
+  min-width: 72px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .inventory-equipment {
@@ -2219,23 +2230,29 @@ html, body {
 
 .equipment-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.equipment-table tr + tr {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+.equipment-table tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.equipment-table tr:last-child {
+  border-bottom: none;
 }
 
 .equipment-table th,
 .equipment-table td {
-  padding: 6px 4px;
+  padding: 8px 0;
   font-size: 0.78rem;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .equipment-table th {
-  width: 44%;
+  width: 132px;
+  padding-right: 12px;
+  text-align: left;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -2254,7 +2271,7 @@ html, body {
 .equipment-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   font-weight: 600;
 }
 
@@ -2262,8 +2279,8 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
   font-size: 0.9rem;
   background: rgba(255, 255, 255, 0.12);
