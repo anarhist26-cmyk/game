@@ -84,6 +84,8 @@ const gameData = {
   loot: new Map(),
   monsters: [],
   monsterIndex: new Map(),
+  locationIndex: new Map(),
+  questIndex: new Map(),
   locations: [
     {
       id: 'central_plaza',
