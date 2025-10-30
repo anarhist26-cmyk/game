@@ -42,18 +42,6 @@ const codexEntryDescription = document.getElementById('codex-entry-description')
 const codexEntryStats = document.getElementById('codex-entry-stats');
 const codexEntryExtra = document.getElementById('codex-entry-extra');
 
-const forgeModal = document.getElementById('forge-modal');
-const forgeCloseButton = document.getElementById('forge-close');
-const forgeListElement = document.getElementById('forge-list');
-const forgeRecipeName = document.getElementById('forge-recipe-name');
-const forgeRecipeMeta = document.getElementById('forge-recipe-meta');
-const forgeRecipeDescription = document.getElementById('forge-recipe-description');
-const forgeRequirementsList = document.getElementById('forge-requirements');
-const forgeCostGold = document.getElementById('forge-cost-gold');
-const forgeCostEssence = document.getElementById('forge-cost-essence');
-const forgeResultPreview = document.getElementById('forge-result');
-const forgeCraftButton = document.getElementById('forge-craft');
-
 const questsModal = document.getElementById('quests-modal');
 const questsCloseButton = document.getElementById('quests-close');
 const questFilterButtons = document.querySelectorAll('[data-quest-filter]');
@@ -101,17 +89,11 @@ const gameData = {
   allSkills: [],
   skillIndex: new Map(),
   races: [],
-  raceIndex: new Map(),
-  recipes: [],
-  recipeIndex: new Map()
+  raceIndex: new Map()
 };
 
 const codexState = {
   category: 'monsters',
-  selectionId: null
-};
-
-const forgeState = {
   selectionId: null
 };
 
@@ -156,8 +138,7 @@ const dataSources = {
   locations: 'data/locations.json',
   quests: 'data/quests.json',
   races: 'data/races.json',
-  skills: 'data/skills.json',
-  recipes: 'data/recipes.json'
+  skills: 'data/skills.json'
 };
 
 const fallbackCatalogs = {
@@ -396,53 +377,6 @@ const fallbackCatalogs = {
       },
       weight: 3.1,
       dropChance: 0
-    }
-  ],
-  recipes: [
-    {
-      id: 'crimson_fury_blade',
-      name: 'Клинок багровой ярости',
-      icon: '⚔️',
-      rarity: 'легендарный',
-      category: 'Оружие',
-      description: 'Перековывает клыки и огненные ядра в легендарное лезвие.',
-      requirements: [
-        { itemId: 'iron_fang', quantity: 2 },
-        { itemId: 'ember_core', quantity: 1 },
-        { itemId: 'moon_shard', quantity: 1 }
-      ],
-      cost: { gold: 450, essence: 120 },
-      result: 'crimson_fury_blade'
-    },
-    {
-      id: 'shadow_guard_plate',
-      name: 'Латы стража сумерек',
-      icon: '🛡️',
-      rarity: 'эпический',
-      category: 'Броня',
-      description: 'Сплетает шкуры и клыки в тёмные латы защитника.',
-      requirements: [
-        { itemId: 'wolf_pelt', quantity: 3 },
-        { itemId: 'iron_fang', quantity: 1 },
-        { itemId: 'withered_root', quantity: 2 }
-      ],
-      cost: { gold: 260, essence: 80 },
-      result: 'shadow_guard_plate'
-    },
-    {
-      id: 'lunar_veil_cloak',
-      name: 'Плащ лунной дымки',
-      icon: '🧥',
-      rarity: 'редкий',
-      category: 'Плащ',
-      description: 'Выкраивает лёгкий плащ из волчьих шкур и лунных осколков.',
-      requirements: [
-        { itemId: 'wolf_pelt', quantity: 2 },
-        { itemId: 'moon_shard', quantity: 1 },
-        { itemId: 'withered_root', quantity: 1 }
-      ],
-      cost: { gold: 180, essence: 60 },
-      result: 'lunar_veil_cloak'
     }
   ],
   monsters: [
@@ -1549,55 +1483,7 @@ function registerQuests(quests = []) {
   }
 }
 
-function transformRecipe(rawRecipe) {
-  if (!rawRecipe) return null;
-  const id = rawRecipe.id ?? slugify(rawRecipe.name ?? 'recipe');
-  const requirements = Array.isArray(rawRecipe.requirements)
-    ? rawRecipe.requirements
-        .map((req) => {
-          if (!req?.itemId) return null;
-          return {
-            itemId: req.itemId,
-            quantity: Math.max(1, Number.parseInt(req.quantity ?? req.count ?? 1, 10))
-          };
-        })
-        .filter(Boolean)
-    : [];
-
-  return {
-    id,
-    name: rawRecipe.name ?? 'Неизвестная заготовка',
-    icon: rawRecipe.icon ?? '⚒️',
-    rarity: rawRecipe.rarity ?? 'обычный',
-    category: rawRecipe.category ?? 'Предмет',
-    description: rawRecipe.description ?? 'Схема требует уточнения.',
-    requirements,
-    cost: {
-      gold: Math.max(0, Number.parseInt(rawRecipe.cost?.gold ?? 0, 10)),
-      essence: Math.max(0, Number.parseInt(rawRecipe.cost?.essence ?? 0, 10))
-    },
-    result: rawRecipe.result ?? rawRecipe.output ?? id
-  };
-}
-
-function registerRecipes(recipes = []) {
-  const entries = Array.isArray(recipes) ? recipes.map((recipe) => transformRecipe(recipe)).filter(Boolean) : [];
-  gameData.recipes = entries;
-  gameData.recipeIndex.clear();
-  entries.forEach((recipe) => {
-    gameData.recipeIndex.set(recipe.id, recipe);
-  });
-
-  if (forgeState.selectionId && !gameData.recipeIndex.has(forgeState.selectionId)) {
-    forgeState.selectionId = null;
-  }
-
-  if (!forgeState.selectionId && entries.length) {
-    forgeState.selectionId = entries[0].id;
-  }
-}
-
-function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [], skills = [], races = [], recipes = [] }) {
+function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [], skills = [], races = [] }) {
   gameData.loot.clear();
   loot.forEach((entry) => {
     const enriched = enrichLootEntry(entry);
@@ -1608,8 +1494,6 @@ function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [],
   registerLocations(locations);
 
   registerSkills(skills);
-
-  registerRecipes(recipes);
 
   gameData.monsterIndex.clear();
   gameData.monsters = monsters.map((monster) => {
@@ -1622,7 +1506,6 @@ function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [],
   syncCodexAfterDataUpdate();
   syncQuestBoardAfterDataUpdate();
   syncSkillsAfterDataUpdate();
-  syncForgeAfterDataUpdate();
 }
 
 function registerRaces(races) {
@@ -1984,14 +1867,13 @@ function ensureRaceSelection() {
 }
 
 async function loadGameData() {
-  const [lootData, monsterData, locationData, questData, raceData, skillData, recipeData] = await Promise.all([
+  const [lootData, monsterData, locationData, questData, raceData, skillData] = await Promise.all([
     fetchJson(dataSources.loot),
     fetchJson(dataSources.monsters),
     fetchJson(dataSources.locations),
     fetchJson(dataSources.quests),
     fetchJson(dataSources.races),
-    fetchJson(dataSources.skills),
-    fetchJson(dataSources.recipes)
+    fetchJson(dataSources.skills)
   ]);
   ingestCatalogs({
     loot: lootData,
@@ -1999,8 +1881,7 @@ async function loadGameData() {
     locations: locationData,
     quests: questData,
     skills: skillData,
-    races: raceData,
-    recipes: recipeData
+    races: raceData
   });
 }
 
@@ -2205,210 +2086,6 @@ function renderInventory(selectedItemId = activeInventorySlot?.dataset.itemId ??
   } else if (!inventoryState.items.length) {
     renderInventoryDetails(null);
   }
-}
-
-function describeRecipeMeta(recipe) {
-  if (!recipe) return '—';
-  const rarity = recipe.rarity ? capitalize(recipe.rarity) : '';
-  const category = recipe.category ?? 'Предмет';
-  return rarity ? `${category} · ${rarity}` : category;
-}
-
-function isRecipeCraftable(recipe) {
-  if (!recipe) return false;
-  const goldCost = recipe.cost?.gold ?? 0;
-  const essenceCost = recipe.cost?.essence ?? 0;
-  if (playerState.gold < goldCost) return false;
-  if (resources.essence < essenceCost) return false;
-  return recipe.requirements.every((req) => getInventoryQuantity(req.itemId) >= req.quantity);
-}
-
-function renderForgeList() {
-  if (!forgeListElement) return;
-  forgeListElement.replaceChildren();
-
-  if (!gameData.recipes.length) {
-    const placeholder = document.createElement('li');
-    placeholder.className = 'forge-placeholder';
-    placeholder.textContent = 'Схемы кузни не найдены.';
-    forgeListElement.append(placeholder);
-    return;
-  }
-
-  gameData.recipes.forEach((recipe) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'forge-recipe';
-    button.dataset.recipeId = recipe.id;
-    button.setAttribute('role', 'option');
-    button.innerHTML = `
-      <span class="forge-recipe__icon">${recipe.icon ?? '⚒️'}</span>
-      <span class="forge-recipe__body">
-        <span class="forge-recipe__title">${recipe.name}</span>
-        <span class="forge-recipe__meta">${describeRecipeMeta(recipe)}</span>
-      </span>
-    `;
-    const selectable = recipe.id === forgeState.selectionId;
-    button.classList.toggle('is-selected', selectable);
-    button.setAttribute('aria-selected', String(selectable));
-    button.classList.toggle('is-available', isRecipeCraftable(recipe));
-    button.addEventListener('click', () => {
-      forgeState.selectionId = recipe.id;
-      renderForgeList();
-      renderForgeDetails();
-    });
-    forgeListElement.append(button);
-  });
-}
-
-function renderForgeDetails() {
-  if (!forgeRecipeName || !forgeRecipeDescription || !forgeRequirementsList) return;
-  const recipe = forgeState.selectionId ? gameData.recipeIndex.get(forgeState.selectionId) : null;
-
-  if (!recipe) {
-    forgeRecipeName.textContent = 'Выберите схему';
-    if (forgeRecipeMeta) forgeRecipeMeta.textContent = '—';
-    forgeRecipeDescription.textContent = 'Откройте одну из схем слева, чтобы увидеть требования.';
-    forgeRequirementsList.replaceChildren();
-    if (forgeCostGold) forgeCostGold.textContent = '0';
-    if (forgeCostEssence) forgeCostEssence.textContent = '0';
-    if (forgeResultPreview) forgeResultPreview.replaceChildren();
-    if (forgeCraftButton) forgeCraftButton.disabled = true;
-    return;
-  }
-
-  forgeRecipeName.textContent = recipe.name;
-  if (forgeRecipeMeta) forgeRecipeMeta.textContent = describeRecipeMeta(recipe);
-  forgeRecipeDescription.textContent = recipe.description;
-
-  forgeRequirementsList.replaceChildren();
-  recipe.requirements.forEach((req) => {
-    const lootEntry = gameData.loot.get(req.itemId);
-    const requirement = document.createElement('li');
-    requirement.className = 'forge-requirement';
-    const available = getInventoryQuantity(req.itemId);
-    requirement.classList.toggle('is-missing', available < req.quantity);
-
-    const icon = document.createElement('span');
-    icon.className = 'forge-requirement__icon';
-    icon.textContent = lootEntry?.icon ?? '⬖';
-
-    const label = document.createElement('span');
-    label.className = 'forge-requirement__label';
-    label.textContent = lootEntry?.name ?? req.itemId;
-
-    const qty = document.createElement('span');
-    qty.className = 'forge-requirement__qty';
-    qty.textContent = `${available}/${req.quantity}`;
-
-    if (lootEntry) {
-      requirement.title = formatPropertiesTooltip(lootEntry);
-    }
-
-    requirement.append(icon, label, qty);
-    forgeRequirementsList.append(requirement);
-  });
-
-  if (forgeCostGold) forgeCostGold.textContent = formatNumber(recipe.cost?.gold ?? 0);
-  if (forgeCostEssence) forgeCostEssence.textContent = formatNumber(recipe.cost?.essence ?? 0);
-
-  if (forgeResultPreview) {
-    forgeResultPreview.replaceChildren();
-    const lootEntry = gameData.loot.get(recipe.result);
-    if (lootEntry) {
-      const resultCard = document.createElement('div');
-      resultCard.className = 'forge-result-item';
-      resultCard.dataset.rarity = (lootEntry.rarity ?? 'common').toLowerCase();
-      resultCard.title = formatPropertiesTooltip(lootEntry);
-
-      const icon = document.createElement('span');
-      icon.className = 'forge-result-item__icon';
-      icon.textContent = lootEntry.icon ?? '⬖';
-
-      const title = document.createElement('span');
-      title.className = 'forge-result-item__title';
-      title.textContent = lootEntry.name;
-
-      resultCard.append(icon, title);
-      forgeResultPreview.append(resultCard);
-    } else {
-      const placeholder = document.createElement('p');
-      placeholder.className = 'forge-result-placeholder';
-      placeholder.textContent = 'Результат будет добавлен в инвентарь.';
-      forgeResultPreview.append(placeholder);
-    }
-  }
-
-  if (forgeCraftButton) {
-    forgeCraftButton.disabled = !isRecipeCraftable(recipe);
-    forgeCraftButton.dataset.recipeId = recipe.id;
-  }
-}
-
-function openForge() {
-  if (!forgeModal) return;
-  forgeModal.classList.remove('is-hidden');
-  forgeModal.setAttribute('aria-hidden', 'false');
-  renderForgeList();
-  renderForgeDetails();
-}
-
-function closeForge() {
-  if (!forgeModal) return;
-  forgeModal.classList.add('is-hidden');
-  forgeModal.setAttribute('aria-hidden', 'true');
-}
-
-function attemptCraft(recipeId) {
-  if (!recipeId) return;
-  const recipe = gameData.recipeIndex.get(recipeId);
-  if (!recipe) return;
-  if (!isRecipeCraftable(recipe)) {
-    appendCombatLog('Кузнец покачивает головой: ресурсов недостаточно.');
-    return;
-  }
-
-  const requirementsSatisfied = recipe.requirements.every((req) => removeInventoryItem(req.itemId, req.quantity));
-  if (!requirementsSatisfied) {
-    appendCombatLog('Расходники исчезли. Проверьте хранилище.');
-    return;
-  }
-
-  const goldCost = recipe.cost?.gold ?? 0;
-  const essenceCost = recipe.cost?.essence ?? 0;
-  playerState.gold = Math.max(0, playerState.gold - goldCost);
-  resources.essence = Math.max(0, resources.essence - essenceCost);
-
-  const lootEntry = gameData.loot.get(recipe.result) ?? {
-    id: recipe.result,
-    name: recipe.name,
-    rarity: recipe.rarity,
-    type: recipe.category,
-    icon: recipe.icon,
-    description: recipe.description,
-    properties: {}
-  };
-
-  const created = addInventoryItemFromLoot(lootEntry, 1);
-  sortInventoryItems();
-  updatePlayerUI();
-  updateResources();
-  updateInventoryWeight();
-  syncInventoryResources();
-
-  const inventoryOpen = inventoryModal && !inventoryModal.classList.contains('is-hidden');
-  if (inventoryOpen) {
-    const selectionId = created?.id ?? lootEntry.id;
-    renderInventory(selectionId);
-    const activeEntry = getInventoryEntry(selectionId);
-    renderInventoryDetails(activeEntry ?? null);
-  }
-
-  renderForgeDetails();
-  renderForgeList();
-
-  appendCombatLog(`В горне выкован предмет «${lootEntry.name}».`);
-  appendChatLog(`<strong>Система</strong>: «${lootEntry.name}» помещён в ваш инвентарь.`);
 }
 
 function formatPropertiesTooltip(entry) {
@@ -3243,19 +2920,6 @@ function closeSkills() {
 
 function syncSkillsAfterDataUpdate() {
   applyRaceSkillFilter({ preserveSelection: true });
-}
-
-function syncForgeAfterDataUpdate() {
-  if (forgeState.selectionId && !gameData.recipeIndex.has(forgeState.selectionId)) {
-    forgeState.selectionId = null;
-  }
-
-  if (!forgeState.selectionId && gameData.recipes.length) {
-    forgeState.selectionId = gameData.recipes[0].id;
-  }
-
-  renderForgeList();
-  renderForgeDetails();
 }
 
 function buildQuestDataset(filter = questBoardState.filter) {
@@ -4336,9 +4000,6 @@ if (commandButtons.length) {
         case 'skills':
           openSkills();
           break;
-        case 'forge':
-          openForge();
-          break;
         case 'race':
           openRaceSelection();
           break;
@@ -4356,15 +4017,6 @@ if (commandButtons.length) {
           break;
       }
     });
-  });
-}
-
-if (forgeModal) {
-  forgeModal.addEventListener('click', (event) => {
-    if (!(event.target instanceof HTMLElement)) return;
-    if (event.target === forgeModal || event.target.matches('[data-dismiss="forge"]')) {
-      closeForge();
-    }
   });
 }
 
@@ -4415,16 +4067,6 @@ if (raceModal) {
 
 if (inventoryCloseButton) {
   inventoryCloseButton.addEventListener('click', () => closeInventory());
-}
-
-if (forgeCloseButton) {
-  forgeCloseButton.addEventListener('click', () => closeForge());
-}
-
-if (forgeCraftButton) {
-  forgeCraftButton.addEventListener('click', () => {
-    attemptCraft(forgeCraftButton.dataset.recipeId ?? forgeState.selectionId);
-  });
 }
 
 if (codexCloseButton) {

@@ -191,7 +191,6 @@
                 <button type="button" class="command-button" data-command="inventory">Инвентарь</button>
                 <button type="button" class="command-button" data-command="codex">Кодекс</button>
                 <button type="button" class="command-button" data-command="skills">Навыки</button>
-                <button type="button" class="command-button" data-command="forge">Кузница</button>
                 <button type="button" class="command-button" data-command="quests">Квесты</button>
                 <button type="button" class="command-button" data-command="map">Карта</button>
                 <button type="button" class="command-button" data-command="help">Помощь</button>
@@ -225,45 +224,6 @@
               <div id="race-detail-skills" class="race-skills"></div>
               <button type="button" class="race-confirm" id="race-confirm" disabled>Подтвердить расу</button>
               <p id="race-lock-note" class="race-lock-note" hidden>Раса закрепится после регистрации героя.</p>
-            </section>
-          </div>
-        </div>
-      </div>
-      <div class="modal-layer is-hidden" id="forge-modal" role="dialog" aria-modal="true" aria-labelledby="forge-title" aria-hidden="true">
-        <div class="modal-backdrop" data-dismiss="forge"></div>
-        <div class="modal-window forge-window" role="document">
-          <header class="modal-header forge-header">
-            <h2 id="forge-title">Кузница</h2>
-            <button type="button" class="modal-close" id="forge-close" aria-label="Закрыть кузницу">✕</button>
-          </header>
-          <div class="forge-body">
-            <aside class="forge-sidebar" aria-label="Схемы кузницы">
-              <ul class="forge-recipes" id="forge-list" role="listbox" aria-labelledby="forge-title"></ul>
-            </aside>
-            <section class="forge-details" aria-live="polite">
-              <header class="forge-details__header">
-                <h3 id="forge-recipe-name">Выберите схему</h3>
-                <p id="forge-recipe-meta" class="forge-recipe-meta">—</p>
-              </header>
-              <p id="forge-recipe-description" class="forge-recipe-description">Отметьте одну из схем слева, чтобы увидеть требования.</p>
-              <section class="forge-section" aria-labelledby="forge-requirements-title">
-                <h4 id="forge-requirements-title">Требования</h4>
-                <ul class="forge-requirements" id="forge-requirements"></ul>
-              </section>
-              <section class="forge-section forge-costs" aria-labelledby="forge-costs-title">
-                <h4 id="forge-costs-title">Стоимость</h4>
-                <ul class="forge-cost-list">
-                  <li><span>Золото</span><span id="forge-cost-gold">0</span></li>
-                  <li><span>Эссенция</span><span id="forge-cost-essence">0</span></li>
-                </ul>
-              </section>
-              <section class="forge-section" aria-labelledby="forge-result-title">
-                <h4 id="forge-result-title">Результат</h4>
-                <div class="forge-result" id="forge-result"></div>
-              </section>
-              <div class="forge-actions">
-                <button type="button" class="forge-action" id="forge-craft" disabled>Ковать</button>
-              </div>
             </section>
           </div>
         </div>
