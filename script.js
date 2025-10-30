@@ -15,6 +15,10 @@ const combatLog = document.getElementById('combat-log');
 const chatLog = document.getElementById('chat-log');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
+const chatScrollButton = document.getElementById('chat-scroll-bottom');
+
+let chatAutoScroll = true;
+const CHAT_SCROLL_EPSILON = 6;
 
 const lootList = document.getElementById('loot-list');
 const actionButtons = document.querySelectorAll('.action-button');
@@ -2133,6 +2137,12 @@ function loadFallbackData() {
   ingestCatalogs(fallbackCatalogs);
 }
 
+function setChatScrollButtonState(isVisible) {
+  if (!chatScrollButton) return;
+  chatScrollButton.classList.toggle('is-active', Boolean(isVisible));
+  chatScrollButton.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+}
+
 function appendLog(target, text) {
   if (!target) return;
   const entry = document.createElement('li');
@@ -2153,7 +2163,21 @@ function appendLog(target, text) {
     target.removeChild(target.firstChild);
   }
 
-  target.scrollTo({ top: target.scrollHeight, behavior: 'smooth' });
+  const isChatTarget = target === chatLog;
+  const shouldAutoScroll = !isChatTarget || chatAutoScroll;
+
+  if (shouldAutoScroll) {
+    if (typeof target.scrollTo === 'function') {
+      target.scrollTo({ top: target.scrollHeight, behavior: 'smooth' });
+    } else {
+      target.scrollTop = target.scrollHeight;
+    }
+    if (isChatTarget) {
+      setChatScrollButtonState(false);
+    }
+  } else if (isChatTarget) {
+    setChatScrollButtonState(true);
+  }
 }
 
 function calculateInventoryWeight() {
@@ -4512,6 +4536,59 @@ actionButtons.forEach((button) => {
 if (enemyPortraitButton) {
   enemyPortraitButton.addEventListener('click', () => {
     openEnemyInCodex();
+  });
+}
+
+if (chatLog) {
+  const isChatAtBottom = () => {
+    if (!chatLog) return true;
+    const distance = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight;
+    return distance <= CHAT_SCROLL_EPSILON;
+  };
+
+  const releaseAutoScrollIfAtBottom = () => {
+    if (isChatAtBottom()) {
+      chatAutoScroll = true;
+      setChatScrollButtonState(false);
+    } else if (!chatAutoScroll) {
+      setChatScrollButtonState(true);
+    }
+  };
+
+  chatLog.addEventListener('scroll', () => {
+    releaseAutoScrollIfAtBottom();
+  });
+
+  chatLog.addEventListener(
+    'wheel',
+    () => {
+      chatAutoScroll = false;
+      setChatScrollButtonState(true);
+    },
+    { passive: true }
+  );
+
+  chatLog.addEventListener(
+    'touchmove',
+    () => {
+      chatAutoScroll = false;
+      setChatScrollButtonState(true);
+    },
+    { passive: true }
+  );
+
+  releaseAutoScrollIfAtBottom();
+}
+
+if (chatScrollButton && chatLog) {
+  chatScrollButton.addEventListener('click', () => {
+    chatAutoScroll = true;
+    if (typeof chatLog.scrollTo === 'function') {
+      chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: 'smooth' });
+    } else {
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+    setChatScrollButtonState(false);
   });
 }
 
