@@ -1174,6 +1174,7 @@ const enemyRewardElement = document.getElementById('enemy-reward');
 
 const sidebarHpBar = document.getElementById('sidebar-hp');
 const sidebarMpBar = document.getElementById('sidebar-mp');
+const heroPortraitName = document.getElementById('hero-portrait-name');
 
 const progressBars = new Map();
 const progressLabels = new Map();
@@ -3797,6 +3798,13 @@ function updatePlayerUI() {
   }
   if (sidebarMpBar) {
     sidebarMpBar.style.width = `${(playerState.mp / playerState.maxMp) * 100}%`;
+  }
+
+  if (heroPortraitName) {
+    const displayName = playerState.name || 'Герой';
+    const levelTag = typeof playerState.level === 'number' ? ` [${playerState.level}]` : '';
+    heroPortraitName.textContent = `${displayName}${levelTag}`;
+    heroPortraitName.setAttribute('aria-label', heroPortraitName.textContent);
   }
 
   // Имя и раса скрыты из пользовательского интерфейса.
