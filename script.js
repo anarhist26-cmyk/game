@@ -18,6 +18,9 @@ const lootList = document.getElementById('loot-list');
 const actionButtons = document.querySelectorAll('.action-button');
 const commandButtons = document.querySelectorAll('.command-button');
 
+const attributesModal = document.getElementById('attributes-modal');
+const attributesCloseButton = document.getElementById('attributes-close');
+
 const inventoryModal = document.getElementById('inventory-modal');
 const inventoryCloseButton = document.getElementById('inventory-close');
 const inventoryGrid = document.getElementById('inventory-grid');
@@ -113,12 +116,27 @@ const raceState = {
   highlightedId: null
 };
 
-const profileStorageKey = 'blood_legends_profile';
-const raceStorageKey = 'blood_legends_race';
+const profileStorageKey = 'labyrinth_client_profile';
+const raceStorageKey = 'labyrinth_client_race';
+const legacyProfileStorageKey = 'blood_legends_profile';
+const legacyRaceStorageKey = 'blood_legends_race';
 
-const storedProfileRaw = safeGetStorageItem(profileStorageKey);
+const newProfileRaw = safeGetStorageItem(profileStorageKey);
+const legacyProfileRaw = safeGetStorageItem(legacyProfileStorageKey);
+const storedProfileRaw = newProfileRaw ?? legacyProfileRaw;
+if (!newProfileRaw && legacyProfileRaw) {
+  safeSetStorageItem(profileStorageKey, legacyProfileRaw);
+  safeSetStorageItem(legacyProfileStorageKey, null);
+}
 const playerProfile = safeParseJson(storedProfileRaw);
-const storedRacePreferenceRaw = safeGetStorageItem(raceStorageKey);
+
+const newRacePreferenceRaw = safeGetStorageItem(raceStorageKey);
+const legacyRacePreferenceRaw = safeGetStorageItem(legacyRaceStorageKey);
+const storedRacePreferenceRaw = newRacePreferenceRaw ?? legacyRacePreferenceRaw;
+if (!newRacePreferenceRaw && legacyRacePreferenceRaw) {
+  safeSetStorageItem(raceStorageKey, legacyRacePreferenceRaw);
+  safeSetStorageItem(legacyRaceStorageKey, null);
+}
 const storedRacePreference = playerProfile?.raceId ?? storedRacePreferenceRaw ?? null;
 
 if (!playerProfile && typeof window !== 'undefined' && window.location) {
@@ -147,7 +165,7 @@ const fallbackCatalogs = {
       id: 'human',
       name: 'Человек',
       icon: '🛡️',
-      description: 'Универсальные исследователи Blood Legends, сочетающие дисциплину и адаптивность.',
+      description: 'Универсальные исследователи лабиринта, сочетающие дисциплину и адаптивность.',
       origin: 'Гарнизон Алого Предела',
       traits: [
         'Сбалансированные показатели характеристик',
@@ -776,7 +794,7 @@ const fallbackCatalogs = {
       cost: 3,
       icon: '✦',
       category: 'Парный',
-      description: 'Сливает опыт боя и тактики, открывая истинный потенциал Blood Legends.',
+      description: 'Сливает опыт боя и тактики, раскрывая истинный потенциал отряда.',
       prerequisites: ['nightmare_blade', 'crimson_vanguard'],
       effects: {
         'Все характеристики': '+8',
@@ -1153,9 +1171,6 @@ const enemyLevelElement = document.getElementById('enemy-level');
 const enemyStatusElement = document.getElementById('enemy-status');
 const enemyDamageElement = document.getElementById('enemy-damage');
 const enemyRewardElement = document.getElementById('enemy-reward');
-
-const playerRaceElement = document.getElementById('player-race');
-const playerNameElements = document.querySelectorAll('[data-player-name]');
 
 const sidebarHpBar = document.getElementById('sidebar-hp');
 const sidebarMpBar = document.getElementById('sidebar-mp');
@@ -2241,6 +2256,19 @@ function closeInventory() {
   inventoryModal.setAttribute('aria-hidden', 'true');
   clearInventorySelection();
   renderInventoryDetails(null);
+}
+
+function openAttributes() {
+  if (!attributesModal) return;
+  updatePlayerUI();
+  attributesModal.classList.remove('is-hidden');
+  attributesModal.setAttribute('aria-hidden', 'false');
+}
+
+function closeAttributes() {
+  if (!attributesModal) return;
+  attributesModal.classList.add('is-hidden');
+  attributesModal.setAttribute('aria-hidden', 'true');
 }
 
 function setCodexActiveTab(category) {
@@ -3771,15 +3799,7 @@ function updatePlayerUI() {
     sidebarMpBar.style.width = `${(playerState.mp / playerState.maxMp) * 100}%`;
   }
 
-  if (playerRaceElement) {
-    playerRaceElement.textContent = playerState.raceName ?? '—';
-  }
-
-  if (playerNameElements.length) {
-    playerNameElements.forEach((element) => {
-      element.textContent = playerState.name ?? '—';
-    });
-  }
+  // Имя и раса скрыты из пользовательского интерфейса.
 }
 
 function grantLoot(template) {
@@ -3994,6 +4014,9 @@ if (commandButtons.length) {
         case 'skills':
           openSkills();
           break;
+        case 'attributes':
+          openAttributes();
+          break;
         case 'race':
           openRaceSelection();
           break;
@@ -4019,6 +4042,15 @@ if (inventoryModal) {
     if (!(event.target instanceof HTMLElement)) return;
     if (event.target === inventoryModal || event.target.matches('[data-dismiss="inventory"]')) {
       closeInventory();
+    }
+  });
+}
+
+if (attributesModal) {
+  attributesModal.addEventListener('click', (event) => {
+    if (!(event.target instanceof HTMLElement)) return;
+    if (event.target === attributesModal || event.target.matches('[data-dismiss="attributes"]')) {
+      closeAttributes();
     }
   });
 }
@@ -4061,6 +4093,10 @@ if (raceModal) {
 
 if (inventoryCloseButton) {
   inventoryCloseButton.addEventListener('click', () => closeInventory());
+}
+
+if (attributesCloseButton) {
+  attributesCloseButton.addEventListener('click', () => closeAttributes());
 }
 
 if (codexCloseButton) {
@@ -4275,7 +4311,7 @@ async function initializeGame() {
     enemyStatusElement.textContent = 'Разведка не обнаружила подходящих координат. Проверьте карту.';
   }
 
-  appendCombatLog('Добро пожаловать в Blood Legends. Лабиринт ждёт ваших решений.');
+  appendCombatLog('Добро пожаловать в лабиринт. Он ждёт ваших решений.');
   appendChatLog('<strong>Система</strong>: Канал связи с отрядом активирован.');
 
   if (usedFallback) {

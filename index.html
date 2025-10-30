@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blood Legends</title>
+  <title>Игровой клиент</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 </head>
 <body>
   <div class="desktop-backdrop">
-    <div class="client-window" role="application" aria-label="Клиент Blood Legends">
+    <div class="client-window" role="application" aria-label="Игровой клиент">
       <div class="client-frame">
         <aside class="client-sidebar" aria-label="Герой и спутники">
           <div class="portrait-slot portrait-slot--hero">
@@ -20,7 +20,6 @@
               <div class="portrait-bar portrait-bar--hp"><span id="sidebar-hp" style="width: 78%"></span></div>
               <div class="portrait-bar portrait-bar--mp"><span id="sidebar-mp" style="width: 64%"></span></div>
             </div>
-            <span class="portrait-name" data-player-name>—</span>
           </div>
           <div class="portrait-slot portrait-slot--companion">
             <div class="portrait-image" aria-hidden="true"></div>
@@ -43,7 +42,6 @@
         <div class="client-main">
           <header class="main-header" aria-label="Статус героя">
             <div class="header-left">
-              <h1 class="game-logo">Blood Legends</h1>
               <div class="resource-bars">
                 <div class="resource-bar">
                   <label for="health-bar">HP</label>
@@ -68,12 +66,7 @@
                 </div>
               </div>
               <dl class="statline">
-                <div><dt>Герой</dt><dd data-player-name>—</dd></div>
-                <div><dt>Сила</dt><dd id="player-strength">45</dd></div>
-                <div><dt>Ловкость</dt><dd id="player-agility">52</dd></div>
-                <div><dt>Защита</dt><dd id="player-defense">38</dd></div>
                 <div><dt>Золото</dt><dd id="player-gold">1 250</dd></div>
-                <div><dt>Раса</dt><dd id="player-race">—</dd></div>
               </dl>
             </div>
           </header>
@@ -171,6 +164,7 @@
                 <button type="button" class="command-button" data-command="inventory">Инвентарь</button>
                 <button type="button" class="command-button" data-command="codex">Кодекс</button>
                 <button type="button" class="command-button" data-command="skills">Навыки</button>
+                <button type="button" class="command-button" data-command="attributes">Характеристики</button>
                 <button type="button" class="command-button" data-command="quests">Квесты</button>
                 <button type="button" class="command-button" data-command="map">Карта</button>
                 <button type="button" class="command-button" data-command="help">Помощь</button>
@@ -186,7 +180,7 @@
           <header class="modal-header race-header">
             <div class="race-header__titles">
               <h2 id="race-title">Выбор расы</h2>
-              <p class="race-subtitle">Каждая культура Blood Legends открывает собственные пути развития.</p>
+              <p class="race-subtitle">Каждая культура открывает собственные пути развития.</p>
             </div>
             <button type="button" class="modal-close" id="race-close" aria-label="Закрыть окно выбора расы">✕</button>
           </header>
@@ -323,7 +317,24 @@
       </div>
       <div class="client-footer">
         <span class="footer-badge">v 4.0.1</span>
-        <span class="footer-text">Blood Legends · Окно клиента</span>
+        <span class="footer-text">Игровой клиент</span>
+      </div>
+    </div>
+  </div>
+  <div class="modal-layer is-hidden" id="attributes-modal" role="dialog" aria-modal="true" aria-labelledby="attributes-title" aria-hidden="true">
+    <div class="modal-backdrop" data-dismiss="attributes"></div>
+    <div class="modal-window attributes-window" role="document">
+      <header class="modal-header attributes-header">
+        <h2 id="attributes-title">Характеристики</h2>
+        <button type="button" class="modal-close" id="attributes-close" aria-label="Закрыть окно характеристик">✕</button>
+      </header>
+      <div class="attributes-body" aria-live="polite">
+        <p class="attributes-intro">Базовые показатели героя, влияющие на бой и исследования.</p>
+        <dl class="attributes-list">
+          <div><dt>Сила</dt><dd id="player-strength">45</dd></div>
+          <div><dt>Ловкость</dt><dd id="player-agility">52</dd></div>
+          <div><dt>Защита</dt><dd id="player-defense">38</dd></div>
+        </dl>
       </div>
     </div>
   </div>

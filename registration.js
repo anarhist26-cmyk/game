@@ -1,5 +1,7 @@
-const profileStorageKey = 'blood_legends_profile';
-const raceStorageKey = 'blood_legends_race';
+const profileStorageKey = 'labyrinth_client_profile';
+const raceStorageKey = 'labyrinth_client_race';
+const legacyProfileStorageKey = 'blood_legends_profile';
+const legacyRaceStorageKey = 'blood_legends_race';
 
 const registrationForm = document.getElementById('registration-form');
 const raceListElement = document.getElementById('registration-race-list');
@@ -81,7 +83,7 @@ function storageAvailable() {
       return false;
     }
     const storage = window.localStorage;
-    const testKey = '__blood_legends_test__';
+    const testKey = '__labyrinth_client_test__';
     storage.setItem(testKey, '1');
     storage.removeItem(testKey);
     return true;
@@ -95,7 +97,15 @@ function getStoredProfile() {
     if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
       return null;
     }
-    return safeParseJson(window.localStorage.getItem(profileStorageKey));
+    const storage = window.localStorage;
+    const newRaw = storage.getItem(profileStorageKey);
+    const legacyRaw = storage.getItem(legacyProfileStorageKey);
+    const raw = newRaw ?? legacyRaw;
+    if (!newRaw && legacyRaw) {
+      storage.setItem(profileStorageKey, legacyRaw);
+      storage.removeItem(legacyProfileStorageKey);
+    }
+    return safeParseJson(raw);
   } catch (error) {
     return null;
   }
@@ -279,6 +289,8 @@ async function handleRegistration(races) {
     }
     window.localStorage.setItem(profileStorageKey, JSON.stringify(profile));
     window.localStorage.setItem(raceStorageKey, raceId);
+    window.localStorage.removeItem(legacyProfileStorageKey);
+    window.localStorage.removeItem(legacyRaceStorageKey);
     window.location.replace('index.html');
   } catch (error) {
     console.error(error);

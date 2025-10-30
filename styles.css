@@ -188,17 +188,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 60%;
-}
-
-.game-logo {
-  font-family: 'Play', sans-serif;
-  font-size: 1.8rem;
-  letter-spacing: 0.12em;
-  margin: 0;
-  text-transform: uppercase;
-  color: var(--accent-gold);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+  width: 100%;
 }
 
 .resource-bars {
@@ -263,7 +253,7 @@ html, body {
 
 .statline {
   display: grid;
-  grid-template-columns: repeat(4, auto);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px 16px;
   margin: 0;
   font-size: 0.8rem;
@@ -756,6 +746,56 @@ html, body {
 .modal-close:hover {
   transform: scale(1.05);
   border-color: rgba(255, 255, 255, 0.32);
+}
+
+.attributes-window {
+  max-width: 420px;
+}
+
+.attributes-header {
+  align-items: center;
+}
+
+.attributes-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.attributes-intro {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.attributes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.attributes-list div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(37, 47, 61, 0.9), rgba(23, 29, 38, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.attributes-list dt {
+  margin: 0;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.attributes-list dd {
+  margin: 0;
+  font-family: 'Play', sans-serif;
+  font-size: 1rem;
+  color: var(--text-bright);
 }
 
 .inventory-window {
