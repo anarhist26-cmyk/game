@@ -135,22 +135,13 @@
                   <input id="chat-input" name="chat" type="text" maxlength="160" placeholder="Введите сообщение" required>
                   <button type="submit" class="chat-send">Отправить</button>
                 </form>
-                <div class="command-row">
-                  <button type="button" class="command-button" data-command="inventory">Инвентарь</button>
-                  <button type="button" class="command-button" data-command="codex">Кодекс</button>
-                  <button type="button" class="command-button" data-command="skills">Навыки</button>
-                  <button type="button" class="command-button" data-command="attributes">Характеристики</button>
-                  <button type="button" class="command-button" data-command="quests">Квесты</button>
-                  <button type="button" class="command-button" data-command="map">Карта</button>
-                  <button type="button" class="command-button" data-command="help">Помощь</button>
-                </div>
               </footer>
             </section>
           </section>
 
           <header class="main-header" aria-label="Статус героя">
-            <div class="header-left">
-              <div class="resource-bars">
+            <div class="main-header__status">
+              <div class="resource-bars resource-bars--column">
                 <div class="resource-bar">
                   <label for="health-bar">HP</label>
                   <div class="resource-bar__track">
@@ -173,15 +164,26 @@
                   </div>
                 </div>
               </div>
-              <dl class="statline">
-                <div class="statline__currency" title="Золото">
-                  <dt>
-                    <span class="statline__icon" aria-hidden="true"></span>
-                    <span class="sr-only">Золото</span>
-                  </dt>
-                  <dd id="player-gold">1 250</dd>
+              <div class="main-header__commands" aria-label="Команды управления">
+                <div class="command-grid">
+                  <button type="button" class="command-button" data-command="inventory">Инвентарь</button>
+                  <button type="button" class="command-button" data-command="codex">Кодекс</button>
+                  <button type="button" class="command-button" data-command="skills">Навыки</button>
+                  <button type="button" class="command-button" data-command="attributes">Характеристики</button>
+                  <button type="button" class="command-button" data-command="quests">Квесты</button>
+                  <button type="button" class="command-button" data-command="map">Карта</button>
+                  <button type="button" class="command-button" data-command="help">Помощь</button>
                 </div>
-              </dl>
+                <dl class="statline">
+                  <div class="statline__currency" title="Золото">
+                    <dt>
+                      <span class="statline__icon" aria-hidden="true"></span>
+                      <span class="sr-only">Золото</span>
+                    </dt>
+                    <dd id="player-gold">1 250</dd>
+                  </div>
+                </dl>
+              </div>
             </div>
           </header>
 
