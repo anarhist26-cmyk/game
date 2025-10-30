@@ -285,53 +285,6 @@ html, body {
   font-family: 'Play', sans-serif;
 }
 
-.header-right {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: flex-end;
-}
-
-.server-info {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 10px 14px;
-  text-align: right;
-}
-
-.server-info__label {
-  display: block;
-  font-size: 0.7rem;
-  color: var(--text-dim);
-}
-
-.server-info__value {
-  font-family: 'Play', sans-serif;
-  font-size: 1.1rem;
-  letter-spacing: 0.08em;
-}
-
-.currency-panel {
-  display: grid;
-  gap: 6px;
-  width: 200px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-
-.currency {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
-}
-
-.currency__label {
-  color: var(--text-dim);
-}
-
 .main-top {
   display: grid;
   grid-template-columns: 1fr 0.9fr;

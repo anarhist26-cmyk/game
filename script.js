@@ -1154,10 +1154,6 @@ const enemyStatusElement = document.getElementById('enemy-status');
 const enemyDamageElement = document.getElementById('enemy-damage');
 const enemyRewardElement = document.getElementById('enemy-reward');
 
-const serverTimeElement = document.getElementById('server-time');
-const essenceCounter = document.getElementById('essence-counter');
-const crystalCounter = document.getElementById('crystal-counter');
-const renownCounter = document.getElementById('renown-counter');
 const playerRaceElement = document.getElementById('player-race');
 const playerNameElements = document.querySelectorAll('[data-player-name]');
 
@@ -1984,11 +1980,9 @@ function addInventoryItemFromLoot(lootEntry, quantity = 1) {
 function syncInventoryResources() {
   if (!inventoryGoldElement || !inventoryEssenceElement || !inventoryCrystalsElement) return;
   const goldText = document.getElementById('player-gold')?.textContent ?? '0';
-  const essenceText = essenceCounter?.textContent ?? '0';
-  const crystalText = crystalCounter?.textContent ?? '0';
   inventoryGoldElement.textContent = goldText;
-  inventoryEssenceElement.textContent = essenceText;
-  inventoryCrystalsElement.textContent = crystalText;
+  inventoryEssenceElement.textContent = formatNumber(resources.essence);
+  inventoryCrystalsElement.textContent = formatNumber(resources.crystals);
 }
 
 function updateInventoryWeight() {
@@ -4245,35 +4239,18 @@ if (mapControls.length) {
   });
 }
 
-function updateServerTime() {
-  if (!serverTimeElement) return;
-  const now = new Date();
-  serverTimeElement.textContent = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-}
-
-updateServerTime();
-setInterval(updateServerTime, 1000);
-
 const resources = {
   essence: 9870,
-  crystals: 1240,
-  renown: 42600
+  crystals: 1240
 };
-
-function updateResources() {
-  if (essenceCounter) essenceCounter.textContent = formatNumber(resources.essence);
-  if (crystalCounter) crystalCounter.textContent = formatNumber(resources.crystals);
-  if (renownCounter) renownCounter.textContent = formatNumber(resources.renown);
-}
 
 setInterval(() => {
   resources.essence += randomBetween(3, 9);
   resources.crystals += randomBetween(1, 4);
-  resources.renown += randomBetween(6, 14);
-  updateResources();
+  syncInventoryResources();
 }, 5000);
 
-updateResources();
+syncInventoryResources();
 
 async function initializeGame() {
   let usedFallback = false;
