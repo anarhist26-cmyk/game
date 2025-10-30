@@ -42,6 +42,18 @@ const codexEntryDescription = document.getElementById('codex-entry-description')
 const codexEntryStats = document.getElementById('codex-entry-stats');
 const codexEntryExtra = document.getElementById('codex-entry-extra');
 
+const forgeModal = document.getElementById('forge-modal');
+const forgeCloseButton = document.getElementById('forge-close');
+const forgeListElement = document.getElementById('forge-list');
+const forgeRecipeName = document.getElementById('forge-recipe-name');
+const forgeRecipeMeta = document.getElementById('forge-recipe-meta');
+const forgeRecipeDescription = document.getElementById('forge-recipe-description');
+const forgeRequirementsList = document.getElementById('forge-requirements');
+const forgeCostGold = document.getElementById('forge-cost-gold');
+const forgeCostEssence = document.getElementById('forge-cost-essence');
+const forgeResultPreview = document.getElementById('forge-result');
+const forgeCraftButton = document.getElementById('forge-craft');
+
 const questsModal = document.getElementById('quests-modal');
 const questsCloseButton = document.getElementById('quests-close');
 const questFilterButtons = document.querySelectorAll('[data-quest-filter]');
@@ -89,11 +101,17 @@ const gameData = {
   allSkills: [],
   skillIndex: new Map(),
   races: [],
-  raceIndex: new Map()
+  raceIndex: new Map(),
+  recipes: [],
+  recipeIndex: new Map()
 };
 
 const codexState = {
   category: 'monsters',
+  selectionId: null
+};
+
+const forgeState = {
   selectionId: null
 };
 
@@ -138,7 +156,8 @@ const dataSources = {
   locations: 'data/locations.json',
   quests: 'data/quests.json',
   races: 'data/races.json',
-  skills: 'data/skills.json'
+  skills: 'data/skills.json',
+  recipes: 'data/recipes.json'
 };
 
 const fallbackCatalogs = {
@@ -332,6 +351,98 @@ const fallbackCatalogs = {
       },
       weight: 0.6,
       dropChance: 0.4
+    },
+    {
+      id: 'crimson_fury_blade',
+      name: 'Клинок багровой ярости',
+      rarity: 'легендарный',
+      type: 'Оружие',
+      icon: '⚔️',
+      description: 'Легендарное лезвие, кованое в Алом Горне. Каждая успешная атака разогревает клинок.',
+      properties: {
+        'Физический урон': '+34',
+        'Критический урон': '+18%',
+        'Ярость': '+10 ед.'
+      },
+      weight: 8.4,
+      dropChance: 0
+    },
+    {
+      id: 'shadow_guard_plate',
+      name: 'Латы стража сумерек',
+      rarity: 'эпический',
+      type: 'Броня',
+      icon: '🛡️',
+      description: 'Броня, впитавшая тень лабиринта и отражающая проклятия.',
+      properties: {
+        'Броня': '+46',
+        'Сопротивление проклятиям': '+20%',
+        'Стойкость': '+12'
+      },
+      weight: 15.6,
+      dropChance: 0
+    },
+    {
+      id: 'lunar_veil_cloak',
+      name: 'Плащ лунной дымки',
+      rarity: 'редкий',
+      type: 'Плащ',
+      icon: '🧥',
+      description: 'Лёгкий плащ следопыта, скрывающий носителя в ночном тумане.',
+      properties: {
+        'Уклонение': '+10%',
+        'Скорость передвижения': '+6%',
+        'Сопротивление тьме': '+8%'
+      },
+      weight: 3.1,
+      dropChance: 0
+    }
+  ],
+  recipes: [
+    {
+      id: 'crimson_fury_blade',
+      name: 'Клинок багровой ярости',
+      icon: '⚔️',
+      rarity: 'легендарный',
+      category: 'Оружие',
+      description: 'Перековывает клыки и огненные ядра в легендарное лезвие.',
+      requirements: [
+        { itemId: 'iron_fang', quantity: 2 },
+        { itemId: 'ember_core', quantity: 1 },
+        { itemId: 'moon_shard', quantity: 1 }
+      ],
+      cost: { gold: 450, essence: 120 },
+      result: 'crimson_fury_blade'
+    },
+    {
+      id: 'shadow_guard_plate',
+      name: 'Латы стража сумерек',
+      icon: '🛡️',
+      rarity: 'эпический',
+      category: 'Броня',
+      description: 'Сплетает шкуры и клыки в тёмные латы защитника.',
+      requirements: [
+        { itemId: 'wolf_pelt', quantity: 3 },
+        { itemId: 'iron_fang', quantity: 1 },
+        { itemId: 'withered_root', quantity: 2 }
+      ],
+      cost: { gold: 260, essence: 80 },
+      result: 'shadow_guard_plate'
+    },
+    {
+      id: 'lunar_veil_cloak',
+      name: 'Плащ лунной дымки',
+      icon: '🧥',
+      rarity: 'редкий',
+      category: 'Плащ',
+      description: 'Выкраивает лёгкий плащ из волчьих шкур и лунных осколков.',
+      requirements: [
+        { itemId: 'wolf_pelt', quantity: 2 },
+        { itemId: 'moon_shard', quantity: 1 },
+        { itemId: 'withered_root', quantity: 1 }
+      ],
+      cost: { gold: 180, essence: 60 },
+      result: 'lunar_veil_cloak'
     }
   ],
   monsters: [
@@ -888,9 +999,91 @@ const inventoryState = {
         'Восстановление MP': '+10'
       },
       description: 'Хранит в себе отголоски павших героев. Усиливает контроль над магией крови.'
+    },
+    {
+      id: 'wolf_pelt',
+      name: 'Шкура теневого волка',
+      short: 'Шкура',
+      type: 'Материал',
+      rarity: 'common',
+      icon: '🐺',
+      quantity: 4,
+      weight: 2.5,
+      stats: {
+        'Броня (лёгкая)': '+8',
+        'Сопротивление холоду': '+10%',
+        'Шанс уклонения': '+4%'
+      },
+      description: 'Плотная шкура, пропитанная тенью. Подходит для пошива скрытных плащей.'
+    },
+    {
+      id: 'iron_fang',
+      name: 'Железный клык',
+      short: 'Клык',
+      type: 'Компонент',
+      rarity: 'uncommon',
+      icon: '🦷',
+      quantity: 3,
+      weight: 1.2,
+      stats: {
+        'Физический урон': '+6',
+        'Прочность оружия': '+15%',
+        'Пробивание брони': '+3'
+      },
+      description: 'Отшлифованный клык с примесью руды. Кузнецы плавят его в клинки повышенной прочности.'
+    },
+    {
+      id: 'ember_core',
+      name: 'Ядро угольного элементаля',
+      short: 'Ядро',
+      type: 'Сердце элементаля',
+      rarity: 'rare',
+      icon: '🔥',
+      quantity: 2,
+      weight: 3.4,
+      stats: {
+        'Урон огнём': '+18%',
+        'Сопротивление холоду': '+8%',
+        'Воспламенение': '+12%'
+      },
+      description: 'Горящее сердце элементаля, дающее тепло даже в руках. Используется для ковки оружия огня.'
+    },
+    {
+      id: 'moon_shard',
+      name: 'Лунный осколок',
+      short: 'Осколок',
+      type: 'Катализатор',
+      rarity: 'rare',
+      icon: '🌙',
+      quantity: 2,
+      weight: 0.4,
+      stats: {
+        'Магический урон по нежити': '+12%',
+        'Критический шанс заклинаний': '+4%',
+        'Пронзание тьмы': '+6'
+      },
+      description: 'Кристалл, напитанный серебристым сиянием. Используется для зачарования оружия против нежити.'
+    },
+    {
+      id: 'withered_root',
+      name: 'Истлевший корень',
+      short: 'Корень',
+      type: 'Ингредиент',
+      rarity: 'common',
+      icon: '🌿',
+      quantity: 5,
+      weight: 0.3,
+      stats: {
+        'Восстановление здоровья вне боя': '+8',
+        'Сопротивление яду': '+6%',
+        'Природная регенерация': '+2 ед./5 сек'
+      },
+      description: 'Распространённый ингредиент для зелий стойкости, растущий на пограничных землях.'
     }
   ]
 };
+
+sortInventoryItems();
 
 const equipmentSlotsMeta = [
   { id: 'helmet', label: 'Шлем' },
@@ -1356,7 +1549,55 @@ function registerQuests(quests = []) {
   }
 }
 
-function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [], skills = [], races = [] }) {
+function transformRecipe(rawRecipe) {
+  if (!rawRecipe) return null;
+  const id = rawRecipe.id ?? slugify(rawRecipe.name ?? 'recipe');
+  const requirements = Array.isArray(rawRecipe.requirements)
+    ? rawRecipe.requirements
+        .map((req) => {
+          if (!req?.itemId) return null;
+          return {
+            itemId: req.itemId,
+            quantity: Math.max(1, Number.parseInt(req.quantity ?? req.count ?? 1, 10))
+          };
+        })
+        .filter(Boolean)
+    : [];
+
+  return {
+    id,
+    name: rawRecipe.name ?? 'Неизвестная заготовка',
+    icon: rawRecipe.icon ?? '⚒️',
+    rarity: rawRecipe.rarity ?? 'обычный',
+    category: rawRecipe.category ?? 'Предмет',
+    description: rawRecipe.description ?? 'Схема требует уточнения.',
+    requirements,
+    cost: {
+      gold: Math.max(0, Number.parseInt(rawRecipe.cost?.gold ?? 0, 10)),
+      essence: Math.max(0, Number.parseInt(rawRecipe.cost?.essence ?? 0, 10))
+    },
+    result: rawRecipe.result ?? rawRecipe.output ?? id
+  };
+}
+
+function registerRecipes(recipes = []) {
+  const entries = Array.isArray(recipes) ? recipes.map((recipe) => transformRecipe(recipe)).filter(Boolean) : [];
+  gameData.recipes = entries;
+  gameData.recipeIndex.clear();
+  entries.forEach((recipe) => {
+    gameData.recipeIndex.set(recipe.id, recipe);
+  });
+
+  if (forgeState.selectionId && !gameData.recipeIndex.has(forgeState.selectionId)) {
+    forgeState.selectionId = null;
+  }
+
+  if (!forgeState.selectionId && entries.length) {
+    forgeState.selectionId = entries[0].id;
+  }
+}
+
+function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [], skills = [], races = [], recipes = [] }) {
   gameData.loot.clear();
   loot.forEach((entry) => {
     const enriched = enrichLootEntry(entry);
@@ -1367,6 +1608,8 @@ function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [],
   registerLocations(locations);
 
   registerSkills(skills);
+
+  registerRecipes(recipes);
 
   gameData.monsterIndex.clear();
   gameData.monsters = monsters.map((monster) => {
@@ -1379,6 +1622,7 @@ function ingestCatalogs({ loot = [], monsters = [], locations = [], quests = [],
   syncCodexAfterDataUpdate();
   syncQuestBoardAfterDataUpdate();
   syncSkillsAfterDataUpdate();
+  syncForgeAfterDataUpdate();
 }
 
 function registerRaces(races) {
@@ -1740,13 +1984,14 @@ function ensureRaceSelection() {
 }
 
 async function loadGameData() {
-  const [lootData, monsterData, locationData, questData, raceData, skillData] = await Promise.all([
+  const [lootData, monsterData, locationData, questData, raceData, skillData, recipeData] = await Promise.all([
     fetchJson(dataSources.loot),
     fetchJson(dataSources.monsters),
     fetchJson(dataSources.locations),
     fetchJson(dataSources.quests),
     fetchJson(dataSources.races),
-    fetchJson(dataSources.skills)
+    fetchJson(dataSources.skills),
+    fetchJson(dataSources.recipes)
   ]);
   ingestCatalogs({
     loot: lootData,
@@ -1754,7 +1999,8 @@ async function loadGameData() {
     locations: locationData,
     quests: questData,
     skills: skillData,
-    races: raceData
+    races: raceData,
+    recipes: recipeData
   });
 }
 
@@ -1787,6 +2033,71 @@ function appendLog(target, text) {
 
 function calculateInventoryWeight() {
   return inventoryState.items.reduce((total, item) => total + item.weight * item.quantity, 0);
+}
+
+function deriveShortLabel(name) {
+  if (!name) return 'Предмет';
+  if (name.length <= 10) return name;
+  const words = name.split(/\s+/).filter(Boolean);
+  const candidate = words.find((word) => word.length <= 10);
+  if (candidate) return candidate;
+  return `${name.slice(0, 9)}…`;
+}
+
+function getInventoryEntry(itemId) {
+  return inventoryState.items.find((entry) => entry.id === itemId) ?? null;
+}
+
+function getInventoryQuantity(itemId) {
+  const entry = getInventoryEntry(itemId);
+  return entry ? entry.quantity : 0;
+}
+
+function sortInventoryItems() {
+  inventoryState.items.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+}
+
+function removeInventoryItem(itemId, quantity) {
+  const entry = getInventoryEntry(itemId);
+  if (!entry || entry.quantity < quantity) {
+    return false;
+  }
+  entry.quantity -= quantity;
+  if (entry.quantity <= 0) {
+    inventoryState.items = inventoryState.items.filter((item) => item.id !== itemId);
+  }
+  return true;
+}
+
+function addInventoryItemFromLoot(lootEntry, quantity = 1) {
+  if (!lootEntry) return null;
+  const existing = getInventoryEntry(lootEntry.id);
+  if (existing) {
+    existing.quantity += quantity;
+    existing.weight = lootEntry.weight ?? existing.weight ?? 1;
+    existing.stats = lootEntry.properties ? { ...lootEntry.properties } : existing.stats;
+    existing.description = lootEntry.description ?? existing.description ?? '';
+    existing.type = lootEntry.type ?? existing.type ?? 'Предмет';
+    existing.rarity = lootEntry.rarity ?? existing.rarity ?? 'обычный';
+    existing.icon = lootEntry.icon ?? existing.icon ?? rarityGlyphs[(lootEntry.rarity ?? 'common').toLowerCase()] ?? '⬖';
+    sortInventoryItems();
+    return existing;
+  }
+  const entry = {
+    id: lootEntry.id,
+    name: lootEntry.name ?? 'Неизвестный предмет',
+    short: deriveShortLabel(lootEntry.short ?? lootEntry.name ?? lootEntry.id),
+    type: lootEntry.type ?? 'Предмет',
+    rarity: lootEntry.rarity ?? 'обычный',
+    icon: lootEntry.icon ?? rarityGlyphs[(lootEntry.rarity ?? 'common').toLowerCase()] ?? '⬖',
+    quantity,
+    weight: lootEntry.weight ?? 1,
+    stats: lootEntry.properties ? { ...lootEntry.properties } : {},
+    description: lootEntry.description ?? ''
+  };
+  inventoryState.items.push(entry);
+  sortInventoryItems();
+  return entry;
 }
 
 function syncInventoryResources() {
@@ -1894,6 +2205,210 @@ function renderInventory(selectedItemId = activeInventorySlot?.dataset.itemId ??
   } else if (!inventoryState.items.length) {
     renderInventoryDetails(null);
   }
+}
+
+function describeRecipeMeta(recipe) {
+  if (!recipe) return '—';
+  const rarity = recipe.rarity ? capitalize(recipe.rarity) : '';
+  const category = recipe.category ?? 'Предмет';
+  return rarity ? `${category} · ${rarity}` : category;
+}
+
+function isRecipeCraftable(recipe) {
+  if (!recipe) return false;
+  const goldCost = recipe.cost?.gold ?? 0;
+  const essenceCost = recipe.cost?.essence ?? 0;
+  if (playerState.gold < goldCost) return false;
+  if (resources.essence < essenceCost) return false;
+  return recipe.requirements.every((req) => getInventoryQuantity(req.itemId) >= req.quantity);
+}
+
+function renderForgeList() {
+  if (!forgeListElement) return;
+  forgeListElement.replaceChildren();
+
+  if (!gameData.recipes.length) {
+    const placeholder = document.createElement('li');
+    placeholder.className = 'forge-placeholder';
+    placeholder.textContent = 'Схемы кузни не найдены.';
+    forgeListElement.append(placeholder);
+    return;
+  }
+
+  gameData.recipes.forEach((recipe) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'forge-recipe';
+    button.dataset.recipeId = recipe.id;
+    button.setAttribute('role', 'option');
+    button.innerHTML = `
+      <span class="forge-recipe__icon">${recipe.icon ?? '⚒️'}</span>
+      <span class="forge-recipe__body">
+        <span class="forge-recipe__title">${recipe.name}</span>
+        <span class="forge-recipe__meta">${describeRecipeMeta(recipe)}</span>
+      </span>
+    `;
+    const selectable = recipe.id === forgeState.selectionId;
+    button.classList.toggle('is-selected', selectable);
+    button.setAttribute('aria-selected', String(selectable));
+    button.classList.toggle('is-available', isRecipeCraftable(recipe));
+    button.addEventListener('click', () => {
+      forgeState.selectionId = recipe.id;
+      renderForgeList();
+      renderForgeDetails();
+    });
+    forgeListElement.append(button);
+  });
+}
+
+function renderForgeDetails() {
+  if (!forgeRecipeName || !forgeRecipeDescription || !forgeRequirementsList) return;
+  const recipe = forgeState.selectionId ? gameData.recipeIndex.get(forgeState.selectionId) : null;
+
+  if (!recipe) {
+    forgeRecipeName.textContent = 'Выберите схему';
+    if (forgeRecipeMeta) forgeRecipeMeta.textContent = '—';
+    forgeRecipeDescription.textContent = 'Откройте одну из схем слева, чтобы увидеть требования.';
+    forgeRequirementsList.replaceChildren();
+    if (forgeCostGold) forgeCostGold.textContent = '0';
+    if (forgeCostEssence) forgeCostEssence.textContent = '0';
+    if (forgeResultPreview) forgeResultPreview.replaceChildren();
+    if (forgeCraftButton) forgeCraftButton.disabled = true;
+    return;
+  }
+
+  forgeRecipeName.textContent = recipe.name;
+  if (forgeRecipeMeta) forgeRecipeMeta.textContent = describeRecipeMeta(recipe);
+  forgeRecipeDescription.textContent = recipe.description;
+
+  forgeRequirementsList.replaceChildren();
+  recipe.requirements.forEach((req) => {
+    const lootEntry = gameData.loot.get(req.itemId);
+    const requirement = document.createElement('li');
+    requirement.className = 'forge-requirement';
+    const available = getInventoryQuantity(req.itemId);
+    requirement.classList.toggle('is-missing', available < req.quantity);
+
+    const icon = document.createElement('span');
+    icon.className = 'forge-requirement__icon';
+    icon.textContent = lootEntry?.icon ?? '⬖';
+
+    const label = document.createElement('span');
+    label.className = 'forge-requirement__label';
+    label.textContent = lootEntry?.name ?? req.itemId;
+
+    const qty = document.createElement('span');
+    qty.className = 'forge-requirement__qty';
+    qty.textContent = `${available}/${req.quantity}`;
+
+    if (lootEntry) {
+      requirement.title = formatPropertiesTooltip(lootEntry);
+    }
+
+    requirement.append(icon, label, qty);
+    forgeRequirementsList.append(requirement);
+  });
+
+  if (forgeCostGold) forgeCostGold.textContent = formatNumber(recipe.cost?.gold ?? 0);
+  if (forgeCostEssence) forgeCostEssence.textContent = formatNumber(recipe.cost?.essence ?? 0);
+
+  if (forgeResultPreview) {
+    forgeResultPreview.replaceChildren();
+    const lootEntry = gameData.loot.get(recipe.result);
+    if (lootEntry) {
+      const resultCard = document.createElement('div');
+      resultCard.className = 'forge-result-item';
+      resultCard.dataset.rarity = (lootEntry.rarity ?? 'common').toLowerCase();
+      resultCard.title = formatPropertiesTooltip(lootEntry);
+
+      const icon = document.createElement('span');
+      icon.className = 'forge-result-item__icon';
+      icon.textContent = lootEntry.icon ?? '⬖';
+
+      const title = document.createElement('span');
+      title.className = 'forge-result-item__title';
+      title.textContent = lootEntry.name;
+
+      resultCard.append(icon, title);
+      forgeResultPreview.append(resultCard);
+    } else {
+      const placeholder = document.createElement('p');
+      placeholder.className = 'forge-result-placeholder';
+      placeholder.textContent = 'Результат будет добавлен в инвентарь.';
+      forgeResultPreview.append(placeholder);
+    }
+  }
+
+  if (forgeCraftButton) {
+    forgeCraftButton.disabled = !isRecipeCraftable(recipe);
+    forgeCraftButton.dataset.recipeId = recipe.id;
+  }
+}
+
+function openForge() {
+  if (!forgeModal) return;
+  forgeModal.classList.remove('is-hidden');
+  forgeModal.setAttribute('aria-hidden', 'false');
+  renderForgeList();
+  renderForgeDetails();
+}
+
+function closeForge() {
+  if (!forgeModal) return;
+  forgeModal.classList.add('is-hidden');
+  forgeModal.setAttribute('aria-hidden', 'true');
+}
+
+function attemptCraft(recipeId) {
+  if (!recipeId) return;
+  const recipe = gameData.recipeIndex.get(recipeId);
+  if (!recipe) return;
+  if (!isRecipeCraftable(recipe)) {
+    appendCombatLog('Кузнец покачивает головой: ресурсов недостаточно.');
+    return;
+  }
+
+  const requirementsSatisfied = recipe.requirements.every((req) => removeInventoryItem(req.itemId, req.quantity));
+  if (!requirementsSatisfied) {
+    appendCombatLog('Расходники исчезли. Проверьте хранилище.');
+    return;
+  }
+
+  const goldCost = recipe.cost?.gold ?? 0;
+  const essenceCost = recipe.cost?.essence ?? 0;
+  playerState.gold = Math.max(0, playerState.gold - goldCost);
+  resources.essence = Math.max(0, resources.essence - essenceCost);
+
+  const lootEntry = gameData.loot.get(recipe.result) ?? {
+    id: recipe.result,
+    name: recipe.name,
+    rarity: recipe.rarity,
+    type: recipe.category,
+    icon: recipe.icon,
+    description: recipe.description,
+    properties: {}
+  };
+
+  const created = addInventoryItemFromLoot(lootEntry, 1);
+  sortInventoryItems();
+  updatePlayerUI();
+  updateResources();
+  updateInventoryWeight();
+  syncInventoryResources();
+
+  const inventoryOpen = inventoryModal && !inventoryModal.classList.contains('is-hidden');
+  if (inventoryOpen) {
+    const selectionId = created?.id ?? lootEntry.id;
+    renderInventory(selectionId);
+    const activeEntry = getInventoryEntry(selectionId);
+    renderInventoryDetails(activeEntry ?? null);
+  }
+
+  renderForgeDetails();
+  renderForgeList();
+
+  appendCombatLog(`В горне выкован предмет «${lootEntry.name}».`);
+  appendChatLog(`<strong>Система</strong>: «${lootEntry.name}» помещён в ваш инвентарь.`);
 }
 
 function formatPropertiesTooltip(entry) {
@@ -2728,6 +3243,19 @@ function closeSkills() {
 
 function syncSkillsAfterDataUpdate() {
   applyRaceSkillFilter({ preserveSelection: true });
+}
+
+function syncForgeAfterDataUpdate() {
+  if (forgeState.selectionId && !gameData.recipeIndex.has(forgeState.selectionId)) {
+    forgeState.selectionId = null;
+  }
+
+  if (!forgeState.selectionId && gameData.recipes.length) {
+    forgeState.selectionId = gameData.recipes[0].id;
+  }
+
+  renderForgeList();
+  renderForgeDetails();
 }
 
 function buildQuestDataset(filter = questBoardState.filter) {
@@ -3808,6 +4336,9 @@ if (commandButtons.length) {
         case 'skills':
           openSkills();
           break;
+        case 'forge':
+          openForge();
+          break;
         case 'race':
           openRaceSelection();
           break;
@@ -3825,6 +4356,15 @@ if (commandButtons.length) {
           break;
       }
     });
+  });
+}
+
+if (forgeModal) {
+  forgeModal.addEventListener('click', (event) => {
+    if (!(event.target instanceof HTMLElement)) return;
+    if (event.target === forgeModal || event.target.matches('[data-dismiss="forge"]')) {
+      closeForge();
+    }
   });
 }
 
@@ -3875,6 +4415,16 @@ if (raceModal) {
 
 if (inventoryCloseButton) {
   inventoryCloseButton.addEventListener('click', () => closeInventory());
+}
+
+if (forgeCloseButton) {
+  forgeCloseButton.addEventListener('click', () => closeForge());
+}
+
+if (forgeCraftButton) {
+  forgeCraftButton.addEventListener('click', () => {
+    attemptCraft(forgeCraftButton.dataset.recipeId ?? forgeState.selectionId);
+  });
 }
 
 if (codexCloseButton) {
