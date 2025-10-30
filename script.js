@@ -96,181 +96,366 @@ const gameData = {
   questIndex: new Map(),
   locations: [
     {
-      id: 'central_plaza',
-      name: 'Сердце Серого Города',
-      sector: 'Центральная площадь',
-      levelRange: [10, 12],
-      type: 'город',
-      threatRating: 3,
-      description: 'Главная площадь города сияет обсидиановыми плитами и золотыми факелами, однако патрули сообщают о тенях в арках.',
-      pointsOfInterest: ['Обсидиановый монолит', 'Зал совета', 'Фонтан памяти'],
-      encounters: ['blood_sentinel', 'shadow_wolf'],
-      travelEvents: [
-        { type: 'парад', description: 'Стража устраивает строевой марш, временно усиливая защиту площади.', dangerLevel: 2 },
-        { type: 'тайная сделка', description: 'Контрабандисты предлагают сведения в обмен на редкие трофеи.', dangerLevel: 3 }
-      ]
-    },
-    {
-      id: 'market_arcade',
-      name: 'Торговые аркады',
-      sector: 'Западные ряды',
-      levelRange: [9, 11],
-      type: 'город',
-      threatRating: 3,
-      description: 'Закрытые лавки, шатры и гул толпы скрывают карманников и агентов легиона.',
-      pointsOfInterest: ['Базар зеркальных масок', 'Хранилище гильдии', 'Переход к подземному тракту'],
-      encounters: ['rootbound_hag', 'shadow_wolf'],
-      travelEvents: [
-        { type: 'схватка', description: 'Охранники ловят диверсанта, схватка грозит перерасти в уличный бой.', dangerLevel: 3 },
-        { type: 'распродажа', description: 'Купцы сбывают артефакты по бросовой цене, но покупка привлекает внимание шпионов.', dangerLevel: 2 }
-      ]
-    },
-    {
-      id: 'noble_heights',
-      name: 'Высоты Домов',
-      sector: 'Северные террасы',
-      levelRange: [12, 15],
-      type: 'город',
+      id: 'central_sanctum',
+      name: 'Алтарь Путей',
+      sector: 'Сердце лабиринта',
+      levelRange: [12, 14],
+      type: 'узел',
       threatRating: 4,
-      description: 'Особняки возвышаются над городом, но каждый балкон скрывает наблюдателей и баллисты.',
-      pointsOfInterest: ['Академия тактики', 'Сад лунного камня', 'Наблюдательная башня'],
+      description: 'Центральный узел лабиринта DarkSwords, где сходятся звёздные линии и караулы стражей.',
+      pointsOfInterest: ['Часовая спираль', 'Зал картографов', 'Круг стражей'],
       encounters: ['blood_sentinel', 'gloom_stalker'],
       travelEvents: [
-        { type: 'бал', description: 'Приглашение на тайный приём сулит союзников или засаду дворянских стражей.', dangerLevel: 3 },
-        { type: 'возгорание', description: 'Пламя вспыхивает на балконе, и приходится спасать архивы тактики.', dangerLevel: 4 }
+        { type: 'ритуал', description: 'Служители проводят калибровку порталов, просят защитить их от вторжения.', dangerLevel: 3 },
+        { type: 'прорыв', description: 'Скопление тени пытается захватить звёздный фокус, требуется отражение атаки.', dangerLevel: 4 }
       ]
     },
     {
-      id: 'wardens_bastion',
-      name: 'Бастион Стражей',
-      sector: 'Восточные стены',
-      levelRange: [13, 17],
-      type: 'город',
+      id: 'north_anchor',
+      name: 'Северный якорь',
+      sector: 'Подъём к морским воротам',
+      levelRange: [10, 13],
+      type: 'ворота',
+      threatRating: 3,
+      description: 'Платформа с древним якорем, удерживающим лабиринт от дрейфа. Здесь постоянно дежурят дозоры.',
+      pointsOfInterest: ['Пост дозора', 'Швартовый круг'],
+      encounters: ['shadow_wolf', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'шквал', description: 'Вихрь магической пены грозит сорвать якорь, стражам нужна помощь в стабилизации.', dangerLevel: 3 },
+        { type: 'диверсия', description: 'Подрывники пытаются ослабить цепи, их нужно задержать.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'sunward_court',
+      name: 'Зал Рассвета',
+      sector: 'Западный луч',
+      levelRange: [11, 13],
+      type: 'атриум',
+      threatRating: 3,
+      description: 'Солнечный атриум, собирающий энергию утра. Лучники и маги тренируются в сияющих залах.',
+      pointsOfInterest: ['Фокусный обелиск', 'Сад лучей'],
+      encounters: ['rootbound_hag', 'shadow_wolf'],
+      travelEvents: [
+        { type: 'испытание', description: 'Легионы устраивают турнир стрелков, победителю обещан редкий ключ.', dangerLevel: 2 },
+        { type: 'отказ', description: 'Люмен-линзы перегрелись, нужно остудить их до прибытия техников.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'lunar_observatory',
+      name: 'Лунный обзорник',
+      sector: 'Северное сияние',
+      levelRange: [11, 14],
+      type: 'обсерватория',
       threatRating: 4,
-      description: 'Казармы и арсеналы подступают к стене, и каждую ночь слышны тревожные колокола.',
-      pointsOfInterest: ['Оружейный двор', 'Зал сигнальных костров', 'Острожная башня'],
+      description: 'Стеклянный купол над северной аркой. Ночные дозорные отслеживают вторжения теней.',
+      pointsOfInterest: ['Гироскоп звёзд', 'Павильон ночи'],
+      encounters: ['gloom_stalker', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'затмение', description: 'Начинается лунное затмение, усиливающее врагов — требуется очистить сигилы.', dangerLevel: 4 },
+        { type: 'сбор данных', description: 'Астрологи просят защитить приборы, пока они записывают аномалии.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'crystal_ward',
+      name: 'Кристальный караул',
+      sector: 'Ледяной коридор',
+      levelRange: [11, 13],
+      type: 'перекрёсток',
+      threatRating: 3,
+      description: 'Перекрёсток, выложенный осколками инея. Холодные стражи патрулируют сияющие тропы.',
+      pointsOfInterest: ['Сторожевая глыба', 'Хранилище инея'],
+      encounters: ['ember_colossus', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'заморозка', description: 'Кристаллы начинают расти неконтролируемо, угрожая перекрыть путь.', dangerLevel: 3 },
+        { type: 'призыв', description: 'Враждебные элементали пытаются прорваться к ядру караула.', dangerLevel: 4 }
+      ]
+    },
+    {
+      id: 'scroll_archive',
+      name: 'Свитковый архив',
+      sector: 'Библиотечные галереи',
+      levelRange: [10, 12],
+      type: 'архив',
+      threatRating: 2,
+      description: 'Пыльные галереи с картами троп. В свитках спрятаны пароли к запечатанным дверям.',
+      pointsOfInterest: ['Руническая галерея', 'Сектор карт'],
+      encounters: ['rootbound_hag', 'shadow_wolf'],
+      travelEvents: [
+        { type: 'утечка', description: 'Старый свиток разлагается, требуется собрать руны прежде чем знания исчезнут.', dangerLevel: 2 },
+        { type: 'ревизия', description: 'Архивариус просит сопровождения во время перезаписи маршрутов.', dangerLevel: 2 }
+      ]
+    },
+    {
+      id: 'chalice_pavilion',
+      name: 'Павильон Чаши',
+      sector: 'Южный балкон',
+      levelRange: [11, 13],
+      type: 'святилище',
+      threatRating: 3,
+      description: 'Бурлящая чаша разливает благословения. Наёмники ищут здесь защиту перед вылазками.',
+      pointsOfInterest: ['Хранилище нектара', 'Коло благословения'],
+      encounters: ['gloom_stalker', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'паломники', description: 'Отряд ищет проводника по лабиринту, в обмен обещают редкий эликсир.', dangerLevel: 2 },
+        { type: 'осквернение', description: 'Последователи тьмы пытаются отравить чашу, их нужно остановить.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'gauntlet_hall',
+      name: 'Зал Перчатки',
+      sector: 'Западные арены',
+      levelRange: [11, 14],
+      type: 'арена',
+      threatRating: 4,
+      description: 'Тренировочная арена легиона. Здесь идут непрерывные спарринги и проверки силы.',
+      pointsOfInterest: ['Арена испытаний', 'Казарменный коридор'],
+      encounters: ['blood_sentinel', 'shadow_wolf'],
+      travelEvents: [
+        { type: 'вызов', description: 'Командир арены бросает вызов вашему отряду, победа принесёт награду.', dangerLevel: 3 },
+        { type: 'боевое учение', description: 'Необходимо удержать круг от волн марионеток.', dangerLevel: 4 }
+      ]
+    },
+    {
+      id: 'ember_sigil',
+      name: 'Сигилл Углей',
+      sector: 'Пылающие штольни',
+      levelRange: [12, 15],
+      type: 'ритуальный зал',
+      threatRating: 4,
+      description: 'Огненные пентаграммы запечатывают демонов. Любая ошибка приводит к вспышкам ярости.',
+      pointsOfInterest: ['Ритуальная печать', 'Зал угольных ковшей'],
+      encounters: ['ember_colossus', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'разрыв печати', description: 'Одна из печатей ослабла — необходимо поддерживать ритуал, отражая волну врагов.', dangerLevel: 4 },
+        { type: 'угольная буря', description: 'Ядовитый дым заполняет туннели, спасите алхимиков, запертых внутри.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'key_vault',
+      name: 'Хранилище ключей',
+      sector: 'Южный лабиринт',
+      levelRange: [10, 12],
+      type: 'кладовая',
+      threatRating: 2,
+      description: 'Кольцевой зал с подвешенными замками. Сборщики ключей охраняют редкие маршруты.',
+      pointsOfInterest: ['Круг замков', 'Рунный порог'],
+      encounters: ['shadow_wolf', 'rootbound_hag'],
+      travelEvents: [
+        { type: 'контроль', description: 'Сборщики просят сопроводить обмен ключами между секциями.', dangerLevel: 2 },
+        { type: 'утечка', description: 'Один из ящиков вскрыт — нужно выяснить, кто украл сигил.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'coin_exchange',
+      name: 'Меновая биржа',
+      sector: 'Шлюзовые лавки',
+      levelRange: [10, 13],
+      type: 'рынок',
+      threatRating: 3,
+      description: 'Центр торговли жетонами экспедиций. Купцы спорят о цене портальных услуг.',
+      pointsOfInterest: ['Зал торгов', 'Купеческий сейф'],
+      encounters: ['shadow_wolf', 'gloom_stalker'],
+      travelEvents: [
+        { type: 'аукцион', description: 'Объявлен аукцион редких артефактов, требуется охрана сделки.', dangerLevel: 3 },
+        { type: 'налёт', description: 'Воры пытаются вскрыть купеческий сейф — удержите позицию до прибытия стражи.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'southern_portal_west',
+      name: 'Западный портал',
+      sector: 'Западные выходы',
+      levelRange: [11, 13],
+      type: 'портал',
+      threatRating: 3,
+      description: 'Нестабильный портал, ведущий к окраинам лабиринта. Перепады энергии привлекают тварей.',
+      pointsOfInterest: ['Щитовый мостик'],
+      encounters: ['grave_titan', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'раскачка', description: 'Волнения портала грозят сорвать стабилизаторы, удержите узел до перезагрузки.', dangerLevel: 4 },
+        { type: 'набег', description: 'Банда мародёров пытается прорваться через портал.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'southern_portal_central',
+      name: 'Центральный портал',
+      sector: 'Главный карниз',
+      levelRange: [12, 14],
+      type: 'портал',
+      threatRating: 4,
+      description: 'Основной выход, синхронизированный с Алтарём Путей. Здесь сосредоточены сигнальные башни.',
+      pointsOfInterest: ['Командная башня', 'Часовой переход'],
       encounters: ['blood_sentinel', 'ember_colossus'],
       travelEvents: [
-        { type: 'учения', description: 'Гарнизон проводит боевые учения, требуя помощи в отражении внезапного прорыва.', dangerLevel: 3 },
-        { type: 'артиллерийский залп', description: 'Балиста выходит из строя и грозит обрушить стену, нужен быстрый ремонт.', dangerLevel: 4 }
+        { type: 'эвакуация', description: 'Нужно прикрыть беглецов, пока портал перегружается.', dangerLevel: 4 },
+        { type: 'инспекция', description: 'Архонт требует сопровождения для проверки обороны.', dangerLevel: 3 }
       ]
     },
     {
-      id: 'harbor_gates',
-      name: 'Врата Гавани',
-      sector: 'Южные доки',
-      levelRange: [11, 14],
-      type: 'город',
-      threatRating: 4,
-      description: 'Каналы и доки освещены фонарями, но в воде прячутся шпионы и контрабандисты.',
-      pointsOfInterest: ['Смотровой мол', 'Склад эфира', 'Внутренняя пристань'],
-      encounters: ['gloom_stalker', 'grave_titan'],
+      id: 'southern_portal_east',
+      name: 'Восточный портал',
+      sector: 'Доки бездны',
+      levelRange: [11, 13],
+      type: 'портал',
+      threatRating: 3,
+      description: 'Портал, ведущий к докам и нижним кварталам. Отсюда стартуют охотничьи отряды.',
+      pointsOfInterest: ['Плац отряда', 'Шлюзовая комната'],
+      encounters: ['gloom_stalker', 'blood_sentinel'],
       travelEvents: [
-        { type: 'контрабанда', description: 'Шлюпка без огней пытается прошмыгнуть через ворота, предлагая запрещённые артефакты.', dangerLevel: 3 },
-        { type: 'буря', description: 'Прибрежный шквал грозит затопить склады, нужна срочная эвакуация грузов.', dangerLevel: 4 }
+        { type: 'конвой', description: 'Необходимо сопроводить караван через нестабильный переход.', dangerLevel: 3 },
+        { type: 'пропажа', description: 'Один из стражей пропал в тумане, нужно организовать поиски.', dangerLevel: 3 }
       ]
     }
   ],
   quests: [
     {
-      id: 'plaza_cordon',
-      name: 'Кордоны площади',
+      id: 'altar_guardians',
+      name: 'Стражи Алтаря',
       type: 'оборона',
       status: 'active',
-      giver: 'Архонт Иллирий',
-      recommendedLevel: 11,
-      locationId: 'central_plaza',
-      summary: 'Усилите посты на Сердце Серого Города и раскройте заговорщиков среди толпы.',
-      description: 'Архонт подозревает, что в торжественную процессию проникли агенты легиона. Нужно укрепить кордоны и вычислить подрывников.',
+      giver: 'Куратор Лира',
+      recommendedLevel: 12,
+      locationId: 'central_sanctum',
+      summary: 'Укрепите защиту Алтаря Путей во время всплеска магической активности.',
+      description: 'Лира сообщает, что ритуальные сигилы перегружаются. Необходимо удержать караул и предотвратить разрыв порталов.',
       objectives: [
-        { id: 'torchline', type: 'defend', description: 'Укрепить огненные кордоны вокруг монолита', required: 3, progress: 1, locationId: 'central_plaza' },
-        { id: 'conclave', type: 'investigate', description: 'Проверить слухи о тайной встрече в Зале совета', required: 1, progress: 0, locationId: 'central_plaza' }
+        { id: 'sigils', type: 'defend', description: 'Удержать три звёздных сигила', required: 3, progress: 1, locationId: 'central_sanctum' },
+        { id: 'vanguard', type: 'defeat', targetId: 'blood_sentinel', description: 'Отразить два отряда кровавых стражей', required: 2, progress: 0, locationId: 'central_sanctum' }
       ],
       rewards: {
-        xp: 920,
-        gold: 240,
+        xp: 980,
+        gold: 260,
         loot: [
-          { itemId: 'blood_vial', quantity: 1, chance: 0.55 },
-          { itemId: 'moon_shard', quantity: 1, chance: 0.35 }
+          { itemId: 'moon_shard', quantity: 1, chance: 0.42 },
+          { itemId: 'cursed_relic', quantity: 1, chance: 0.18 }
         ]
       },
-      tags: ['город', 'разведка'],
+      tags: ['ритуал', 'оборона'],
       urgency: 'высокая'
     },
     {
-      id: 'arcade_cleanup',
-      name: 'Ночной дозор аркад',
+      id: 'anchor_patrol',
+      name: 'Патруль якоря',
       type: 'патруль',
       status: 'available',
-      giver: 'Капитан Нарас',
-      recommendedLevel: 10,
-      locationId: 'market_arcade',
-      summary: 'Обезвредьте диверсантов и перехватите контрабанду в Торговых аркадах.',
-      description: 'Капитан Нарас просит очистить аркады от шпионов, которые подделывают гильдейские печати и скупают запрещённые кристаллы.',
+      giver: 'Дозорный Тарен',
+      recommendedLevel: 11,
+      locationId: 'north_anchor',
+      summary: 'Зачистите северный якорь от налётов теней и восстановите цепи стабилизации.',
+      description: 'Якорные цепи ослабли после ночного шторма. Тарен просит нейтрализовать тварей и закрепить ритуальные шпильки.',
       objectives: [
-        { id: 'smugglers', type: 'defeat', description: 'Обезвредить агентов легиона', required: 5, progress: 0, locationId: 'market_arcade' },
-        { id: 'cache', type: 'gather', description: 'Изъять ящики с поддельными печатями', required: 3, progress: 1, locationId: 'market_arcade' }
+        { id: 'reinforce', type: 'gather', description: 'Закрепить три стабилизирующих шпильки', required: 3, progress: 1, locationId: 'north_anchor' },
+        { id: 'skirmish', type: 'defeat', targetId: 'shadow_wolf', description: 'Уничтожить налётчиков тьмы', required: 4, progress: 0, locationId: 'north_anchor' }
       ],
       rewards: {
-        xp: 760,
-        gold: 210,
+        xp: 780,
+        gold: 220,
         loot: [
-          { itemId: 'wolf_pelt', quantity: 1, chance: 0.65 },
-          { itemId: 'withered_root', quantity: 1, chance: 0.28 }
+          { itemId: 'wolf_pelt', quantity: 1, chance: 0.58 },
+          { itemId: 'blood_vial', quantity: 1, chance: 0.32 }
         ]
       },
-      tags: ['патруль', 'контрабанда'],
+      tags: ['патруль', 'ворота'],
       urgency: 'средняя'
     },
     {
-      id: 'harbor_vigil',
-      name: 'Дозор у ворот Гавани',
-      type: 'сопровождение',
-      status: 'active',
-      giver: 'Магистр пристани Селест',
+      id: 'sunward_trial',
+      name: 'Рассветное испытание',
+      type: 'операция',
+      status: 'available',
+      giver: 'Мастер Сайлен',
       recommendedLevel: 12,
-      locationId: 'harbor_gates',
-      summary: 'Сопроводите инспекторов через доки и отразите ночные налёты из каналов.',
-      description: 'Селест сообщает, что в доках появились теневые пловцы. Инспекторы должны переписать грузы, а вы — охранять их и зачистить каналы.',
+      locationId: 'sunward_court',
+      summary: 'Верните контроль над зеркальными линзами Зала Рассвета и обезвредьте диверсантов.',
+      description: 'Сайлен просит очистить линзы, чтобы лучи снова освещали коридоры. Карманники прячут в атриуме темные тотемы.',
       objectives: [
-        { id: 'escort', type: 'escort', description: 'Провести инспекторов вдоль внутренней пристани', required: 1, progress: 0, locationId: 'harbor_gates' },
-        { id: 'lurkers', type: 'defeat', targetId: 'gloom_stalker', description: 'Уничтожить теневых пловцов в каналах', required: 4, progress: 1, locationId: 'harbor_gates' }
+        { id: 'totems', type: 'gather', description: 'Изъять скрытые тотемы из лучевых ниш', required: 4, progress: 1, locationId: 'sunward_court' },
+        { id: 'champion', type: 'defeat', targetId: 'rootbound_hag', description: 'Победить хранителя сумерек', required: 1, progress: 0, locationId: 'sunward_court' }
       ],
       rewards: {
-        xp: 1020,
+        xp: 840,
+        gold: 245,
+        loot: [
+          { itemId: 'ashen_scroll', quantity: 1, chance: 0.24 },
+          { itemId: 'blood_vial', quantity: 1, chance: 0.4 }
+        ]
+      },
+      tags: ['операция', 'свет'],
+      urgency: 'средняя'
+    },
+    {
+      id: 'lunar_eclipse',
+      name: 'Лунный разлом',
+      type: 'разведка',
+      status: 'active',
+      giver: 'Астролог Рил',
+      recommendedLevel: 13,
+      locationId: 'lunar_observatory',
+      summary: 'Исследуйте разлом, появившийся во время затмения, и устраните ночных следопытов.',
+      description: 'Во время затмения в обзорнике открылась трещина. Рил просит записать аномалии и изгнать тварей из разлома.',
+      objectives: [
+        { id: 'readings', type: 'investigate', description: 'Собрать данные о магическом фоне', required: 4, progress: 2, locationId: 'lunar_observatory' },
+        { id: 'prowlers', type: 'defeat', targetId: 'gloom_stalker', description: 'Уничтожить ночных следопытов', required: 3, progress: 1, locationId: 'lunar_observatory' }
+      ],
+      rewards: {
+        xp: 1090,
         gold: 320,
         loot: [
-          { itemId: 'iron_fang', quantity: 1, chance: 0.6 },
-          { itemId: 'ember_core', quantity: 1, chance: 0.22 }
+          { itemId: 'moon_shard', quantity: 1, chance: 0.55 },
+          { itemId: 'cursed_relic', quantity: 1, chance: 0.22 }
         ]
       },
-      tags: ['сопровождение', 'доки'],
+      tags: ['разведка', 'затмение'],
+      urgency: 'высокая'
+    },
+    {
+      id: 'ember_quell',
+      name: 'Погасить угли',
+      type: 'операция',
+      status: 'available',
+      giver: 'Инженер Варек',
+      recommendedLevel: 14,
+      locationId: 'ember_sigil',
+      summary: 'Сдержите побег демона и перезапустите огненные печати Сигилла Углей.',
+      description: 'Печати перегрелись, и варницы вот-вот лопнут. Варек просит удержать круг и перенаправить энергию.',
+      objectives: [
+        { id: 'vents', type: 'defend', description: 'Защитить клапаны охлаждения', required: 3, progress: 1, locationId: 'ember_sigil' },
+        { id: 'inferno', type: 'defeat', targetId: 'ember_colossus', description: 'Одолеть пылающего колосса', required: 1, progress: 0, locationId: 'ember_sigil' }
+      ],
+      rewards: {
+        xp: 1220,
+        gold: 360,
+        loot: [
+          { itemId: 'ember_core', quantity: 1, chance: 0.42 },
+          { itemId: 'blood_vial', quantity: 2, chance: 0.48 }
+        ]
+      },
+      tags: ['операция', 'огонь'],
       urgency: 'средняя'
     },
     {
-      id: 'bastion_drills',
-      name: 'Учения бастиона',
-      type: 'операция',
-      status: 'completed',
-      giver: 'Лорд-командор Каэлин',
-      recommendedLevel: 15,
-      locationId: 'wardens_bastion',
-      summary: 'Поддержите учения гарнизона и остановите испорченную осадную машину.',
-      description: 'На учениях одна из баллист вышла из-под контроля. Ваша задача — помочь гарнизону удержать стены и перехватить раскалённые заряды.',
+      id: 'portal_watch',
+      name: 'Стражи портала',
+      type: 'оборона',
+      status: 'available',
+      giver: 'Командир Каэлин',
+      recommendedLevel: 13,
+      locationId: 'southern_portal_central',
+      summary: 'Обеспечьте защиту центрального портала во время эвакуации и сопроводите беженцев.',
+      description: 'Каэлин готовит эвакуацию через центральный портал. Требуется отбить штурм и вывести караван.',
       objectives: [
-        { id: 'drill', type: 'defend', description: 'Удержать три сигнальных костра', required: 3, progress: 3, locationId: 'wardens_bastion' },
-        { id: 'ballista', type: 'defeat', targetId: 'blood_sentinel', description: 'Обезвредить одержимого стража у баллисты', required: 1, progress: 1, locationId: 'wardens_bastion' }
+        { id: 'convoy', type: 'escort', description: 'Сопроводить три группы эвакуирующихся', required: 3, progress: 1, locationId: 'southern_portal_central' },
+        { id: 'breach', type: 'defeat', targetId: 'grave_titan', description: 'Остановить титана, пытающегося прорваться', required: 1, progress: 0, locationId: 'southern_portal_west' }
       ],
       rewards: {
-        xp: 1280,
-        gold: 410,
+        xp: 1150,
+        gold: 340,
         loot: [
-          { itemId: 'cursed_relic', quantity: 1, chance: 0.6 },
-          { itemId: 'blood_vial', quantity: 2, chance: 0.75 }
+          { itemId: 'shadow_guard_plate', quantity: 1, chance: 0.28 },
+          { itemId: 'supply_rations', quantity: 2, chance: 0.5 }
         ]
       },
-      tags: ['гарнизон', 'операция'],
-      urgency: 'низкая'
+      tags: ['портал', 'эвакуация'],
+      urgency: 'высокая'
     }
   ],
   skills: [],
@@ -659,181 +844,366 @@ const fallbackCatalogs = {
   ],
   locations: [
     {
-      id: 'central_plaza',
-      name: 'Сердце Серого Города',
-      sector: 'Центральная площадь',
-      levelRange: [10, 12],
-      type: 'город',
-      threatRating: 3,
-      description: 'Главная площадь города сияет обсидиановыми плитами и золотыми факелами, однако патрули сообщают о тенях в арках.',
-      pointsOfInterest: ['Обсидиановый монолит', 'Зал совета', 'Фонтан памяти'],
-      encounters: ['blood_sentinel', 'shadow_wolf'],
-      travelEvents: [
-        { type: 'парад', description: 'Стража устраивает строевой марш, временно усиливая защиту площади.', dangerLevel: 2 },
-        { type: 'тайная сделка', description: 'Контрабандисты предлагают сведения в обмен на редкие трофеи.', dangerLevel: 3 }
-      ]
-    },
-    {
-      id: 'market_arcade',
-      name: 'Торговые аркады',
-      sector: 'Западные ряды',
-      levelRange: [9, 11],
-      type: 'город',
-      threatRating: 3,
-      description: 'Закрытые лавки, шатры и гул толпы скрывают карманников и агентов легиона.',
-      pointsOfInterest: ['Базар зеркальных масок', 'Хранилище гильдии', 'Переход к подземному тракту'],
-      encounters: ['rootbound_hag', 'shadow_wolf'],
-      travelEvents: [
-        { type: 'схватка', description: 'Охранники ловят диверсанта, схватка грозит перерасти в уличный бой.', dangerLevel: 3 },
-        { type: 'распродажа', description: 'Купцы сбывают артефакты по бросовой цене, но покупка привлекает внимание шпионов.', dangerLevel: 2 }
-      ]
-    },
-    {
-      id: 'noble_heights',
-      name: 'Высоты Домов',
-      sector: 'Северные террасы',
-      levelRange: [12, 15],
-      type: 'город',
+      id: 'central_sanctum',
+      name: 'Алтарь Путей',
+      sector: 'Сердце лабиринта',
+      levelRange: [12, 14],
+      type: 'узел',
       threatRating: 4,
-      description: 'Особняки возвышаются над городом, но каждый балкон скрывает наблюдателей и баллисты.',
-      pointsOfInterest: ['Академия тактики', 'Сад лунного камня', 'Наблюдательная башня'],
+      description: 'Центральный узел лабиринта DarkSwords, где сходятся звёздные линии и караулы стражей.',
+      pointsOfInterest: ['Часовая спираль', 'Зал картографов', 'Круг стражей'],
       encounters: ['blood_sentinel', 'gloom_stalker'],
       travelEvents: [
-        { type: 'бал', description: 'Приглашение на тайный приём сулит союзников или засаду дворянских стражей.', dangerLevel: 3 },
-        { type: 'возгорание', description: 'Пламя вспыхивает на балконе, и приходится спасать архивы тактики.', dangerLevel: 4 }
+        { type: 'ритуал', description: 'Служители проводят калибровку порталов, просят защитить их от вторжения.', dangerLevel: 3 },
+        { type: 'прорыв', description: 'Скопление тени пытается захватить звёздный фокус, требуется отражение атаки.', dangerLevel: 4 }
       ]
     },
     {
-      id: 'wardens_bastion',
-      name: 'Бастион Стражей',
-      sector: 'Восточные стены',
-      levelRange: [13, 17],
-      type: 'город',
+      id: 'north_anchor',
+      name: 'Северный якорь',
+      sector: 'Подъём к морским воротам',
+      levelRange: [10, 13],
+      type: 'ворота',
+      threatRating: 3,
+      description: 'Платформа с древним якорем, удерживающим лабиринт от дрейфа. Здесь постоянно дежурят дозоры.',
+      pointsOfInterest: ['Пост дозора', 'Швартовый круг'],
+      encounters: ['shadow_wolf', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'шквал', description: 'Вихрь магической пены грозит сорвать якорь, стражам нужна помощь в стабилизации.', dangerLevel: 3 },
+        { type: 'диверсия', description: 'Подрывники пытаются ослабить цепи, их нужно задержать.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'sunward_court',
+      name: 'Зал Рассвета',
+      sector: 'Западный луч',
+      levelRange: [11, 13],
+      type: 'атриум',
+      threatRating: 3,
+      description: 'Солнечный атриум, собирающий энергию утра. Лучники и маги тренируются в сияющих залах.',
+      pointsOfInterest: ['Фокусный обелиск', 'Сад лучей'],
+      encounters: ['rootbound_hag', 'shadow_wolf'],
+      travelEvents: [
+        { type: 'испытание', description: 'Легионы устраивают турнир стрелков, победителю обещан редкий ключ.', dangerLevel: 2 },
+        { type: 'отказ', description: 'Люмен-линзы перегрелись, нужно остудить их до прибытия техников.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'lunar_observatory',
+      name: 'Лунный обзорник',
+      sector: 'Северное сияние',
+      levelRange: [11, 14],
+      type: 'обсерватория',
       threatRating: 4,
-      description: 'Казармы и арсеналы подступают к стене, и каждую ночь слышны тревожные колокола.',
-      pointsOfInterest: ['Оружейный двор', 'Зал сигнальных костров', 'Острожная башня'],
+      description: 'Стеклянный купол над северной аркой. Ночные дозорные отслеживают вторжения теней.',
+      pointsOfInterest: ['Гироскоп звёзд', 'Павильон ночи'],
+      encounters: ['gloom_stalker', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'затмение', description: 'Начинается лунное затмение, усиливающее врагов — требуется очистить сигилы.', dangerLevel: 4 },
+        { type: 'сбор данных', description: 'Астрологи просят защитить приборы, пока они записывают аномалии.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'crystal_ward',
+      name: 'Кристальный караул',
+      sector: 'Ледяной коридор',
+      levelRange: [11, 13],
+      type: 'перекрёсток',
+      threatRating: 3,
+      description: 'Перекрёсток, выложенный осколками инея. Холодные стражи патрулируют сияющие тропы.',
+      pointsOfInterest: ['Сторожевая глыба', 'Хранилище инея'],
+      encounters: ['ember_colossus', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'заморозка', description: 'Кристаллы начинают расти неконтролируемо, угрожая перекрыть путь.', dangerLevel: 3 },
+        { type: 'призыв', description: 'Враждебные элементали пытаются прорваться к ядру караула.', dangerLevel: 4 }
+      ]
+    },
+    {
+      id: 'scroll_archive',
+      name: 'Свитковый архив',
+      sector: 'Библиотечные галереи',
+      levelRange: [10, 12],
+      type: 'архив',
+      threatRating: 2,
+      description: 'Пыльные галереи с картами троп. В свитках спрятаны пароли к запечатанным дверям.',
+      pointsOfInterest: ['Руническая галерея', 'Сектор карт'],
+      encounters: ['rootbound_hag', 'shadow_wolf'],
+      travelEvents: [
+        { type: 'утечка', description: 'Старый свиток разлагается, требуется собрать руны прежде чем знания исчезнут.', dangerLevel: 2 },
+        { type: 'ревизия', description: 'Архивариус просит сопровождения во время перезаписи маршрутов.', dangerLevel: 2 }
+      ]
+    },
+    {
+      id: 'chalice_pavilion',
+      name: 'Павильон Чаши',
+      sector: 'Южный балкон',
+      levelRange: [11, 13],
+      type: 'святилище',
+      threatRating: 3,
+      description: 'Бурлящая чаша разливает благословения. Наёмники ищут здесь защиту перед вылазками.',
+      pointsOfInterest: ['Хранилище нектара', 'Коло благословения'],
+      encounters: ['gloom_stalker', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'паломники', description: 'Отряд ищет проводника по лабиринту, в обмен обещают редкий эликсир.', dangerLevel: 2 },
+        { type: 'осквернение', description: 'Последователи тьмы пытаются отравить чашу, их нужно остановить.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'gauntlet_hall',
+      name: 'Зал Перчатки',
+      sector: 'Западные арены',
+      levelRange: [11, 14],
+      type: 'арена',
+      threatRating: 4,
+      description: 'Тренировочная арена легиона. Здесь идут непрерывные спарринги и проверки силы.',
+      pointsOfInterest: ['Арена испытаний', 'Казарменный коридор'],
+      encounters: ['blood_sentinel', 'shadow_wolf'],
+      travelEvents: [
+        { type: 'вызов', description: 'Командир арены бросает вызов вашему отряду, победа принесёт награду.', dangerLevel: 3 },
+        { type: 'боевое учение', description: 'Необходимо удержать круг от волн марионеток.', dangerLevel: 4 }
+      ]
+    },
+    {
+      id: 'ember_sigil',
+      name: 'Сигилл Углей',
+      sector: 'Пылающие штольни',
+      levelRange: [12, 15],
+      type: 'ритуальный зал',
+      threatRating: 4,
+      description: 'Огненные пентаграммы запечатывают демонов. Любая ошибка приводит к вспышкам ярости.',
+      pointsOfInterest: ['Ритуальная печать', 'Зал угольных ковшей'],
+      encounters: ['ember_colossus', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'разрыв печати', description: 'Одна из печатей ослабла — необходимо поддерживать ритуал, отражая волну врагов.', dangerLevel: 4 },
+        { type: 'угольная буря', description: 'Ядовитый дым заполняет туннели, спасите алхимиков, запертых внутри.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'key_vault',
+      name: 'Хранилище ключей',
+      sector: 'Южный лабиринт',
+      levelRange: [10, 12],
+      type: 'кладовая',
+      threatRating: 2,
+      description: 'Кольцевой зал с подвешенными замками. Сборщики ключей охраняют редкие маршруты.',
+      pointsOfInterest: ['Круг замков', 'Рунный порог'],
+      encounters: ['shadow_wolf', 'rootbound_hag'],
+      travelEvents: [
+        { type: 'контроль', description: 'Сборщики просят сопроводить обмен ключами между секциями.', dangerLevel: 2 },
+        { type: 'утечка', description: 'Один из ящиков вскрыт — нужно выяснить, кто украл сигил.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'coin_exchange',
+      name: 'Меновая биржа',
+      sector: 'Шлюзовые лавки',
+      levelRange: [10, 13],
+      type: 'рынок',
+      threatRating: 3,
+      description: 'Центр торговли жетонами экспедиций. Купцы спорят о цене портальных услуг.',
+      pointsOfInterest: ['Зал торгов', 'Купеческий сейф'],
+      encounters: ['shadow_wolf', 'gloom_stalker'],
+      travelEvents: [
+        { type: 'аукцион', description: 'Объявлен аукцион редких артефактов, требуется охрана сделки.', dangerLevel: 3 },
+        { type: 'налёт', description: 'Воры пытаются вскрыть купеческий сейф — удержите позицию до прибытия стражи.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'southern_portal_west',
+      name: 'Западный портал',
+      sector: 'Западные выходы',
+      levelRange: [11, 13],
+      type: 'портал',
+      threatRating: 3,
+      description: 'Нестабильный портал, ведущий к окраинам лабиринта. Перепады энергии привлекают тварей.',
+      pointsOfInterest: ['Щитовый мостик'],
+      encounters: ['grave_titan', 'blood_sentinel'],
+      travelEvents: [
+        { type: 'раскачка', description: 'Волнения портала грозят сорвать стабилизаторы, удержите узел до перезагрузки.', dangerLevel: 4 },
+        { type: 'набег', description: 'Банда мародёров пытается прорваться через портал.', dangerLevel: 3 }
+      ]
+    },
+    {
+      id: 'southern_portal_central',
+      name: 'Центральный портал',
+      sector: 'Главный карниз',
+      levelRange: [12, 14],
+      type: 'портал',
+      threatRating: 4,
+      description: 'Основной выход, синхронизированный с Алтарём Путей. Здесь сосредоточены сигнальные башни.',
+      pointsOfInterest: ['Командная башня', 'Часовой переход'],
       encounters: ['blood_sentinel', 'ember_colossus'],
       travelEvents: [
-        { type: 'учения', description: 'Гарнизон проводит боевые учения, требуя помощи в отражении внезапного прорыва.', dangerLevel: 3 },
-        { type: 'артиллерийский залп', description: 'Балиста выходит из строя и грозит обрушить стену, нужен быстрый ремонт.', dangerLevel: 4 }
+        { type: 'эвакуация', description: 'Нужно прикрыть беглецов, пока портал перегружается.', dangerLevel: 4 },
+        { type: 'инспекция', description: 'Архонт требует сопровождения для проверки обороны.', dangerLevel: 3 }
       ]
     },
     {
-      id: 'harbor_gates',
-      name: 'Врата Гавани',
-      sector: 'Южные доки',
-      levelRange: [11, 14],
-      type: 'город',
-      threatRating: 4,
-      description: 'Каналы и доки освещены фонарями, но в воде прячутся шпионы и контрабандисты.',
-      pointsOfInterest: ['Смотровой мол', 'Склад эфира', 'Внутренняя пристань'],
-      encounters: ['gloom_stalker', 'grave_titan'],
+      id: 'southern_portal_east',
+      name: 'Восточный портал',
+      sector: 'Доки бездны',
+      levelRange: [11, 13],
+      type: 'портал',
+      threatRating: 3,
+      description: 'Портал, ведущий к докам и нижним кварталам. Отсюда стартуют охотничьи отряды.',
+      pointsOfInterest: ['Плац отряда', 'Шлюзовая комната'],
+      encounters: ['gloom_stalker', 'blood_sentinel'],
       travelEvents: [
-        { type: 'контрабанда', description: 'Шлюпка без огней пытается прошмыгнуть через ворота, предлагая запрещённые артефакты.', dangerLevel: 3 },
-        { type: 'буря', description: 'Прибрежный шквал грозит затопить склады, нужна срочная эвакуация грузов.', dangerLevel: 4 }
+        { type: 'конвой', description: 'Необходимо сопроводить караван через нестабильный переход.', dangerLevel: 3 },
+        { type: 'пропажа', description: 'Один из стражей пропал в тумане, нужно организовать поиски.', dangerLevel: 3 }
       ]
     }
   ],
   quests: [
     {
-      id: 'plaza_cordon',
-      name: 'Кордоны площади',
+      id: 'altar_guardians',
+      name: 'Стражи Алтаря',
       type: 'оборона',
       status: 'active',
-      giver: 'Архонт Иллирий',
-      recommendedLevel: 11,
-      locationId: 'central_plaza',
-      summary: 'Усилите посты на Сердце Серого Города и раскройте заговорщиков среди толпы.',
-      description: 'Архонт подозревает, что в торжественную процессию проникли агенты легиона. Нужно укрепить кордоны и вычислить подрывников.',
+      giver: 'Куратор Лира',
+      recommendedLevel: 12,
+      locationId: 'central_sanctum',
+      summary: 'Укрепите защиту Алтаря Путей во время всплеска магической активности.',
+      description: 'Лира сообщает, что ритуальные сигилы перегружаются. Необходимо удержать караул и предотвратить разрыв порталов.',
       objectives: [
-        { id: 'torchline', type: 'defend', description: 'Укрепить огненные кордоны вокруг монолита', required: 3, progress: 1, locationId: 'central_plaza' },
-        { id: 'conclave', type: 'investigate', description: 'Проверить слухи о тайной встрече в Зале совета', required: 1, progress: 0, locationId: 'central_plaza' }
+        { id: 'sigils', type: 'defend', description: 'Удержать три звёздных сигила', required: 3, progress: 1, locationId: 'central_sanctum' },
+        { id: 'vanguard', type: 'defeat', targetId: 'blood_sentinel', description: 'Отразить два отряда кровавых стражей', required: 2, progress: 0, locationId: 'central_sanctum' }
       ],
       rewards: {
-        xp: 920,
-        gold: 240,
+        xp: 980,
+        gold: 260,
         loot: [
-          { itemId: 'blood_vial', quantity: 1, chance: 0.55 },
-          { itemId: 'moon_shard', quantity: 1, chance: 0.35 }
+          { itemId: 'moon_shard', quantity: 1, chance: 0.42 },
+          { itemId: 'cursed_relic', quantity: 1, chance: 0.18 }
         ]
       },
-      tags: ['город', 'разведка'],
+      tags: ['ритуал', 'оборона'],
       urgency: 'высокая'
     },
     {
-      id: 'arcade_cleanup',
-      name: 'Ночной дозор аркад',
+      id: 'anchor_patrol',
+      name: 'Патруль якоря',
       type: 'патруль',
       status: 'available',
-      giver: 'Капитан Нарас',
-      recommendedLevel: 10,
-      locationId: 'market_arcade',
-      summary: 'Обезвредьте диверсантов и перехватите контрабанду в Торговых аркадах.',
-      description: 'Капитан Нарас просит очистить аркады от шпионов, которые подделывают гильдейские печати и скупают запрещённые кристаллы.',
+      giver: 'Дозорный Тарен',
+      recommendedLevel: 11,
+      locationId: 'north_anchor',
+      summary: 'Зачистите северный якорь от налётов теней и восстановите цепи стабилизации.',
+      description: 'Якорные цепи ослабли после ночного шторма. Тарен просит нейтрализовать тварей и закрепить ритуальные шпильки.',
       objectives: [
-        { id: 'smugglers', type: 'defeat', description: 'Обезвредить агентов легиона', required: 5, progress: 0, locationId: 'market_arcade' },
-        { id: 'cache', type: 'gather', description: 'Изъять ящики с поддельными печатями', required: 3, progress: 1, locationId: 'market_arcade' }
+        { id: 'reinforce', type: 'gather', description: 'Закрепить три стабилизирующих шпильки', required: 3, progress: 1, locationId: 'north_anchor' },
+        { id: 'skirmish', type: 'defeat', targetId: 'shadow_wolf', description: 'Уничтожить налётчиков тьмы', required: 4, progress: 0, locationId: 'north_anchor' }
       ],
       rewards: {
-        xp: 760,
-        gold: 210,
+        xp: 780,
+        gold: 220,
         loot: [
-          { itemId: 'wolf_pelt', quantity: 1, chance: 0.65 },
-          { itemId: 'withered_root', quantity: 1, chance: 0.28 }
+          { itemId: 'wolf_pelt', quantity: 1, chance: 0.58 },
+          { itemId: 'blood_vial', quantity: 1, chance: 0.32 }
         ]
       },
-      tags: ['патруль', 'контрабанда'],
+      tags: ['патруль', 'ворота'],
       urgency: 'средняя'
     },
     {
-      id: 'harbor_vigil',
-      name: 'Дозор у ворот Гавани',
-      type: 'сопровождение',
-      status: 'active',
-      giver: 'Магистр пристани Селест',
+      id: 'sunward_trial',
+      name: 'Рассветное испытание',
+      type: 'операция',
+      status: 'available',
+      giver: 'Мастер Сайлен',
       recommendedLevel: 12,
-      locationId: 'harbor_gates',
-      summary: 'Сопроводите инспекторов через доки и отразите ночные налёты из каналов.',
-      description: 'Селест сообщает, что в доках появились теневые пловцы. Инспекторы должны переписать грузы, а вы — охранять их и зачистить каналы.',
+      locationId: 'sunward_court',
+      summary: 'Верните контроль над зеркальными линзами Зала Рассвета и обезвредьте диверсантов.',
+      description: 'Сайлен просит очистить линзы, чтобы лучи снова освещали коридоры. Карманники прячут в атриуме темные тотемы.',
       objectives: [
-        { id: 'escort', type: 'escort', description: 'Провести инспекторов вдоль внутренней пристани', required: 1, progress: 0, locationId: 'harbor_gates' },
-        { id: 'lurkers', type: 'defeat', targetId: 'gloom_stalker', description: 'Уничтожить теневых пловцов в каналах', required: 4, progress: 1, locationId: 'harbor_gates' }
+        { id: 'totems', type: 'gather', description: 'Изъять скрытые тотемы из лучевых ниш', required: 4, progress: 1, locationId: 'sunward_court' },
+        { id: 'champion', type: 'defeat', targetId: 'rootbound_hag', description: 'Победить хранителя сумерек', required: 1, progress: 0, locationId: 'sunward_court' }
       ],
       rewards: {
-        xp: 1020,
+        xp: 840,
+        gold: 245,
+        loot: [
+          { itemId: 'ashen_scroll', quantity: 1, chance: 0.24 },
+          { itemId: 'blood_vial', quantity: 1, chance: 0.4 }
+        ]
+      },
+      tags: ['операция', 'свет'],
+      urgency: 'средняя'
+    },
+    {
+      id: 'lunar_eclipse',
+      name: 'Лунный разлом',
+      type: 'разведка',
+      status: 'active',
+      giver: 'Астролог Рил',
+      recommendedLevel: 13,
+      locationId: 'lunar_observatory',
+      summary: 'Исследуйте разлом, появившийся во время затмения, и устраните ночных следопытов.',
+      description: 'Во время затмения в обзорнике открылась трещина. Рил просит записать аномалии и изгнать тварей из разлома.',
+      objectives: [
+        { id: 'readings', type: 'investigate', description: 'Собрать данные о магическом фоне', required: 4, progress: 2, locationId: 'lunar_observatory' },
+        { id: 'prowlers', type: 'defeat', targetId: 'gloom_stalker', description: 'Уничтожить ночных следопытов', required: 3, progress: 1, locationId: 'lunar_observatory' }
+      ],
+      rewards: {
+        xp: 1090,
         gold: 320,
         loot: [
-          { itemId: 'iron_fang', quantity: 1, chance: 0.6 },
-          { itemId: 'ember_core', quantity: 1, chance: 0.22 }
+          { itemId: 'moon_shard', quantity: 1, chance: 0.55 },
+          { itemId: 'cursed_relic', quantity: 1, chance: 0.22 }
         ]
       },
-      tags: ['сопровождение', 'доки'],
+      tags: ['разведка', 'затмение'],
+      urgency: 'высокая'
+    },
+    {
+      id: 'ember_quell',
+      name: 'Погасить угли',
+      type: 'операция',
+      status: 'available',
+      giver: 'Инженер Варек',
+      recommendedLevel: 14,
+      locationId: 'ember_sigil',
+      summary: 'Сдержите побег демона и перезапустите огненные печати Сигилла Углей.',
+      description: 'Печати перегрелись, и варницы вот-вот лопнут. Варек просит удержать круг и перенаправить энергию.',
+      objectives: [
+        { id: 'vents', type: 'defend', description: 'Защитить клапаны охлаждения', required: 3, progress: 1, locationId: 'ember_sigil' },
+        { id: 'inferno', type: 'defeat', targetId: 'ember_colossus', description: 'Одолеть пылающего колосса', required: 1, progress: 0, locationId: 'ember_sigil' }
+      ],
+      rewards: {
+        xp: 1220,
+        gold: 360,
+        loot: [
+          { itemId: 'ember_core', quantity: 1, chance: 0.42 },
+          { itemId: 'blood_vial', quantity: 2, chance: 0.48 }
+        ]
+      },
+      tags: ['операция', 'огонь'],
       urgency: 'средняя'
     },
     {
-      id: 'bastion_drills',
-      name: 'Учения бастиона',
-      type: 'операция',
-      status: 'completed',
-      giver: 'Лорд-командор Каэлин',
-      recommendedLevel: 15,
-      locationId: 'wardens_bastion',
-      summary: 'Поддержите учения гарнизона и остановите испорченную осадную машину.',
-      description: 'На учениях одна из баллист вышла из-под контроля. Ваша задача — помочь гарнизону удержать стены и перехватить раскалённые заряды.',
+      id: 'portal_watch',
+      name: 'Стражи портала',
+      type: 'оборона',
+      status: 'available',
+      giver: 'Командир Каэлин',
+      recommendedLevel: 13,
+      locationId: 'southern_portal_central',
+      summary: 'Обеспечьте защиту центрального портала во время эвакуации и сопроводите беженцев.',
+      description: 'Каэлин готовит эвакуацию через центральный портал. Требуется отбить штурм и вывести караван.',
       objectives: [
-        { id: 'drill', type: 'defend', description: 'Удержать три сигнальных костра', required: 3, progress: 3, locationId: 'wardens_bastion' },
-        { id: 'ballista', type: 'defeat', targetId: 'blood_sentinel', description: 'Обезвредить одержимого стража у баллисты', required: 1, progress: 1, locationId: 'wardens_bastion' }
+        { id: 'convoy', type: 'escort', description: 'Сопроводить три группы эвакуирующихся', required: 3, progress: 1, locationId: 'southern_portal_central' },
+        { id: 'breach', type: 'defeat', targetId: 'grave_titan', description: 'Остановить титана, пытающегося прорваться', required: 1, progress: 0, locationId: 'southern_portal_west' }
       ],
       rewards: {
-        xp: 1280,
-        gold: 410,
+        xp: 1150,
+        gold: 340,
         loot: [
-          { itemId: 'cursed_relic', quantity: 1, chance: 0.6 },
-          { itemId: 'blood_vial', quantity: 2, chance: 0.75 }
+          { itemId: 'shadow_guard_plate', quantity: 1, chance: 0.28 },
+          { itemId: 'supply_rations', quantity: 2, chance: 0.5 }
         ]
       },
-      tags: ['гарнизон', 'операция'],
-      urgency: 'низкая'
+      tags: ['портал', 'эвакуация'],
+      urgency: 'высокая'
     }
   ],
   skills: [
@@ -3675,8 +4045,8 @@ const mapView = {
 };
 
 const mapConfig = {
-  cols: 15,
-  rows: 11
+  cols: 13,
+  rows: 13
 };
 
 function applyMapTransform() {
@@ -3715,7 +4085,7 @@ function centerMapOnCurrent() {
   if (mapState.current) {
     centerMapOnNode(mapState.current);
   } else {
-    const origin = mapState.nodes.get('7,5');
+    const origin = mapState.nodes.get('6,6');
     if (origin) {
       centerMapOnNode(origin);
     }
@@ -3739,7 +4109,8 @@ function ensureNode(x, y) {
       levelRange: [8, 12],
       sector: null,
       neighbors: [],
-      element: null
+      element: null,
+      iconId: null
     });
   }
   return mapState.nodes.get(key);
@@ -3748,262 +4119,388 @@ function ensureNode(x, y) {
 function buildLabyrinth() {
   mapState.nodes.clear();
 
-  const addPath = (path) => {
-    path.forEach(([x, y]) => ensureNode(x, y));
+  const addSegment = ([x1, y1], [x2, y2]) => {
+    ensureNode(x1, y1);
+    ensureNode(x2, y2);
+    if (x1 === x2) {
+      const [start, end] = y1 <= y2 ? [y1, y2] : [y2, y1];
+      for (let y = start; y <= end; y += 1) {
+        ensureNode(x1, y);
+      }
+    } else if (y1 === y2) {
+      const [start, end] = x1 <= x2 ? [x1, x2] : [x2, x1];
+      for (let x = start; x <= end; x += 1) {
+        ensureNode(x, y1);
+      }
+    }
   };
 
-  const streetPaths = [
-    [[7, 5], [7, 4], [7, 3], [7, 2], [7, 1], [7, 0]],
-    [[7, 5], [7, 6], [7, 7], [7, 8], [7, 9], [7, 10]],
-    [[7, 5], [6, 5], [5, 5], [4, 5], [3, 5], [2, 5], [1, 5], [0, 5]],
-    [[7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5]],
-    [[5, 4], [6, 4], [7, 4], [8, 4], [9, 4]],
-    [[5, 6], [6, 6], [7, 6], [8, 6], [9, 6]],
-    [[5, 4], [5, 5], [5, 6], [5, 7], [5, 8]],
-    [[9, 4], [9, 5], [9, 6], [9, 7], [9, 8]],
-    [[4, 5], [4, 4], [4, 3], [3, 3], [2, 3], [1, 3]],
-    [[3, 5], [3, 4], [3, 3], [3, 2]],
-    [[3, 5], [3, 6], [3, 7], [3, 8]],
-    [[2, 5], [2, 4], [2, 6], [2, 7], [2, 8]],
-    [[1, 5], [1, 6], [1, 7], [1, 8]],
-    [[5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2]],
-    [[6, 1], [7, 1], [8, 1], [9, 1]],
-    [[8, 2], [8, 1], [8, 0]],
-    [[6, 3], [6, 2], [6, 1]],
-    [[10, 2], [10, 3], [10, 4], [10, 5]],
-    [[11, 5], [11, 6], [11, 7], [11, 8], [11, 9], [11, 10]],
-    [[12, 5], [12, 6], [12, 7], [12, 8], [12, 9], [12, 10]],
-    [[13, 5], [13, 6], [13, 7], [13, 8], [13, 9]],
-    [[7, 7], [6, 7], [5, 7], [4, 7], [3, 7]],
-    [[7, 8], [6, 8], [5, 8], [4, 8], [3, 8]],
-    [[7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [14, 8]],
-    [[7, 9], [8, 9], [9, 9], [10, 9], [11, 9]],
-    [[7, 10], [8, 10], [9, 10], [10, 10]],
-    [[4, 8], [4, 9], [4, 10]],
-    [[0, 5], [0, 6], [0, 7], [0, 8]],
-    [[14, 5], [14, 6], [14, 7], [14, 8]],
-    [[9, 3], [8, 3], [7, 3], [6, 3], [5, 3]],
-    [[6, 6], [6, 7], [6, 8]],
-    [[8, 6], [8, 7], [8, 8], [8, 9], [8, 10]],
-    [[10, 6], [10, 7], [10, 8]],
-    [[9, 8], [9, 9], [9, 10]],
-    [[5, 9], [6, 9], [7, 9]],
-    [[2, 8], [1, 8], [0, 8]]
+  const segments = [
+    [[6, 0], [6, 12]],
+    [[0, 6], [12, 6]],
+    [[2, 2], [10, 2]],
+    [[2, 10], [10, 10]],
+    [[2, 2], [2, 10]],
+    [[10, 2], [10, 10]],
+    [[4, 4], [8, 4]],
+    [[4, 8], [8, 8]],
+    [[4, 4], [4, 8]],
+    [[8, 4], [8, 8]],
+    [[0, 4], [4, 4]],
+    [[0, 8], [4, 8]],
+    [[12, 4], [8, 4]],
+    [[12, 8], [8, 8]],
+    [[4, 0], [4, 4]],
+    [[8, 0], [8, 4]],
+    [[4, 12], [4, 8]],
+    [[8, 12], [8, 8]],
+    [[0, 4], [0, 8]],
+    [[12, 4], [12, 8]],
+    [[2, 0], [2, 2]],
+    [[10, 0], [10, 2]],
+    [[2, 12], [2, 10]],
+    [[10, 12], [10, 10]],
+    [[0, 2], [2, 2]],
+    [[10, 2], [12, 2]],
+    [[0, 10], [2, 10]],
+    [[10, 10], [12, 10]],
+    [[2, 0], [10, 0]],
+    [[2, 12], [10, 12]],
+    [[0, 2], [0, 4]],
+    [[0, 8], [0, 10]],
+    [[12, 2], [12, 4]],
+    [[12, 8], [12, 10]]
   ];
 
-  streetPaths.forEach(addPath);
+  segments.forEach(([start, end]) => addSegment(start, end));
+
+  const pivotNodes = [
+    [6, 6],
+    [6, 4],
+    [6, 8],
+    [4, 6],
+    [8, 6],
+    [4, 2],
+    [8, 2],
+    [4, 10],
+    [8, 10],
+    [2, 4],
+    [10, 4],
+    [2, 8],
+    [10, 8]
+  ];
+  pivotNodes.forEach(([x, y]) => ensureNode(x, y));
 
   const locationBindings = [
     {
-      id: 'central_plaza',
+      id: 'central_sanctum',
+      name: 'Алтарь Путей',
+      iconId: 'star',
+      type: 'stronghold',
+      anchor: '6,6',
+      description: 'Центральный узел лабиринта DarkSwords, где сходятся все ритуальные тропы и звёздные линии.',
+      levelRange: [12, 14],
+      threat: 15,
+      encounterChance: 0.42,
+      points: ['Часовая спираль', 'Зал картографов', 'Круг стражей'],
       nodes: [
-        [7, 5],
-        [6, 5],
-        [8, 5],
-        [7, 4],
-        [7, 6],
-        [6, 4],
-        [8, 4],
         [6, 6],
-        [8, 6],
-        [5, 5],
-        [9, 5],
-        [6, 3],
-        [7, 3],
-        [8, 3],
-        [5, 4],
+        [6, 5],
+        [6, 7],
         [5, 6],
-        [9, 4],
-        [9, 6]
-      ],
-      anchor: '7,5'
+        [7, 6],
+        [5, 5],
+        [7, 5],
+        [5, 7],
+        [7, 7]
+      ]
     },
     {
-      id: 'market_arcade',
+      id: 'north_anchor',
+      name: 'Северный якорь',
+      iconId: 'anchor',
+      type: 'stronghold',
+      anchor: '6,1',
+      description: 'Подъём к морским воротам, где древний якорь удерживает лабиринт от разрыва.',
+      levelRange: [10, 13],
+      threat: 12,
+      encounterChance: 0.34,
+      points: ['Пост дозора', 'Швартовый круг'],
       nodes: [
-        [4, 5],
-        [3, 5],
-        [2, 5],
-        [1, 5],
-        [0, 5],
-        [3, 4],
-        [2, 4],
-        [1, 4],
-        [3, 6],
-        [2, 6],
-        [1, 6],
-        [2, 3],
-        [1, 3],
-        [3, 7],
-        [3, 8],
-        [2, 7],
-        [2, 8],
-        [1, 7],
-        [1, 8],
-        [0, 7],
-        [0, 8]
-      ],
-      anchor: '2,5'
+        [6, 0],
+        [6, 1],
+        [6, 2],
+        [6, 3]
+      ]
     },
     {
-      id: 'noble_heights',
+      id: 'sunward_court',
+      name: 'Зал Рассвета',
+      iconId: 'sun',
+      type: 'treasure',
+      anchor: '3,3',
+      description: 'Солнечный атриум, наполняющийся энергией по утрам. Здесь прячутся хранители рассветных ключей.',
+      levelRange: [11, 13],
+      threat: 12,
+      encounterChance: 0.36,
+      points: ['Фокусный обелиск', 'Сад лучей'],
+      nodes: [
+        [2, 2],
+        [3, 2],
+        [4, 2],
+        [2, 3],
+        [3, 3],
+        [2, 4]
+      ]
+    },
+    {
+      id: 'lunar_observatory',
+      name: 'Лунный Обзорник',
+      iconId: 'moon',
+      type: 'treasure',
+      anchor: '9,3',
+      description: 'Под куполом из синего стекла маги отслеживают фазы луны и передвижение ночных тварей.',
+      levelRange: [11, 14],
+      threat: 13,
+      encounterChance: 0.38,
+      points: ['Гироскоп звёзд', 'Павильон ночи'],
+      nodes: [
+        [10, 2],
+        [9, 2],
+        [8, 2],
+        [10, 3],
+        [9, 3],
+        [10, 4]
+      ]
+    },
+    {
+      id: 'crystal_ward',
+      name: 'Кристальный караул',
+      iconId: 'crystal',
+      type: 'encounter',
+      anchor: '6,3',
+      description: 'Перекрёсток, выложенный осколками льда. Здесь активны патрули из ледяных стражей.',
+      levelRange: [11, 13],
+      threat: 12,
+      encounterChance: 0.4,
+      points: ['Сторожевая глыба', 'Хранилище инея'],
       nodes: [
         [6, 2],
-        [7, 2],
-        [8, 2],
-        [9, 2],
-        [10, 2],
-        [11, 2],
-        [6, 1],
-        [7, 1],
-        [8, 1],
-        [9, 1],
-        [7, 0],
-        [8, 0],
         [6, 3],
-        [7, 3],
-        [8, 3],
-        [9, 3],
         [5, 2],
-        [5, 3]
-      ],
-      anchor: '7,2'
+        [7, 2],
+        [5, 3],
+        [7, 3]
+      ]
     },
     {
-      id: 'wardens_bastion',
+      id: 'scroll_archive',
+      name: 'Свитковый архив',
+      iconId: 'scroll',
+      type: 'treasure',
+      anchor: '3,4',
+      description: 'Запылённые хранилища знаний легиона. В свитках скрыты маршруты и тайные переходы.',
+      levelRange: [10, 12],
+      threat: 11,
+      encounterChance: 0.32,
+      points: ['Руническая галерея', 'Сектор карт'],
       nodes: [
-        [10, 5],
-        [11, 5],
-        [12, 5],
-        [13, 5],
-        [14, 5],
-        [11, 6],
-        [12, 6],
-        [13, 6],
-        [14, 6],
-        [11, 7],
-        [12, 7],
-        [13, 7],
-        [14, 7],
-        [11, 8],
-        [12, 8],
-        [13, 8],
-        [14, 8],
-        [12, 9],
-        [12, 10],
-        [11, 9],
-        [11, 10],
-        [13, 9]
-      ],
-      anchor: '12,6'
+        [4, 4],
+        [3, 4],
+        [2, 4],
+        [4, 5],
+        [3, 5]
+      ]
     },
     {
-      id: 'harbor_gates',
+      id: 'chalice_pavilion',
+      name: 'Павильон Чаши',
+      iconId: 'chalice',
+      type: 'treasure',
+      anchor: '9,4',
+      description: 'Зал, где вечно бурлит ритуальная чаша. Служители предлагают благословения за редкие трофеи.',
+      levelRange: [11, 13],
+      threat: 12,
+      encounterChance: 0.35,
+      points: ['Хранилище нектара', 'Коло благословения'],
       nodes: [
-        [7, 7],
-        [7, 8],
-        [7, 9],
-        [7, 10],
-        [6, 7],
-        [6, 8],
-        [6, 9],
-        [5, 7],
-        [5, 8],
-        [5, 9],
-        [4, 7],
-        [4, 8],
-        [4, 9],
-        [4, 10],
-        [8, 8],
-        [9, 8],
-        [10, 8],
-        [11, 8],
-        [12, 8],
-        [13, 8],
+        [8, 4],
+        [9, 4],
+        [10, 4],
+        [8, 5],
+        [9, 5]
+      ]
+    },
+    {
+      id: 'gauntlet_hall',
+      name: 'Зал Перчатки',
+      iconId: 'gauntlet',
+      type: 'encounter',
+      anchor: '3,6',
+      description: 'Тренировочная арена, где легионеры проверяют силу отрядов. Часто устраиваются схватки.',
+      levelRange: [11, 14],
+      threat: 13,
+      encounterChance: 0.43,
+      points: ['Арена испытаний', 'Казарменный коридор'],
+      nodes: [
+        [2, 6],
+        [3, 6],
+        [4, 6],
+        [2, 7],
+        [3, 7],
+        [4, 7]
+      ]
+    },
+    {
+      id: 'ember_sigil',
+      name: 'Сигилл Углей',
+      iconId: 'sigil',
+      type: 'encounter',
+      anchor: '9,6',
+      description: 'Огненный зал, где чародеи запечатывают демонов. Жар и дым скрывают смертельные ловушки.',
+      levelRange: [12, 15],
+      threat: 14,
+      encounterChance: 0.45,
+      points: ['Ритуальная печать', 'Зал угольных ковшей'],
+      nodes: [
+        [8, 6],
+        [9, 6],
+        [10, 6],
+        [8, 7],
+        [9, 7],
+        [10, 7]
+      ]
+    },
+    {
+      id: 'key_vault',
+      name: 'Хранилище ключей',
+      iconId: 'key',
+      type: 'treasure',
+      anchor: '3,9',
+      description: 'Комната с подвесными замками. Каждый ключ открывает новую ветку лабиринта.',
+      levelRange: [10, 12],
+      threat: 11,
+      encounterChance: 0.33,
+      points: ['Круг замков', 'Рунный порог'],
+      nodes: [
+        [2, 9],
+        [3, 9],
+        [2, 10],
+        [3, 10]
+      ]
+    },
+    {
+      id: 'coin_exchange',
+      name: 'Меновая биржа',
+      iconId: 'coin',
+      type: 'treasure',
+      anchor: '9,9',
+      description: 'Здесь обменивают экспедиционные жетоны. Контролируется жадной гильдией сборщиков.',
+      levelRange: [10, 13],
+      threat: 12,
+      encounterChance: 0.34,
+      points: ['Зал торгов', 'Купеческий сейф'],
+      nodes: [
         [8, 9],
         [9, 9],
         [10, 9],
-        [11, 9],
         [8, 10],
         [9, 10],
         [10, 10]
-      ],
-      anchor: '7,8'
+      ]
+    },
+    {
+      id: 'southern_portal_west',
+      name: 'Западный портал',
+      iconId: 'portal',
+      type: 'stronghold',
+      anchor: '3,12',
+      description: 'Один из трёх порталов выхода из лабиринта. Считается нестабильным и капризным.',
+      levelRange: [11, 13],
+      threat: 13,
+      encounterChance: 0.37,
+      points: ['Щитовый мостик'],
+      nodes: [
+        [2, 12],
+        [3, 12],
+        [4, 12],
+        [2, 11],
+        [3, 11]
+      ]
+    },
+    {
+      id: 'southern_portal_central',
+      name: 'Центральный портал',
+      iconId: 'portal',
+      type: 'stronghold',
+      anchor: '6,11',
+      description: 'Главный выход, синхронизированный с Алтарём Путей. Здесь сосредоточены сигнальные башни.',
+      levelRange: [12, 14],
+      threat: 14,
+      encounterChance: 0.4,
+      points: ['Командная башня', 'Часовой переход'],
+      nodes: [
+        [6, 10],
+        [6, 11],
+        [6, 12],
+        [5, 11],
+        [7, 11]
+      ]
+    },
+    {
+      id: 'southern_portal_east',
+      name: 'Восточный портал',
+      iconId: 'portal',
+      type: 'stronghold',
+      anchor: '9,12',
+      description: 'Портал в доки и нижние кварталы. Часто охотничьи отряды начинают путь отсюда.',
+      levelRange: [11, 13],
+      threat: 13,
+      encounterChance: 0.37,
+      points: ['Плац отряда', 'Шлюзовая комната'],
+      nodes: [
+        [8, 12],
+        [9, 12],
+        [10, 12],
+        [8, 11],
+        [9, 11]
+      ]
     }
   ];
 
   locationBindings.forEach((binding) => {
     const location = gameData.locationIndex.get(binding.id);
-    if (!location) return;
-    const [minLevel, maxLevel] = location.levelRange ?? [1, 1];
-    const baseThreat = Math.round((minLevel + maxLevel) / 2 + (location.threatRating ?? 0) * 2);
-    const encounterChance = Math.min(0.9, 0.24 + (location.threatRating ?? 1) * 0.1);
+    const [minLevel, maxLevel] = binding.levelRange ?? location?.levelRange ?? [10, 12];
+    const threatRating = binding.threat ?? location?.threatRating ?? Math.round((minLevel + maxLevel) / 2);
+    const encounterChance = binding.encounterChance ?? Math.min(0.9, 0.24 + (location?.threatRating ?? 1) * 0.08);
+    const locationName = binding.name ?? location?.name ?? 'Локация';
     binding.nodes.forEach(([x, y], index) => {
       const node = ensureNode(x, y);
       const key = `${x},${y}`;
       node.locationId = binding.id;
-      node.sector = location.sector;
-      node.levelRange = location.levelRange;
-      node.threat = baseThreat;
+      node.levelRange = binding.levelRange ?? location?.levelRange ?? node.levelRange;
+      node.threat = binding.threat ?? threatRating;
       node.encounterChance = encounterChance;
-      const poi = location.pointsOfInterest?.[index % (location.pointsOfInterest.length || 1)] ?? null;
-      const travelEvent = location.travelEvents?.[index % (location.travelEvents.length || 1)] ?? null;
-      node.type = key === binding.anchor ? 'stronghold' : node.type === 'treasure' ? 'treasure' : 'encounter';
-      const intelParts = [location.description];
-      if (poi) intelParts.push(`Точка интереса: ${poi}.`);
-      if (travelEvent?.description) intelParts.push(`Событие: ${travelEvent.description}`);
-      node.intel = intelParts.join(' ');
-      node.name = key === binding.anchor ? location.name : `${location.name} · ${poi ?? 'Квартал'}`;
+      node.sector = location?.sector ?? node.sector;
+      const poiSource = binding.points?.length ? binding.points : location?.pointsOfInterest ?? [];
+      const poi = poiSource[index % (poiSource.length || 1)] ?? null;
+      const description = binding.description ?? location?.description ?? '';
+      node.intel = [description, poi ? `Точка интереса: ${poi}.` : '']
+        .filter(Boolean)
+        .join(' ');
+      if (key === binding.anchor) {
+        node.type = binding.type ?? 'stronghold';
+        node.iconId = binding.iconId ?? null;
+        node.name = locationName;
+      } else {
+        node.type = node.type === 'treasure' ? 'treasure' : 'step';
+        node.name = poi ? `${locationName} · ${poi}` : `${locationName} · Коридор`;
+        if (node.iconId && node.iconId === binding.iconId && key !== binding.anchor) {
+          node.iconId = null;
+        }
+      }
     });
   });
-
-  const plaza = ensureNode(7, 5);
-  plaza.type = 'stronghold';
-  plaza.name = 'Сердце Серого Города';
-  plaza.intel = 'Главная площадь с обсидиановым монолитом и штабом городского гарнизона.';
-  plaza.threat = 12;
-  plaza.levelRange = [10, 12];
-  plaza.encounterChance = 0.42;
-
-  const councilHall = ensureNode(6, 4);
-  councilHall.name = 'Зал совета';
-  councilHall.intel = 'В зале собираются архонты, отчёты и миссии обновляются каждый час.';
-  councilHall.encounterChance = 0.33;
-
-  const marketHub = ensureNode(2, 6);
-  marketHub.name = 'Караванный перекрёсток';
-  marketHub.intel = 'Через перекрёсток проходят торговые караваны, здесь часты засады карманников.';
-  marketHub.encounterChance = 0.38;
-
-  const harborCache = ensureNode(12, 8);
-  harborCache.type = 'treasure';
-  harborCache.name = 'Склад эфира';
-  harborCache.intel = 'Охраняемый склад с запечатанными кристаллами. Высокий риск налёта контрабандистов.';
-  harborCache.encounterChance = 0.41;
-
-  const northGate = ensureNode(7, 0);
-  northGate.type = 'stronghold';
-  northGate.name = 'Северные ворота';
-  northGate.intel = 'Проход к террасам знати. Стража тщательно проверяет пропуска.';
-  northGate.encounterChance = 0.28;
-
-  const westGate = ensureNode(0, 6);
-  westGate.type = 'stronghold';
-  westGate.name = 'Западная арка';
-  westGate.intel = 'Контрольный пункт торговых аркад. Охрана ищет поддельные печати.';
-  westGate.encounterChance = 0.32;
-
-  const eastGate = ensureNode(14, 6);
-  eastGate.type = 'stronghold';
-  eastGate.name = 'Бастионы Стражей';
-  eastGate.intel = 'Тяжёлые ворота бастиона. Отсюда выдвигаются манипулы стражи.';
-  eastGate.encounterChance = 0.37;
-
-  const southGate = ensureNode(7, 10);
-  southGate.type = 'stronghold';
-  southGate.name = 'Южные доки';
-  southGate.intel = 'Спуск к пристаням и каналам. Ночные рейды происходят каждую смену.';
-  southGate.encounterChance = 0.4;
 
   mapState.nodes.forEach((node) => {
     if (!node.levelRange) {
@@ -4016,7 +4513,7 @@ function buildLabyrinth() {
       node.encounterChance = 0.3;
     }
     if (!node.name) {
-      node.name = `Улица [${String(node.x + 1).padStart(2, '0')}:${String(node.y + 1).padStart(2, '0')}]`;
+      node.name = `Ход [${String(node.x + 1).padStart(2, '0')}:${String(node.y + 1).padStart(2, '0')}]`;
     }
     node.neighbors = [];
   });
@@ -4055,127 +4552,69 @@ function drawMap() {
   const { width, height } = mapCanvas;
   mapContext.clearRect(0, 0, width, height);
 
-  const baseGradient = mapContext.createLinearGradient(0, 0, width, height);
-  baseGradient.addColorStop(0, '#171c27');
-  baseGradient.addColorStop(1, '#2f3345');
-  mapContext.fillStyle = baseGradient;
+  mapContext.fillStyle = '#9fd3d9';
   mapContext.fillRect(0, 0, width, height);
 
   const spacingX = width / (mapConfig.cols - 1);
   const spacingY = height / (mapConfig.rows - 1);
+  const corridorWidth = Math.max(spacingX, spacingY) * 0.7;
 
-  const drawRect = (x0, y0, x1, y1, color) => {
-    const x = x0 * spacingX;
-    const y = y0 * spacingY;
-    const w = (x1 - x0) * spacingX;
-    const h = (y1 - y0) * spacingY;
-    mapContext.fillStyle = color;
-    mapContext.fillRect(x, y, w, h);
-  };
-
-  const districtRects = [
-    { x0: 4.2, y0: 3.2, x1: 10.2, y1: 7.1, color: 'rgba(247, 209, 140, 0.16)' },
-    { x0: 0.05, y0: 2.1, x1: 4.6, y1: 8.4, color: 'rgba(88, 122, 173, 0.18)' },
-    { x0: 4.3, y0: 0.1, x1: 11.2, y1: 3.5, color: 'rgba(102, 134, 192, 0.16)' },
-    { x0: 9.6, y0: 3.2, x1: 14.5, y1: 8.6, color: 'rgba(140, 108, 186, 0.18)' },
-    { x0: 4.0, y0: 6.1, x1: 13.8, y1: 10.8, color: 'rgba(70, 124, 154, 0.18)' }
-  ];
-  districtRects.forEach((rect) => drawRect(rect.x0, rect.y0, rect.x1, rect.y1, rect.color));
-
-  const plazaCenter = gridToPixel(7, 5);
-  const plazaRadius = Math.max(spacingX, spacingY) * 2.05;
-  mapContext.beginPath();
-  mapContext.fillStyle = 'rgba(255, 214, 150, 0.28)';
-  mapContext.arc(plazaCenter.x, plazaCenter.y, plazaRadius, 0, Math.PI * 2);
-  mapContext.fill();
-  mapContext.lineWidth = Math.max(spacingX, spacingY) * 0.18;
-  mapContext.strokeStyle = 'rgba(255, 238, 190, 0.45)';
-  mapContext.stroke();
-
-  const harbor = { x0: 8.25, y0: 7.1, x1: 14.6, y1: 10.9 };
-  const hx = harbor.x0 * spacingX;
-  const hy = harbor.y0 * spacingY;
-  const hw = (harbor.x1 - harbor.x0) * spacingX;
-  const hh = (harbor.y1 - harbor.y0) * spacingY;
-  const waterGradient = mapContext.createLinearGradient(hx, hy, hx, hy + hh);
-  waterGradient.addColorStop(0, 'rgba(38, 92, 140, 0.72)');
-  waterGradient.addColorStop(1, 'rgba(18, 54, 88, 0.88)');
-  mapContext.fillStyle = waterGradient;
-  mapContext.fillRect(hx, hy, hw, hh);
-  mapContext.fillStyle = 'rgba(196, 168, 120, 0.56)';
-  for (let i = 0; i < 4; i += 1) {
-    const px = (9 + i * 1.05) * spacingX;
-    mapContext.fillRect(px, hy - spacingY * 0.2, spacingX * 0.38, hh + spacingY * 0.6);
-  }
-
-  const buildingBlocks = [
-    { x0: 0.4, y0: 2.5, x1: 1.6, y1: 3.6 },
-    { x0: 1.8, y0: 2.2, x1: 3.2, y1: 3.6 },
-    { x0: 0.6, y0: 4.2, x1: 2.2, y1: 5.5 },
-    { x0: 0.5, y0: 6.2, x1: 2.1, y1: 7.6 },
-    { x0: 4.6, y0: 0.4, x1: 5.9, y1: 1.5 },
-    { x0: 6.2, y0: 0.35, x1: 7.7, y1: 1.4 },
-    { x0: 8.0, y0: 0.45, x1: 9.6, y1: 1.6 },
-    { x0: 10.3, y0: 2.5, x1: 11.8, y1: 3.9 },
-    { x0: 10.7, y0: 5.6, x1: 11.8, y1: 6.8 },
-    { x0: 12.3, y0: 5.5, x1: 13.7, y1: 6.9 },
-    { x0: 5.2, y0: 7.3, x1: 6.4, y1: 8.4 },
-    { x0: 9.1, y0: 8.7, x1: 10.2, y1: 9.6 }
-  ];
-  buildingBlocks.forEach((block) => {
-    const x = block.x0 * spacingX;
-    const y = block.y0 * spacingY;
-    const w = (block.x1 - block.x0) * spacingX;
-    const h = (block.y1 - block.y0) * spacingY;
-    mapContext.fillStyle = 'rgba(18, 22, 32, 0.86)';
-    mapContext.fillRect(x, y, w, h);
-    mapContext.strokeStyle = 'rgba(230, 205, 156, 0.18)';
-    mapContext.lineWidth = Math.max(spacingX, spacingY) * 0.06;
-    mapContext.strokeRect(x, y, w, h);
-  });
-
-  const drawRoadNetwork = (lineWidth, color) => {
-    mapContext.strokeStyle = color;
-    mapContext.lineWidth = lineWidth;
-    mapContext.lineCap = 'round';
-    mapState.nodes.forEach((node) => {
-      const { x, y } = gridToPixel(node.x, node.y);
-      node.neighbors.forEach((neighborKey) => {
-        const neighbor = mapState.nodes.get(neighborKey);
-        if (!neighbor) return;
-        if (neighbor.x < node.x || neighbor.y < node.y) return;
-        const { x: nx, y: ny } = gridToPixel(neighbor.x, neighbor.y);
-        mapContext.beginPath();
-        mapContext.moveTo(x, y);
-        mapContext.lineTo(nx, ny);
-        mapContext.stroke();
+  const edges = [];
+  const seenEdges = new Set();
+  mapState.nodes.forEach((node) => {
+    node.neighbors.forEach((neighborKey) => {
+      const neighbor = mapState.nodes.get(neighborKey);
+      if (!neighbor) return;
+      const edgeKey = node.key < neighbor.key ? `${node.key}|${neighbor.key}` : `${neighbor.key}|${node.key}`;
+      if (seenEdges.has(edgeKey)) return;
+      seenEdges.add(edgeKey);
+      edges.push({
+        from: gridToPixel(node.x, node.y),
+        to: gridToPixel(neighbor.x, neighbor.y)
       });
     });
+  });
+
+  const drawEdges = (color, width) => {
+    mapContext.save();
+    mapContext.strokeStyle = color;
+    mapContext.lineWidth = width;
+    mapContext.lineCap = 'round';
+    mapContext.lineJoin = 'round';
+    mapContext.beginPath();
+    edges.forEach(({ from, to }) => {
+      mapContext.moveTo(from.x, from.y);
+      mapContext.lineTo(to.x, to.y);
+    });
+    mapContext.stroke();
+    mapContext.restore();
   };
 
-  const majorWidth = Math.max(spacingX, spacingY) * 0.42;
-  drawRoadNetwork(majorWidth, 'rgba(223, 198, 146, 0.68)');
-  drawRoadNetwork(Math.max(spacingX, spacingY) * 0.14, 'rgba(46, 42, 38, 0.82)');
-  drawRoadNetwork(Math.max(spacingX, spacingY) * 0.05, 'rgba(255, 255, 255, 0.08)');
+  drawEdges('rgba(247, 222, 183, 0.95)', corridorWidth);
+  drawEdges('rgba(102, 68, 46, 0.6)', corridorWidth * 0.34);
+  drawEdges('rgba(255, 255, 255, 0.18)', corridorWidth * 0.18);
 
-  mapContext.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-  mapContext.lineWidth = 1;
-  mapContext.beginPath();
-  for (let c = 0; c < mapConfig.cols; c += 1) {
-    const x = c * spacingX;
-    mapContext.moveTo(x, 0);
-    mapContext.lineTo(x, height);
-  }
-  for (let r = 0; r < mapConfig.rows; r += 1) {
-    const y = r * spacingY;
-    mapContext.moveTo(0, y);
-    mapContext.lineTo(width, y);
-  }
-  mapContext.stroke();
+  const nodeRadiusBase = Math.max(spacingX, spacingY) * 0.36;
+  mapState.nodes.forEach((node) => {
+    const { x, y } = gridToPixel(node.x, node.y);
+    const radius = node.iconId ? nodeRadiusBase * 1.45 : nodeRadiusBase;
+    mapContext.beginPath();
+    mapContext.fillStyle = node.iconId ? 'rgba(255, 241, 208, 0.95)' : 'rgba(244, 224, 188, 0.8)';
+    mapContext.strokeStyle = node.iconId ? 'rgba(112, 74, 54, 0.85)' : 'rgba(108, 74, 52, 0.55)';
+    mapContext.lineWidth = Math.max(spacingX, spacingY) * 0.14;
+    mapContext.arc(x, y, radius, 0, Math.PI * 2);
+    mapContext.fill();
+    mapContext.stroke();
+  });
 
-  mapContext.strokeStyle = 'rgba(245, 214, 162, 0.3)';
+  mapContext.save();
+  mapContext.strokeStyle = 'rgba(64, 98, 108, 0.65)';
+  mapContext.lineWidth = Math.max(spacingX, spacingY) * 0.2;
+  mapContext.strokeRect(spacingX * 0.55, spacingY * 0.55, width - spacingX * 1.1, height - spacingY * 1.1);
+  mapContext.strokeStyle = 'rgba(255, 255, 255, 0.24)';
   mapContext.lineWidth = Math.max(spacingX, spacingY) * 0.08;
-  mapContext.strokeRect(spacingX * 0.35, spacingY * 0.35, width - spacingX * 0.7, height - spacingY * 0.7);
+  mapContext.strokeRect(spacingX * 0.4, spacingY * 0.4, width - spacingX * 0.8, height - spacingY * 0.8);
+  mapContext.restore();
 }
 
 function renderNodes() {
@@ -4190,6 +4629,10 @@ function renderNodes() {
     if (node.locationId) {
       element.dataset.location = node.locationId;
     }
+    if (node.iconId) {
+      element.classList.add('map-node--landmark');
+      element.dataset.iconId = node.iconId;
+    }
     const { x, y } = gridToPixel(node.x, node.y);
     element.style.left = `${x}px`;
     element.style.top = `${y}px`;
@@ -4201,6 +4644,17 @@ function renderNodes() {
     }
     details.push(`Угроза: ${node.threat}`);
     element.title = details.join('\n');
+    element.setAttribute('aria-label', label);
+    if (node.iconId) {
+      const icon = document.createElement('img');
+      icon.src = `assets/map/${node.iconId}.svg`;
+      icon.alt = '';
+      icon.decoding = 'async';
+      icon.loading = 'lazy';
+      icon.draggable = false;
+      icon.setAttribute('aria-hidden', 'true');
+      element.append(icon);
+    }
     element.addEventListener('click', () => attemptMove(node));
     mapOverlay.append(element);
     node.element = element;
