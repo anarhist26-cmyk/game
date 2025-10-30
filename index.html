@@ -41,37 +41,6 @@
         </aside>
 
         <div class="client-main">
-          <header class="main-header" aria-label="Статус героя">
-            <div class="header-left">
-              <div class="resource-bars">
-                <div class="resource-bar">
-                  <label for="health-bar">HP</label>
-                  <div class="resource-bar__track">
-                    <div id="health-bar" class="resource-bar__value resource-bar__value--hp" data-bar="player-hp" data-current="450" data-max="600" style="--value:0.75"></div>
-                    <span class="resource-bar__text" data-bar-text="player-hp">450 / 600</span>
-                  </div>
-                </div>
-                <div class="resource-bar">
-                  <label for="mana-bar">MP</label>
-                  <div class="resource-bar__track">
-                    <div id="mana-bar" class="resource-bar__value resource-bar__value--mp" data-bar="player-mp" data-current="280" data-max="350" style="--value:0.8"></div>
-                    <span class="resource-bar__text" data-bar-text="player-mp">280 / 350</span>
-                  </div>
-                </div>
-                <div class="resource-bar">
-                  <label for="xp-bar">XP</label>
-                  <div class="resource-bar__track">
-                    <div id="xp-bar" class="resource-bar__value resource-bar__value--xp" data-bar="player-xp" data-current="2400" data-max="3000" style="--value:0.8"></div>
-                    <span class="resource-bar__text" data-bar-text="player-xp">2 400 / 3 000</span>
-                  </div>
-                </div>
-              </div>
-              <dl class="statline">
-                <div><dt>Золото</dt><dd id="player-gold">1 250</dd></div>
-              </dl>
-            </div>
-          </header>
-
           <section class="main-top" aria-label="Карта и разведданные">
             <aside class="intel-panel">
               <div class="intel-section">
@@ -135,6 +104,37 @@
               </div>
             </div>
           </section>
+
+          <header class="main-header" aria-label="Статус героя">
+            <div class="header-left">
+              <div class="resource-bars">
+                <div class="resource-bar">
+                  <label for="health-bar">HP</label>
+                  <div class="resource-bar__track">
+                    <div id="health-bar" class="resource-bar__value resource-bar__value--hp" data-bar="player-hp" data-current="450" data-max="600" style="--value:0.75"></div>
+                    <span class="resource-bar__text" data-bar-text="player-hp">450 / 600</span>
+                  </div>
+                </div>
+                <div class="resource-bar">
+                  <label for="mana-bar">MP</label>
+                  <div class="resource-bar__track">
+                    <div id="mana-bar" class="resource-bar__value resource-bar__value--mp" data-bar="player-mp" data-current="280" data-max="350" style="--value:0.8"></div>
+                    <span class="resource-bar__text" data-bar-text="player-mp">280 / 350</span>
+                  </div>
+                </div>
+                <div class="resource-bar">
+                  <label for="xp-bar">XP</label>
+                  <div class="resource-bar__track">
+                    <div id="xp-bar" class="resource-bar__value resource-bar__value--xp" data-bar="player-xp" data-current="2400" data-max="3000" style="--value:0.8"></div>
+                    <span class="resource-bar__text" data-bar-text="player-xp">2 400 / 3 000</span>
+                  </div>
+                </div>
+              </div>
+              <dl class="statline">
+                <div><dt>Золото</dt><dd id="player-gold">1 250</dd></div>
+              </dl>
+            </div>
+          </header>
 
           <section class="main-log" aria-label="Журнал и чат">
             <header class="log-header">
